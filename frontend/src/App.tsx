@@ -1,22 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle2,
-  Columns2,
-  Cpu,
-  Database,
-  FileSpreadsheet,
-  GitBranch,
-  History,
-  Layers,
-  Maximize2,
-  Play,
-  Settings,
-  Workflow,
-  X,
-} from "lucide-react";
+import { Columns2, Maximize2, Play, Workflow, X } from "lucide-react";
 import { apiClient, ApiClientError } from "./api/client";
 import { WorkflowCanvas } from "./components/canvas/WorkflowCanvas";
 import type {
@@ -40,19 +24,19 @@ import { SettingsView } from "./views/SettingsView";
 import { StructuralDiffView } from "./views/StructuralDiffView";
 import { TensorExplorerView } from "./views/TensorExplorerView";
 
-const NAV_ITEMS: Array<{ id: ViewId; label: string; icon: React.ReactNode }> = [
-  { id: "dashboard", label: "Node Graph Canvas", icon: <Workflow size={17} /> },
-  { id: "compare", label: "Queue Comparison", icon: <Play size={16} /> },
-  { id: "compatibility", label: "Compatibility Gate", icon: <CheckCircle2 size={16} /> },
-  { id: "tensors", label: "Tensor Explorer", icon: <Database size={16} /> },
-  { id: "structural", label: "Structural Topology", icon: <GitBranch size={16} /> },
-  { id: "layers", label: "Layer & GQA Heatmap", icon: <Layers size={16} /> },
-  { id: "activations", label: "Activation CKA Scope", icon: <Activity size={16} /> },
-  { id: "behavioral", label: "Behavioral Harness", icon: <Cpu size={16} /> },
-  { id: "regression", label: "Regression Gate", icon: <AlertTriangle size={16} /> },
-  { id: "history", label: "Experiment History", icon: <History size={16} /> },
-  { id: "reports", label: "Report Exporter", icon: <FileSpreadsheet size={16} /> },
-  { id: "settings", label: "Studio Settings", icon: <Settings size={16} /> },
+const NAV_ITEMS: Array<{ id: ViewId; short: string; title: string }> = [
+  { id: "dashboard", short: "Canvas", title: "Workflow Graph" },
+  { id: "compare", short: "Compare", title: "Configure Comparison" },
+  { id: "compatibility", short: "Validate", title: "Compatibility Check" },
+  { id: "tensors", short: "Tensors", title: "Tensor Explorer" },
+  { id: "structural", short: "Topology", title: "Structural Topology" },
+  { id: "layers", short: "Layers", title: "Layer & Head Analysis" },
+  { id: "activations", short: "Activations", title: "Activation & Linear CKA" },
+  { id: "behavioral", short: "Behavior", title: "Behavioral Evaluation" },
+  { id: "regression", short: "Regression", title: "Regression Gate" },
+  { id: "history", short: "History", title: "Experiment Ledger" },
+  { id: "reports", short: "Export", title: "Reports & Artifacts" },
+  { id: "settings", short: "Settings", title: "Runtime Settings" },
 ];
 
 export const App: React.FC = () => {
@@ -144,357 +128,314 @@ export const App: React.FC = () => {
 
   return (
     <div className="studio-viewport">
-      {/* 1. Full-Viewport ComfyUI Interactive Node-Graph Canvas */}
-      <div className="studio-canvas-layer">
-        <WorkflowCanvas
-          activeBundle={activeBundle}
-          health={health}
-          experiments={experiments}
-          modelA={modelA}
-          modelB={modelB}
-          activeView={activeView}
-          onSelectView={setActiveView}
-        />
-      </div>
-
-      {/* 2. Left ComfyUI Compact Icon Rail with Liquid Spring Pill */}
-      <aside className="comfy-left-rail" aria-label="Studio Node & Inspector Dock">
-        <div className="rail-group">
-          {NAV_ITEMS.slice(0, 9).map((item) => {
-            const isActive = activeView === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                data-testid={`nav-${item.id}`}
-                title={item.label}
-                aria-label={item.label}
-                className={`rail-btn ${isActive ? "active" : ""}`}
-                onClick={() => setActiveView(item.id)}
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="comfy-rail-pill"
-                    className="rail-active-pill"
-                    transition={{ type: "spring", stiffness: 460, damping: 34, mass: 0.8 }}
-                  />
-                )}
-                <span className="rail-icon-fg">{item.icon}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="rail-group" style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: 8 }}>
-          {NAV_ITEMS.slice(9).map((item) => {
-            const isActive = activeView === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                data-testid={`nav-${item.id}`}
-                title={item.label}
-                aria-label={item.label}
-                className={`rail-btn ${isActive ? "active" : ""}`}
-                onClick={() => setActiveView(item.id)}
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="comfy-rail-pill"
-                    className="rail-active-pill"
-                    transition={{ type: "spring", stiffness: 460, damping: 34, mass: 0.8 }}
-                  />
-                )}
-                <span className="rail-icon-fg">{item.icon}</span>
-              </button>
-            );
-          })}
-        </div>
-      </aside>
-
-      {/* 3. Floating Top ComfyUI Action & Queue Bar */}
-      <header className="comfy-topbar">
-        <div className="comfy-bar-cluster">
-          <div className="studio-brand">
-            <div className="studio-logo-mark">
-              <Workflow size={15} />
-            </div>
-            <div>
-              <div className="studio-brand-title">NEURAL DIFF</div>
-              <div className="studio-brand-sub">
-                NODES 2.0 STUDIO • v{health?.version ?? "0.1.0"}
-              </div>
-            </div>
-          </div>
-
-          <span className="badge badge-ok">
-            {health ? `BACKEND ONLINE (${health.device.toUpperCase()})` : "CONNECTING"}
-          </span>
-
-          <div className="mode-segmented">
-            <button
-              type="button"
-              className={`mode-seg-btn ${activeView === "dashboard" ? "active" : ""}`}
-              onClick={() => setActiveView("dashboard")}
-            >
-              {activeView === "dashboard" && (
-                <motion.span layoutId="studio-mode-seg" className="mode-seg-pill" />
-              )}
-              <span style={{ position: "relative", zIndex: 1 }}>Graph Canvas</span>
-            </button>
-            <button
-              type="button"
-              className={`mode-seg-btn ${activeView !== "dashboard" ? "active" : ""}`}
-              onClick={() => {
-                if (activeView === "dashboard") setActiveView("tensors");
-              }}
-            >
-              {activeView !== "dashboard" && (
-                <motion.span layoutId="studio-mode-seg" className="mode-seg-pill" />
-              )}
-              <span style={{ position: "relative", zIndex: 1 }}>
-                Inspector: {activeNavMeta?.label ?? "Studio"}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <div className="comfy-bar-cluster">
-          <label
-            htmlFor="active-exp-selector"
-            className="mono"
-            style={{ fontSize: 11, color: "var(--text-muted)" }}
+      {/* Unified Single-Line Studio Header */}
+      <header className="studio-header">
+        <div className="studio-header-left">
+          <button
+            type="button"
+            className="studio-brand"
+            onClick={() => setActiveView("dashboard")}
+            title="Return to Node Graph"
           >
-            RUN:
-          </label>
+            <span className="studio-mark">
+              <Workflow size={13} strokeWidth={2} />
+            </span>
+            <span className="studio-brand-name">Neural Diff</span>
+          </button>
+
+          <span className="studio-divider-v" />
+
+          <div className="studio-telemetry-quiet">
+            <span className={`dot ${health ? "dot-ok" : ""}`} />
+            <span>{health ? "Backend online" : "Connecting"}</span>
+            <span style={{ color: "var(--text-faint)" }}>·</span>
+            <span className="mono" style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {health ? health.device.toUpperCase() : "CUDA:0"}
+            </span>
+          </div>
+        </div>
+
+        {/* Unified Navigation Ribbon with Smooth Spring Pill */}
+        <nav className="studio-nav-ribbon" aria-label="Studio Workspace">
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeView === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                data-testid={`nav-${item.id}`}
+                title={item.title}
+                className={`studio-nav-item ${isActive ? "active" : ""}`}
+                onClick={() => setActiveView(item.id)}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="studio-nav-pill"
+                    className="studio-nav-pill"
+                    transition={{ type: "spring", stiffness: 500, damping: 38, mass: 0.7 }}
+                  />
+                )}
+                <span className="studio-nav-label">{item.short}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="studio-header-right">
           <select
             id="active-exp-selector"
+            aria-label="Active Experiment Run"
             data-testid="active-exp-selector"
+            className="studio-run-select"
             value={activeBundle?.comparison_id ?? ""}
             onChange={(e) => {
               if (e.target.value) void handleSelectExperiment(e.target.value);
             }}
-            style={{ maxWidth: 310, padding: "5px 9px", fontSize: 11.5 }}
           >
-            <option value="">— Select Executed Workflow —</option>
+            <option value="">Select comparison run...</option>
             {experiments
               .filter((e) => e.status === "completed")
               .map((e) => (
                 <option key={e.comparison_id} value={e.comparison_id}>
-                  {e.comparison_id} ({e.model_a_id} → {e.model_b_id})
+                  {e.comparison_id} · {e.model_a_id} → {e.model_b_id}
                 </option>
               ))}
           </select>
 
-          <motion.button
+          <button
             type="button"
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.97 }}
-            className="btn-queue-gold"
+            className="btn-studio-primary"
             onClick={() => setActiveView("compare")}
           >
-            <Play size={12} fill="currentColor" />
-            <span>Queue Diff</span>
-          </motion.button>
+            <Play size={11} fill="currentColor" />
+            <span>New Diff</span>
+          </button>
         </div>
       </header>
 
-      {/* Global Floating Error Toast when on Canvas Mode */}
-      <AnimatePresence>
-        {errorBanner && activeView === "dashboard" && (
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            style={{ position: "absolute", top: 72, right: 20, zIndex: 45, maxWidth: 560 }}
-          >
-            <div className="error-banner" role="alert" data-testid="error-banner">
-              <div>
-                <strong>
-                  [{errorBanner.code}
-                  {errorBanner.status ? ` • HTTP ${errorBanner.status}` : ""}]
-                </strong>{" "}
-                {errorBanner.message}
-              </div>
-              <button
-                className="btn"
-                data-testid="btn-dismiss-error"
-                onClick={() => setErrorBanner(null)}
-              >
-                Dismiss
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 4. Floating HUD Ribbon on Graph Canvas OR Spring-Physics Glass Inspector Dock */}
-      <AnimatePresence>
-        {activeView === "dashboard" ? (
-          <DashboardView
-            key="hud-dashboard"
+      {/* Main ComfyUI Node Graph + Sliding Editorial Sheet */}
+      <div className="studio-body">
+        <div className="studio-canvas-layer">
+          <WorkflowCanvas
+            activeBundle={activeBundle}
             health={health}
             experiments={experiments}
-            activeBundle={activeBundle}
-            onNavigate={setActiveView}
-            onSelectExperiment={(cid) => {
-              void handleSelectExperiment(cid);
-              setActiveView("tensors");
-            }}
+            modelA={modelA}
+            modelB={modelB}
+            activeView={activeView}
+            onSelectView={setActiveView}
           />
-        ) : (
-          <motion.section
-            key="inspector-dock"
-            aria-label="Node Inspector Workbench"
-            className={`inspector-drawer ${drawerExpanded ? "is-expanded" : ""}`}
-            initial={{ opacity: 0, x: 54, scale: 0.985 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 42, scale: 0.985 }}
-            transition={{ type: "spring", stiffness: 390, damping: 34, mass: 0.85 }}
-          >
-            <div className="inspector-drawer-header">
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ color: "var(--gold)", display: "grid" }}>
-                  {activeNavMeta?.icon}
-                </span>
-                <span style={{ fontWeight: 700, fontSize: 14, letterSpacing: "-0.01em" }}>
-                  {activeNavMeta?.label}
-                </span>
-                {activeBundle && (
-                  <span
-                    className={`badge ${
-                      activeBundle.experiment_type === "REAL MODEL EXPERIMENT"
-                        ? "badge-ok"
-                        : "badge-purple"
-                    }`}
-                  >
-                    {activeBundle.experiment_type === "REAL MODEL EXPERIMENT"
-                      ? "REAL MODEL"
-                      : "SYNTHETIC"}
-                  </span>
-                )}
-              </div>
+        </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{ padding: "5px 9px", fontSize: 11.5 }}
-                  onClick={() => setDrawerExpanded((v) => !v)}
-                  title="Toggle Split Canvas vs Expanded Studio Sheet"
-                >
-                  {drawerExpanded ? <Columns2 size={13} /> : <Maximize2 size={13} />}
-                  <span>{drawerExpanded ? "Split Graph" : "Expand"}</span>
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{ padding: "5px 9px", fontSize: 11.5 }}
-                  onClick={() => setActiveView("dashboard")}
-                  title="Return to unobstructed Node Graph Canvas"
-                >
-                  <X size={13} />
-                  <span>Canvas</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="inspector-drawer-scroll">
-              {errorBanner && (
-                <div className="error-banner" role="alert" data-testid="error-banner">
-                  <div>
-                    <strong>
-                      [{errorBanner.code}
-                      {errorBanner.status ? ` • HTTP ${errorBanner.status}` : ""}]
-                    </strong>{" "}
-                    {errorBanner.message}
-                  </div>
-                  <button
-                    className="btn"
-                    data-testid="btn-dismiss-error"
-                    onClick={() => setErrorBanner(null)}
-                  >
-                    Dismiss
-                  </button>
+        {/* Canvas-mode error toast */}
+        <AnimatePresence>
+          {errorBanner && activeView === "dashboard" && (
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              style={{ position: "absolute", top: 16, right: 20, zIndex: 45, maxWidth: 520 }}
+            >
+              <div className="error-banner" role="alert" data-testid="error-banner">
+                <div>
+                  <strong className="mono">
+                    {errorBanner.code}
+                    {errorBanner.status ? ` · ${errorBanner.status}` : ""}
+                  </strong>{" "}
+                  — {errorBanner.message}
                 </div>
-              )}
+                <button
+                  className="btn"
+                  data-testid="btn-dismiss-error"
+                  onClick={() => setErrorBanner(null)}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
+        {/* Either Quiet Canvas Status Strip OR Smooth Sliding Inspector Sheet */}
+        <AnimatePresence>
+          {activeView === "dashboard" ? (
+            <DashboardView
+              key="canvas-status"
+              health={health}
+              experiments={experiments}
+              activeBundle={activeBundle}
+              onNavigate={setActiveView}
+              onSelectExperiment={(cid) => {
+                void handleSelectExperiment(cid);
+                setActiveView("tensors");
+              }}
+            />
+          ) : (
+            <React.Fragment key="inspector-layer">
               <motion.div
-                key={activeView}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="inspector-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+                onClick={() => setActiveView("dashboard")}
+              />
+              <motion.section
+                aria-label="Inspector Sheet"
+                className={`inspector-sheet ${drawerExpanded ? "is-expanded" : ""}`}
+                initial={{ opacity: 0, x: 48 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 36 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               >
-                {activeView === "compare" && (
-                  <ModelComparisonView
-                    discovered={discovered}
-                    baselines={baselines}
-                    modelA={modelA}
-                    modelB={modelB}
-                    onChangeModelA={setModelA}
-                    onChangeModelB={setModelB}
-                    onComparisonComplete={handleComparisonComplete}
-                    onError={handleError}
-                  />
-                )}
-                {activeView === "compatibility" && (
-                  <CompatibilityView
-                    modelA={modelA}
-                    modelB={modelB}
-                    activeBundle={activeBundle}
-                    onChangeModelA={setModelA}
-                    onChangeModelB={setModelB}
-                    onError={handleError}
-                  />
-                )}
-                {activeView === "tensors" && (
-                  <TensorExplorerView activeBundle={activeBundle} onError={handleError} />
-                )}
-                {activeView === "structural" && (
-                  <StructuralDiffView activeBundle={activeBundle} />
-                )}
-                {activeView === "layers" && (
-                  <LayerVisualizationView activeBundle={activeBundle} />
-                )}
-                {activeView === "activations" && (
-                  <ActivationComparisonView activeBundle={activeBundle} />
-                )}
-                {activeView === "behavioral" && (
-                  <BehavioralDiffView activeBundle={activeBundle} />
-                )}
-                {activeView === "regression" && (
-                  <RegressionDashboardView
-                    activeBundle={activeBundle}
-                    baselines={baselines}
-                    onRefreshBaselines={() => void refreshCoreData()}
-                    onError={handleError}
-                  />
-                )}
-                {activeView === "history" && (
-                  <ExperimentHistoryView
-                    experiments={experiments}
-                    activeComparisonId={activeBundle?.comparison_id ?? null}
-                    onSelectExperiment={(cid) => {
-                      void handleSelectExperiment(cid);
-                      setActiveView("tensors");
-                    }}
-                    onRefresh={() => void refreshCoreData()}
-                  />
-                )}
-                {activeView === "reports" && (
-                  <ReportViewerView activeBundle={activeBundle} onError={handleError} />
-                )}
-                {activeView === "settings" && (
-                  <SettingsView
-                    onError={handleError}
-                    onSettingsSaved={() => void refreshCoreData()}
-                  />
-                )}
-              </motion.div>
-            </div>
-          </motion.section>
-        )}
-      </AnimatePresence>
+                <div className="inspector-sheet-header">
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <span className="inspector-sheet-title">
+                      {activeNavMeta?.title ?? "Inspector"}
+                    </span>
+                    {activeBundle && (
+                      <span className="inspector-sheet-meta">
+                        <span
+                          className={`dot ${
+                            activeBundle.experiment_type === "REAL MODEL EXPERIMENT"
+                              ? "dot-ivory"
+                              : ""
+                          }`}
+                        />
+                        <span>
+                          {activeBundle.experiment_type === "REAL MODEL EXPERIMENT"
+                            ? "Real model"
+                            : "Synthetic fixture"}
+                        </span>
+                        <span style={{ color: "var(--text-faint)" }}>·</span>
+                        <span className="mono" style={{ fontSize: 11 }}>
+                          {activeBundle.model_a.model_id} → {activeBundle.model_b.model_id}
+                        </span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => setDrawerExpanded((v) => !v)}
+                      title="Toggle full-width view"
+                    >
+                      {drawerExpanded ? <Columns2 size={13} /> : <Maximize2 size={13} />}
+                      <span>{drawerExpanded ? "Split" : "Full width"}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => setActiveView("dashboard")}
+                      title="Close inspector"
+                    >
+                      <X size={13} />
+                      <span>Close</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="inspector-sheet-scroll">
+                  {errorBanner && (
+                    <div className="error-banner" role="alert" data-testid="error-banner">
+                      <div>
+                        <strong className="mono">
+                          {errorBanner.code}
+                          {errorBanner.status ? ` · ${errorBanner.status}` : ""}
+                        </strong>{" "}
+                        — {errorBanner.message}
+                      </div>
+                      <button
+                        className="btn"
+                        data-testid="btn-dismiss-error"
+                        onClick={() => setErrorBanner(null)}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+
+                  <motion.div
+                    key={activeView}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    {activeView === "compare" && (
+                      <ModelComparisonView
+                        discovered={discovered}
+                        baselines={baselines}
+                        modelA={modelA}
+                        modelB={modelB}
+                        onChangeModelA={setModelA}
+                        onChangeModelB={setModelB}
+                        onComparisonComplete={handleComparisonComplete}
+                        onError={handleError}
+                      />
+                    )}
+                    {activeView === "compatibility" && (
+                      <CompatibilityView
+                        modelA={modelA}
+                        modelB={modelB}
+                        activeBundle={activeBundle}
+                        onChangeModelA={setModelA}
+                        onChangeModelB={setModelB}
+                        onError={handleError}
+                      />
+                    )}
+                    {activeView === "tensors" && (
+                      <TensorExplorerView activeBundle={activeBundle} onError={handleError} />
+                    )}
+                    {activeView === "structural" && (
+                      <StructuralDiffView activeBundle={activeBundle} />
+                    )}
+                    {activeView === "layers" && (
+                      <LayerVisualizationView activeBundle={activeBundle} />
+                    )}
+                    {activeView === "activations" && (
+                      <ActivationComparisonView activeBundle={activeBundle} />
+                    )}
+                    {activeView === "behavioral" && (
+                      <BehavioralDiffView activeBundle={activeBundle} />
+                    )}
+                    {activeView === "regression" && (
+                      <RegressionDashboardView
+                        activeBundle={activeBundle}
+                        baselines={baselines}
+                        onRefreshBaselines={() => void refreshCoreData()}
+                        onError={handleError}
+                      />
+                    )}
+                    {activeView === "history" && (
+                      <ExperimentHistoryView
+                        experiments={experiments}
+                        activeComparisonId={activeBundle?.comparison_id ?? null}
+                        onSelectExperiment={(cid) => {
+                          void handleSelectExperiment(cid);
+                          setActiveView("tensors");
+                        }}
+                        onRefresh={() => void refreshCoreData()}
+                      />
+                    )}
+                    {activeView === "reports" && (
+                      <ReportViewerView activeBundle={activeBundle} onError={handleError} />
+                    )}
+                    {activeView === "settings" && (
+                      <SettingsView
+                        onError={handleError}
+                        onSettingsSaved={() => void refreshCoreData()}
+                      />
+                    )}
+                  </motion.div>
+                </div>
+              </motion.section>
+            </React.Fragment>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
