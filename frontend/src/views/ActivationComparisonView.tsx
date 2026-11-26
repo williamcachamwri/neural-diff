@@ -93,7 +93,7 @@ export const ActivationComparisonView: React.FC<Props> = ({ activeBundle }) => {
                     <td style={{ width: 180 }}>
                       <div
                         style={{
-                          background: "#0a1020",
+                          background: "#1b1b21",
                           borderRadius: 4,
                           height: 10,
                           overflow: "hidden",
@@ -103,7 +103,7 @@ export const ActivationComparisonView: React.FC<Props> = ({ activeBundle }) => {
                           style={{
                             width: `${pct}%`,
                             height: "100%",
-                            background: "linear-gradient(90deg, #38bdf8, #2dd4bf)",
+                            background: "#d4d4d8",
                           }}
                         />
                       </div>
@@ -157,3 +157,4 @@ export const ActivationComparisonView: React.FC<Props> = ({ activeBundle }) => {
     </div>
   );
 };
+

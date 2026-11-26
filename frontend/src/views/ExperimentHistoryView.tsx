@@ -54,7 +54,7 @@ export const ExperimentHistoryView: React.FC<Props> = ({
                   style={{
                     background:
                       exp.comparison_id === activeComparisonId
-                        ? "rgba(56, 189, 248, 0.12)"
+                        ? "rgba(255, 255, 255, 0.055)"
                         : undefined,
                   }}
                 >
@@ -124,3 +124,4 @@ export const ExperimentHistoryView: React.FC<Props> = ({
     </div>
   );
 };
+

@@ -43,7 +43,7 @@ export const LayerVisualizationView: React.FC<Props> = ({ activeBundle }) => {
   const colorForRelL2 = (val: number | null | undefined): string => {
     if (val == null) return "#111116";
     const t = Math.min(1, Math.max(0, val / maxRelL2));
-    // Obsidian -> Deep Espresso Bronze -> Warm Champagne Gold -> Luminous Ivory
+    // Obsidian to warm ivory
     const r = Math.round(20 + 215 * Math.pow(t, 0.85));
     const g = Math.round(20 + 168 * Math.pow(t, 0.95));
     const b = Math.round(26 + 85 * Math.pow(t, 1.35));
@@ -124,11 +124,7 @@ export const LayerVisualizationView: React.FC<Props> = ({ activeBundle }) => {
 
       {na && (
         <>
-          <div className="panel" style={{ borderColor: "var(--warn)" }}>
-            <div style={{ fontSize: 12.5, color: "var(--warn)" }}>
-              <strong>Epistemic Caution ({na.epistemic_status}):</strong> {na.epistemic_caution}
-            </div>
-          </div>
+          <p className="editorial-footnote"><strong style={{ color: "var(--text-secondary)", fontWeight: 500 }}>Note: {na.epistemic_status.toLowerCase()}.</strong> {na.epistemic_caution}</p>
 
           <div className="grid-2">
             <div className="panel">
@@ -231,3 +227,5 @@ export const LayerVisualizationView: React.FC<Props> = ({ activeBundle }) => {
     </div>
   );
 };
+
+

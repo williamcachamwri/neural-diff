@@ -103,7 +103,7 @@ export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => 
               height: 620,
               border: "1px solid var(--border)",
               borderRadius: 8,
-              background: "#0b1020",
+              background: "#09090b",
             }}
           />
         ) : (
@@ -118,3 +118,4 @@ export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => 
     </div>
   );
 };
+

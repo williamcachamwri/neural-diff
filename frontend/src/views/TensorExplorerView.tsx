@@ -168,8 +168,7 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
                   key={rec.name}
                   style={{
                     cursor: "pointer",
-                    background:
-                      selected?.name === rec.name ? "rgba(56, 189, 248, 0.14)" : undefined,
+                    background: selected?.name === rec.name ? "rgba(255, 255, 255, 0.055)" : undefined,
                   }}
                   onClick={() => setSelected(rec)}
                 >
@@ -245,3 +244,4 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
     </div>
   );
 };
+
