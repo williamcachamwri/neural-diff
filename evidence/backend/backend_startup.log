@@ -1,0 +1,50 @@
+INFO:     Started server process [24000]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60164 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60175 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60177 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60178 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60176 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60180 - "GET /api/comparisons/ndiff-7d3ad71311 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60183 - "POST /api/models/validate HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:60185 - "POST /api/models/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60187 - "POST /api/comparisons/run HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60189 - "GET /api/comparisons/ndiff-177c033c35 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60193 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60199 - "GET /api/comparisons/ndiff-177c033c35/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60197 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60196 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60201 - "GET /api/comparisons/ndiff-177c033c35/export/markdown HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60203 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60212 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60213 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60209 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60211 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60215 - "GET /api/comparisons/ndiff-177c033c35 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60217 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60219 - "GET /api/comparisons/ndiff-real-qwen25-05b/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60223 - "GET /api/comparisons/ndiff-real-qwen25-05b/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60225 - "GET /api/comparisons/ndiff-real-cross-arch HTTP/1.1" 200 OK
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00, 1528.93it/s]
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00, 1982.45it/s]
+INFO:     127.0.0.1:60221 - "POST /api/models/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60234 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60236 - "GET /api/comparisons/ndiff-real-qwen25-05b/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60239 - "GET /api/comparisons/ndiff-real-regression-detected HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60241 - "GET /api/comparisons/ndiff-real-regression-detected/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60244 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60246 - "GET /api/comparisons/ndiff-real-qwen25-05b/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60248 - "GET /api/comparisons/ndiff-real-qwen25-05b/export/markdown HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60250 - "GET /api/comparisons/ndiff-real-qwen25-05b/export/html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60258 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60256 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60254 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60257 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60260 - "GET /api/comparisons/ndiff-177c033c35 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60262 - "POST /api/models/validate HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:60264 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60266 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60268 - "GET /api/comparisons/ndiff-real-qwen25-05b/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK

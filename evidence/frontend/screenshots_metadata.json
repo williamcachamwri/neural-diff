@@ -1,0 +1,152 @@
+[
+  {
+    "filename": "evidence/frontend/01-dashboard.png",
+    "timestamp_utc": "2026-11-26T19:43:27.273005+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Application dashboard displaying RTX 5050 CUDA:0 status, memory telemetry, real vs synthetic experiment counts, and recent runs.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (active Qwen/Qwen2.5-0.5B -> Qwen2.5-0.5B-Instruct) + ledger",
+    "scenario": "Initial workbench overview"
+  },
+  {
+    "filename": "evidence/frontend/02-model-selection.png",
+    "timestamp_utc": "2026-11-26T19:43:27.717822+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Model A and Model B selection form with verified open-access presets, tolerances, baseline gate selector, and analysis module checkboxes.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT configuration (Qwen/Qwen2.5-0.5B vs Qwen/Qwen2.5-0.5B-Instruct)",
+    "scenario": "Comparison setup workflow"
+  },
+  {
+    "filename": "evidence/frontend/03-compatibility-validation.png",
+    "timestamp_utc": "2026-11-26T19:43:28.201947+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Live compatibility validation of Qwen/Qwen2.5-0.5B vs Qwen/Qwen2.5-0.5B-Instruct (290 aligned tensors, 494,032,768 parameters).",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT",
+    "scenario": "POST /api/models/validate on Qwen2.5-0.5B checkpoints"
+  },
+  {
+    "filename": "evidence/frontend/04-tensor-diff.png",
+    "timestamp_utc": "2026-11-26T19:43:28.743386+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Tensor Explorer displaying float64-accumulated cosine, relative L2, RMSE, max abs diff, and quantile distribution shifts across Qwen2.5-0.5B weights.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-qwen25-05b)",
+    "scenario": "Parameter-level numerical inspection"
+  },
+  {
+    "filename": "evidence/frontend/05-structural-diff.png",
+    "timestamp_utc": "2026-11-26T19:43:30.345854+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Git-style Structural Diff view comparing Qwen2.5-0.5B-Instruct (24 layers, 494M params) vs SmolLM2-135M-Instruct (30 layers, 134.5M params), highlighting added/removed keys, shape changes, and layer deltas.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-cross-arch)",
+    "scenario": "Cross-architecture structural topology comparison"
+  },
+  {
+    "filename": "evidence/frontend/06-layer-analysis.png",
+    "timestamp_utc": "2026-11-26T19:43:31.244816+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "24-layer submodule Relative L2 heatmap with GQA Attention Head slicing (14 Q heads, 2 KV heads), MLP basis shifts, embedding drift, and polysemanticity caution.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-qwen25-05b)",
+    "scenario": "Layer & head/MLP structural localization"
+  },
+  {
+    "filename": "evidence/frontend/07-activation-comparison.png",
+    "timestamp_utc": "2026-11-26T19:43:31.717622+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Observational forward-hook Activation Diff across 24 Qwen2.5 layers showing Hidden Cosine, Linear CKA, Attention/MLP alignment, and Top-5 next-token logit probabilities.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-qwen25-05b)",
+    "scenario": "Controlled identical-prompt forward-pass trace comparison"
+  },
+  {
+    "filename": "evidence/frontend/08-behavioral-diff.png",
+    "timestamp_utc": "2026-11-26T19:43:32.525935+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "8-suite deterministic Behavioral Diff showing pass-rate improvement, 95% bootstrap CI, McNemar p-value, domain breakdown, and side-by-side paired model outputs.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-qwen25-05b)",
+    "scenario": "24-case deterministic evaluation across Base vs Instruct"
+  },
+  {
+    "filename": "evidence/frontend/09-regression-report.png",
+    "timestamp_utc": "2026-11-26T19:43:33.402231+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Regression Gate Dashboard demonstrating FAILED_REGRESSION detection, severity badges, deterministic CLI reproduction commands, and versioned baseline management.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-regression-detected)",
+    "scenario": "Automated behavioral regression gate failure & reproduction"
+  },
+  {
+    "filename": "evidence/frontend/10-benchmark-results.png",
+    "timestamp_utc": "2026-11-26T19:43:34.208559+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Persisted Experiment & Benchmark History distinguishing REAL MODEL EXPERIMENT runs (SmolLM2-135M, Qwen2.5-0.5B, Cross-Arch) from SYNTHETIC FIXTURE runs with wall-clock durations.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT + SYNTHETIC FIXTURE EXPERIMENT (clearly badged)",
+    "scenario": "Historical experiment & runtime audit table"
+  },
+  {
+    "filename": "evidence/frontend/11-report-export.png",
+    "timestamp_utc": "2026-11-26T19:43:35.167891+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Report Viewer rendering the standalone SVG-equipped HTML report preview alongside .html, .md, and .json export controls.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (ndiff-real-qwen25-05b)",
+    "scenario": "Multi-format report preview & download"
+  },
+  {
+    "filename": "evidence/frontend/12-test-execution-summary.png",
+    "timestamp_utc": "2026-11-26T19:43:35.684778+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Rendered summary of actual executed static analysis, unit, Hypothesis property, integration, regression, security, coverage, and Vitest logs.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "VERIFIED TEST SUITE EXECUTION LOGS",
+    "scenario": "Automated test & coverage summary"
+  },
+  {
+    "filename": "evidence/frontend/13-error-handling.png",
+    "timestamp_utc": "2026-11-26T19:43:36.816320+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Structured application error banner displaying [SECURITY_VALIDATION_ERROR \u2022 HTTP 403] when a disallowed path-traversal checkpoint path is submitted.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "LIVE SECURITY & API ERROR HANDLING",
+    "scenario": "Path traversal rejection in Compatibility Check"
+  },
+  {
+    "filename": "evidence/frontend/14-settings.png",
+    "timestamp_utc": "2026-11-26T19:43:37.296725+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Runtime & Security Settings view displaying persisted compute device, streaming chunk size, tolerances, and weights_only serialization policy.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "LIVE SQLITE SETTINGS CONFIGURATION",
+    "scenario": "Engine configuration inspection"
+  },
+  {
+    "filename": "evidence/frontend/15-final-application-state.png",
+    "timestamp_utc": "2026-11-26T19:43:38.135678+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "demonstrates": "Final clean application state on Dashboard with active Qwen2.5-0.5B real model comparison, verified CUDA:0 telemetry, and persisted baseline.",
+    "capture_method": "Playwright headless Chromium full-page screenshot against live FastAPI (127.0.0.1:8000) + Vite (127.0.0.1:4173)",
+    "data_provenance": "REAL MODEL EXPERIMENT (Final Verified State)",
+    "scenario": "Post-verification workbench dashboard"
+  }
+]
