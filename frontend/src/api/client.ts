@@ -137,4 +137,35 @@ export const apiClient = {
       method: "PUT",
       body: JSON.stringify(settings),
     }),
+
+  probeTensor: (modelA: string, modelB: string, tensorName: string) =>
+    requestJson<{
+      tensor_name: string;
+      shape: number[];
+      svd_spectrum: {
+        shannon_effective_rank: number;
+        max_possible_rank: number;
+        rank_at_90pct_energy: number;
+        spectral_norm: number;
+        top_singular_values: number[];
+        inferred_update_regime: string;
+      } | null;
+      sparsity_b: {
+        exact_zero_pct: number;
+        zeroed_rows_count: number;
+        zeroed_cols_count: number;
+        semi_structured_2_to_4_compliant_pct: number;
+      } | null;
+      histogram: {
+        total_variation_distance: number;
+        jensen_shannon_divergence: number;
+      };
+    }>("/api/diagnostics/tensor-probe", {
+      method: "POST",
+      body: JSON.stringify({
+        model_a: modelA,
+        model_b: modelB,
+        tensor_name: tensorName,
+      }),
+    }),
 };

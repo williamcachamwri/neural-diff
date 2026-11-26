@@ -16,6 +16,22 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
   const [records, setRecords] = useState<TensorRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [selected, setSelected] = useState<TensorRecord | null>(null);
+  const [probeLoading, setProbeLoading] = useState(false);
+  const [probeData, setProbeData] = useState<{
+    tensor_name: string;
+    svd_spectrum: {
+      shannon_effective_rank: number;
+      max_possible_rank: number;
+      rank_at_90pct_energy: number;
+      spectral_norm: number;
+      top_singular_values: number[];
+      inferred_update_regime: string;
+    } | null;
+    sparsity_b: {
+      exact_zero_pct: number;
+      semi_structured_2_to_4_compliant_pct: number;
+    } | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!activeBundle?.tensor_diff) {
@@ -217,11 +233,77 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
             <h3 className="panel-title mono" style={{ fontSize: 13 }}>
               {selected.name}
             </h3>
-            <span className="mono" style={{ color: "var(--text-muted)", fontSize: 11.5 }}>
-              {selected.dtype_a ?? "—"} → {selected.dtype_b ?? "—"} ·{" "}
-              {selected.metrics ? `${selected.metrics.changed_pct.toFixed(2)}% changed` : "—"}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span className="mono" style={{ color: "var(--text-muted)", fontSize: 11.5 }}>
+                {selected.dtype_a ?? "—"} → {selected.dtype_b ?? "—"} ·{" "}
+                {selected.metrics ? `${selected.metrics.changed_pct.toFixed(2)}% changed` : "—"}
+              </span>
+              {(selected.shape_a?.length ?? 0) === 2 && (
+                <button
+                  type="button"
+                  className="btn"
+                  style={{ padding: "4px 10px", fontSize: 11.5 }}
+                  disabled={probeLoading}
+                  onClick={() => {
+                    setProbeLoading(true);
+                    apiClient
+                      .probeTensor(
+                        activeBundle.model_a.resolved_path || activeBundle.model_a.model_id,
+                        activeBundle.model_b.resolved_path || activeBundle.model_b.model_id,
+                        selected.name
+                      )
+                      .then((res) => setProbeData(res))
+                      .catch((err) => onError(err instanceof Error ? err : new Error(String(err))))
+                      .finally(() => setProbeLoading(false));
+                  }}
+                >
+                  {probeLoading ? "Computing SVD..." : "Probe SVD & Sparsity"}
+                </button>
+              )}
+            </div>
           </div>
+
+          {probeData && probeData.tensor_name === selected.name && probeData.svd_spectrum && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 12,
+                padding: "10px 0 14px",
+                marginBottom: 12,
+                borderBottom: "1px solid var(--border-faint)",
+                fontSize: 12,
+              }}
+            >
+              <div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11 }}>Effective Rank</div>
+                <div className="mono" style={{ marginTop: 3, color: "var(--text-main)" }}>
+                  {probeData.svd_spectrum.shannon_effective_rank.toFixed(1)} /{" "}
+                  {probeData.svd_spectrum.max_possible_rank}
+                </div>
+              </div>
+              <div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11 }}>90% Energy Rank</div>
+                <div className="mono" style={{ marginTop: 3 }}>
+                  {probeData.svd_spectrum.rank_at_90pct_energy}
+                </div>
+              </div>
+              <div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11 }}>Update Profile</div>
+                <div style={{ marginTop: 3 }}>
+                  {probeData.svd_spectrum.inferred_update_regime.replace(/_/g, " ")}
+                </div>
+              </div>
+              <div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11 }}>2:4 Sparsity</div>
+                <div className="mono" style={{ marginTop: 3 }}>
+                  {probeData.sparsity_b
+                    ? `${probeData.sparsity_b.semi_structured_2_to_4_compliant_pct.toFixed(1)}%`
+                    : "—"}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid-2">
             <table className="data-table">
