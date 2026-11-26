@@ -175,13 +175,13 @@ def main() -> int:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True)
             browser_ver = f"Chromium {browser.version}"
-            context = browser.new_context(viewport={"width": 1440, "height": 940})
+            context = browser.new_context(viewport={"width": 1600, "height": 980}, device_scale_factor=1.5)
             page = context.new_page()
 
-            def _snap(filename: str, demonstrates: str, data_kind: str, scenario: str) -> None:
-                page.wait_for_timeout(350)
+            def _snap(filename: str, demonstrates: str, data_kind: str, scenario: str, *, full_page: bool = False) -> None:
+                page.wait_for_timeout(450)
                 out_file = FRONTEND_EVIDENCE / filename
-                page.screenshot(path=str(out_file), full_page=True)
+                page.screenshot(path=str(out_file), full_page=full_page)
                 screenshots_meta.append(
                     {
                         "filename": f"evidence/frontend/{filename}",
@@ -331,6 +331,7 @@ def main() -> int:
                 "Rendered summary of actual executed static analysis, unit, Hypothesis property, integration, regression, security, coverage, and Vitest logs.",
                 "VERIFIED TEST SUITE EXECUTION LOGS",
                 "Automated test & coverage summary",
+                full_page=True,
             )
 
             # Return to live web app for Error Handling, Settings, and Final State
@@ -357,15 +358,16 @@ def main() -> int:
                 "Engine configuration inspection",
             )
 
-            # View 15: Final application state
+            # View 15: Final application state (demonstrating Nodes 2.0 Orthogonal PCB Cable Routing)
             page.get_by_test_id("active-exp-selector").select_option("ndiff-real-qwen25-05b")
             page.wait_for_timeout(350)
             page.get_by_test_id("nav-dashboard").click()
+            page.get_by_role("button", name="Cables: Bezier Spline").click()
             _snap(
                 "15-final-application-state.png",
-                "Final clean application state on Dashboard with active Qwen2.5-0.5B real model comparison, verified CUDA:0 telemetry, and persisted baseline.",
+                "Final ComfyUI Nodes 2.0 Studio canvas in Orthogonal PCB cable-routing mode with active Qwen2.5-0.5B real model DAG, embedded micro-scopes, and MiniMap.",
                 "REAL MODEL EXPERIMENT (Final Verified State)",
-                "Post-verification workbench dashboard",
+                "Post-verification ComfyUI Studio DAG (Orthogonal PCB Cables)",
             )
 
             browser.close()
