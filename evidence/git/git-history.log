@@ -1,0 +1,99 @@
+=== NEURAL DIFF GIT VERIFICATION ===
+Captured (UTC): 2026-11-26T20:20:30.429425+00:00
+
+$ git rev-list --count HEAD (rc=0)
+88
+
+$ git status --short (rc=0)
+(clean working tree)
+
+$ git log --oneline (rc=0)
+abfaa6b docs(report): add final engineering report with verified results and disclosed limitations
+94e6abf test(evidence): refresh test summary logs and screenshots from final full verification run
+7662876 test(e2e): recapture 15 live screenshots after anti-slop redesign
+e3cc863 style(frontend): replace caution boxes with editorial footnotes and remove residual blue accents
+e28a833 refactor(frontend): simplify canvas nodes, signal cables and status strip to restrained monochrome
+af54969 style(frontend): unify header navigation and replace pill badges with quiet monochrome typography
+b604971 feat(structural): add structured pruning and 2:4 semi-structured sparsity analyzer
+b14bdf0 feat(diff): add SVD task-vector spectrum and Shannon effective-rank LoRA detector
+292230a feat(frontend): integrate interactive 9-node XYFlow DAG canvas and spring inspector dock
+ec87028 feat(frontend): build collapsible ComfyUI Nodes 2.0 with inline heatmaps and CKA scopes
+1fc8747 feat(frontend): implement dual-layer Bezier and Orthogonal PCB animated signal cables
+69c9711 style(frontend): replace dashboard CSS with Obsidian-Champagne ComfyUI studio theme
+5c14a72 build(frontend): add @xyflow/react, framer-motion, and Vite 8 vendor chunking
+a955f3b feat(structural): add embedding-to-lm_head weight-tying detector and tests
+00b3075 feat(stats): add aligned-bin histogram, TVD, and JS divergence analyzer
+96dcd79 feat(diff): add top-k elementwise coordinate delta extractor and unit tests
+5557285 style(scripts): standardize Python 3.12 datetime.UTC usage and ignore tsbuildinfo
+8147952 docs(readme): complete README and BENCHMARKS with verified real-model metrics and screenshots
+0c24240 docs(screenshots): add 15 live Playwright Chromium screenshots and provenance index
+d976d61 perf(benchmarks): record synthetic throughput and real SmolLM2/Qwen2.5 GPU comparison artifacts
+73d15c4 chore(scripts): add git history verification script and Playwright installation log
+fa00be6 test(adapters): add multi-shard, pickle policy, and evaluator edge-case tests (90% coverage)
+196304b fix(provenance): enforce strict SYNTHETIC vs REAL MODEL badge separation across API and UI
+7d071c1 test(evidence): record verified test execution logs and preserved initial failure traces
+350e77a docs(manual): document installation, math, activations, behavior, limitations, and roadmap
+f1b4212 test(e2e): add Playwright full-stack E2E suite and runnable comparison examples
+6012c3b feat(scripts): add benchmark, live screenshot, and SHA-256 evidence manifest scripts
+8793bb7 ci(github): add multi-job GitHub Actions workflow for Python, security, and Playwright
+fdb0d2b fix(core): guard empty token sequences, align baseline roots, and satisfy mypy/ruff
+c342d0e test(all): add integration, golden regression, frontend Vitest suites, and test runner
+6fda0ca test(security): add adversarial tests for traversal, safetensors headers, pickle, and API
+9e574ea test(property): add Hypothesis mathematical invariant tests for tensor diff and CKA
+8fc64d4 test(behavior): add unit tests for all 8 deterministic evaluators, regression, and CLI
+caf2297 test(core): add unit tests for structural diff, head/MLP slicing, and Linear CKA
+e0d5fb3 test(diff): add synthetic checkpoint fixtures and unit tests for tensor math metrics
+a6af2df fix(security): upgrade setuptools>=84.1.0, add security audit script, and document controls
+d7653a8 feat(frontend): add Report Viewer, Settings view, and main 12-view navigation shell
+1119575 feat(frontend): add Regression Gate dashboard, baseline manager, and History views
+e4a00b8 feat(frontend): add Activation CKA/JS inspector and 8-suite Behavioral Diff views
+e57fa5b feat(frontend): add Git-style Structural Diff and Layer Heatmap/Head views
+c259302 feat(frontend): add Compatibility Validation and interactive Tensor Explorer views
+93c4ea7 feat(frontend): add responsive design system, Dashboard, and Model Comparison views
+8dc2090 feat(frontend): configure Vite TypeScript shell, strict API types, and HTTP client
+737257b feat(api): implement FastAPI endpoints, cancellation, exports, and security middleware
+08920e3 feat(api): implement thread-safe SQLite store for runs, baselines, and settings
+d48f184 feat(api): add strict Pydantic v2 validation schemas with payload bounds
+46d60de feat(cli): implement neural-diff CLI for inspect, validate, compare, and behavior
+5cf77c5 feat(core): add ComparisonOrchestrator with real step-boundary telemetry
+4b04300 feat(report): implement JSON, Markdown, and SVG heatmap HTML ReportEngine
+ce0af1c feat(regression): implement versioned baselines, severity thresholds, and CLI reproductions
+b22c29b feat(behavior): implement sequential paired BehavioralDiffEngine across 8 suites
+158bb7b feat(stats): add paired bootstrap CI and exact McNemar significance test
+3f48965 feat(benchmarks): add validated JSON benchmark suite loader and category filter
+6347587 feat(benchmarks): curate versioned 24-case deterministic behavioral dataset
+3e6e54c feat(behavior): add unified 8-domain deterministic evaluator registry
+bf58079 feat(behavior): add contradiction-aware factual accuracy evaluator
+15fbc6d feat(behavior): add dual-direction refusal and false-refusal evaluator
+d799855 feat(behavior): add anti-gaming conciseness and verbosity evaluator
+26ea556 feat(behavior): add IFEval-style deterministic instruction constraint evaluator
+e848cc1 feat(behavior): add deterministic mathematical reasoning answer evaluator
+0d68dfd feat(behavior): add strict and extracted JSON schema reliability evaluator
+12a1ea9 feat(behavior): add AST-based code preservation and signature evaluator
+0a4b00e feat(behavior): add deterministic evaluator base and Vietnamese quality evaluator
+91b63d2 feat(activation): implement sequential forward-hook ActivationDiffEngine and logit JS divergence
+4715c99 feat(activation): implement Linear CKA and token-wise activation comparison metrics
+b9f40c0 feat(neuron): add head-sliced attention, MLP basis, embedding, and norm analyzers
+75c652b feat(structural): implement StructuralDiffEngine with conservative rename inference
+5198bc2 feat(structural): implement multi-dimensional model compatibility validator
+4dd6d16 feat(diff): add checkpoint TensorDiffEngine with layer and distribution summaries
+1aab401 feat(diff): implement chunked float64 tensor comparison metrics and tolerances
+17cf79f feat(stats): implement float64-accumulated tensor distribution and shift summaries
+ab1f000 feat(loader): implement unified ModelLoader orchestrating all checkpoint formats
+fbe73d1 feat(loader): add Hugging Face local directory and safe Hub snapshot resolver
+788cd76 feat(loader): add safe PyTorch weights_only checkpoint reader with opcode verification
+7165d30 feat(loader): implement single, multi-file, and sharded Safetensors slice readers
+004b64a feat(loader): add lazy CheckpointReader interface and LoadedModel handle
+73d5816 feat(arch): add multi-architecture config parser and canonical tensor role mapper
+6371f9d feat(perf): add resource manager, CUDA kernel probe, and cancellation token
+b98fc53 build(deps): lock Python 3.12 cu128 and zero-vulnerability frontend dependencies
+daca9cc feat(security): implement path traversal guard, safetensors header validator, and pickle scanner
+01511e8 feat(core): add typed domain, compatibility, and security exception hierarchy
+b1e30a5 feat(core): define canonical domain types, metadata models, and epistemic enums
+e022649 chore(repo): initialize modular package layout, pyproject.toml, and frontend manifest
+413a1c7 docs(arch): specify modular architecture, contracts, and epistemic status model
+10acfe1 docs(research): add competitive analysis across weight, interp, and eval tools
+813f019 docs(research): document neural diffing ecosystem and live HF hub verification
+2315ee0 docs(env): document baseline hardware, OS, GPU, and toolchain audit
+a96b936 chore(env): add baseline environment audit script and initial host snapshot
+
