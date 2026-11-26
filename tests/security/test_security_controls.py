@@ -17,6 +17,7 @@ from core.exceptions import MalformedCheckpointError, SecurityValidationError
 from core.loaders.model_loader import ModelLoader
 from core.security import (
     SecurityPolicy,
+    default_allowed_roots,
     inspect_pytorch_archive_safety,
     validate_safe_path,
     validate_safe_shard_filename,
@@ -156,3 +157,15 @@ def test_api_security_headers_payload_limit_and_traversal_blocking(tmp_path: Pat
     )
     assert too_large.status_code == 413
     assert too_large.json()["error"] == "PAYLOAD_TOO_LARGE"
+
+
+@pytest.mark.security
+def test_default_allowed_roots_honors_cwd_and_env_override(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ext_dir = tmp_path / "external_checkpoints"
+    ext_dir.mkdir()
+    monkeypatch.setenv("NEURAL_DIFF_ALLOWED_ROOTS", str(ext_dir))
+    roots = default_allowed_roots()
+    assert Path.cwd().resolve() in roots
+    assert ext_dir.resolve() in roots

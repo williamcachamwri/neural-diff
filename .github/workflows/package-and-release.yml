@@ -57,6 +57,7 @@ jobs:
           MODEL_B="$GITHUB_WORKSPACE/data/demo_fixtures/synth_model_b"
 
           # Execute from /tmp so local repo folders are NOT on sys.path
+          export NEURAL_DIFF_ALLOWED_ROOTS="$GITHUB_WORKSPACE/data"
           cd /tmp
           "$BIN_DIR/neural-diff" suites
           "$BIN_DIR/neural-diff" inspect "$MODEL_A" --local-only > /tmp/inspect.json

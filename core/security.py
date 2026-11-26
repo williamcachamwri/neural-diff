@@ -63,12 +63,19 @@ _ALLOWED_PICKLE_GLOBALS: set[tuple[str, str]] = {
 
 
 def default_allowed_roots() -> list[Path]:
-    """Build default safe filesystem roots (workspace, HF cache, system temp)."""
+    """Build default safe filesystem roots (cwd, package root, HF cache, system temp, env roots)."""
     repo_root = Path(__file__).resolve().parent.parent
     roots = [
+        Path.cwd().resolve(),
         repo_root.resolve(),
         Path(tempfile.gettempdir()).resolve(),
     ]
+    extra_env = os.environ.get("NEURAL_DIFF_ALLOWED_ROOTS", "")
+    if extra_env:
+        for raw_entry in extra_env.split(os.pathsep):
+            cleaned = raw_entry.strip()
+            if cleaned:
+                roots.append(Path(cleaned).resolve())
     hf_home = os.environ.get("HF_HOME")
     if hf_home:
         roots.append(Path(hf_home).resolve())
