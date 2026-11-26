@@ -1,0 +1,52 @@
+============================================================================
+NEURAL DIFF ENVIRONMENT AUDIT — STAGE: post_install
+Captured (UTC): 2026-11-26T18:29:02.683878+00:00
+============================================================================
+
+[OS & CPU]
+  Platform       : Windows-11-10.0.26320-SP0
+  Architecture   : AMD64
+  Processor      : Intel64 Family 6 Model 183 Stepping 1, GenuineIntel
+  Logical CPUs   : 16
+  Apple Silicon  : False
+
+[MEMORY & STORAGE]
+  Total RAM (GB) : 15.71
+  Avail RAM (GB) : 3.86
+  workspace_drive: D:\LLM — 93.0 GB free / 200.05 GB total
+  home_drive     : C:\Users\MSl — 42.79 GB free / 247.94 GB total
+
+[PYTHON RUNTIME]
+  Executable     : D:\LLM\.venv\Scripts\python.exe
+  Version        : 3.12.16 (main, Nov 24 2026, 16:59:49) [MSC v.1944 64 bit (AMD64)]
+  Python >= 3.11 : True
+  Virtualenv     : True
+
+[CLI TOOLS]
+  python      : [AVAILABLE] rc=0 | Python 3.12.16
+  uv          : [MISSING/UNAVAILABLE] rc=None | uv not found on PATH
+  pip         : [AVAILABLE] rc=0 | pip 26.3 from D:\LLM\.venv\Lib\site-packages\pip (python 3.12)
+  git         : [AVAILABLE] rc=0 | git version 2.56.0.windows.4
+  node        : [AVAILABLE] rc=0 | v26.13.0
+  npm         : [AVAILABLE] rc=0 | 11.20.0
+  npx         : [AVAILABLE] rc=0 | 11.20.0
+  docker      : [MISSING/UNAVAILABLE] rc=None | docker not found on PATH
+  nvidia_smi  : [AVAILABLE] rc=0 | NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 6474 MiB, 12.0
+
+[PYTHON PACKAGES]
+  torch           : INSTALLED (2.11.0+cu128) (cuda_available=True, cuda_compiled=12.8, devices=[{'index': 0, 'name': 'NVIDIA GeForce RTX 5050 Laptop GPU', 'total_memory_gb': 7.96, 'compute_capability': '12.0', 'multi_processor_count': 20, 'kernel_execution_verified': True, 'kernel_error': None}])
+  transformers    : INSTALLED (5.24.1)
+  safetensors     : INSTALLED (0.8.0)
+  numpy           : INSTALLED (2.5.5)
+  scipy           : INSTALLED (1.18.1)
+  pytest          : INSTALLED (9.2.0)
+  hypothesis      : INSTALLED (6.170.17)
+  ruff            : INSTALLED (0.17.6)
+  mypy            : INSTALLED (2.4.1)
+  fastapi         : INSTALLED (0.165.0)
+  pydantic        : INSTALLED (2.14.4)
+  uvicorn         : INSTALLED (0.54.0)
+  httpx           : INSTALLED (0.29.0)
+  psutil          : INSTALLED (7.2.2)
+  huggingface_hub : INSTALLED (2.5.0)
+  playwright      : INSTALLED (1.65.2)

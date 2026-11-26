@@ -1,0 +1,253 @@
+{
+  "captured_at_utc": "2026-11-26T18:29:02.683878+00:00",
+  "stage": "post_install",
+  "os": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26320",
+    "platform": "Windows-11-10.0.26320-SP0",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 16
+  },
+  "apple_silicon_metal": {
+    "apple_silicon_hardware": false,
+    "metal_mps_supported": false
+  },
+  "memory": {
+    "total_gb": 15.71,
+    "available_gb": 3.86,
+    "total_bytes": 16870060032,
+    "available_bytes": 4142325760
+  },
+  "storage": {
+    "workspace_drive": {
+      "path": "D:\\LLM",
+      "total_gb": 200.05,
+      "used_gb": 107.04,
+      "free_gb": 93.0
+    },
+    "home_drive": {
+      "path": "C:\\Users\\MSl",
+      "total_gb": 247.94,
+      "used_gb": 205.14,
+      "free_gb": 42.79
+    }
+  },
+  "python_runtime": {
+    "executable": "D:\\LLM\\.venv\\Scripts\\python.exe",
+    "version": "3.12.16 (main, Nov 24 2026, 16:59:49) [MSC v.1944 64 bit (AMD64)]",
+    "version_info": [
+      3,
+      12,
+      16
+    ],
+    "meets_3_11_plus": true,
+    "in_virtualenv": true,
+    "prefix": "D:\\LLM\\.venv"
+  },
+  "cli_tools": {
+    "python": {
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "--version"
+      ],
+      "available": true,
+      "executable": "D:\\LLM\\.venv\\Scripts\\python.exe",
+      "returncode": 0,
+      "stdout": "Python 3.12.16",
+      "stderr": ""
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "available": false,
+      "executable": null,
+      "returncode": null,
+      "stdout": "",
+      "stderr": "uv not found on PATH"
+    },
+    "pip": {
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "--version"
+      ],
+      "available": true,
+      "executable": "D:\\LLM\\.venv\\Scripts\\python.exe",
+      "returncode": 0,
+      "stdout": "pip 26.3 from D:\\LLM\\.venv\\Lib\\site-packages\\pip (python 3.12)",
+      "stderr": ""
+    },
+    "git": {
+      "command": [
+        "git",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\Git\\cmd\\git.EXE",
+      "returncode": 0,
+      "stdout": "git version 2.56.0.windows.4",
+      "stderr": ""
+    },
+    "node": {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\nodejs\\node.EXE",
+      "returncode": 0,
+      "stdout": "v26.13.0",
+      "stderr": ""
+    },
+    "npm": {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\nodejs\\npm.CMD",
+      "returncode": 0,
+      "stdout": "11.20.0",
+      "stderr": ""
+    },
+    "npx": {
+      "command": [
+        "npx",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\nodejs\\npx.CMD",
+      "returncode": 0,
+      "stdout": "11.20.0",
+      "stderr": ""
+    },
+    "docker": {
+      "command": [
+        "docker",
+        "--version"
+      ],
+      "available": false,
+      "executable": null,
+      "returncode": null,
+      "stdout": "",
+      "stderr": "docker not found on PATH"
+    },
+    "nvidia_smi": {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=name,driver_version,memory.total,memory.free,compute_cap",
+        "--format=csv,noheader"
+      ],
+      "available": true,
+      "executable": "C:\\WINDOWS\\system32\\nvidia-smi.EXE",
+      "returncode": 0,
+      "stdout": "NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 6474 MiB, 12.0",
+      "stderr": ""
+    }
+  },
+  "python_packages": {
+    "torch": {
+      "installed": true,
+      "version": "2.11.0+cu128",
+      "cuda_available": true,
+      "cuda_compiled_version": "12.8",
+      "mps_available": false,
+      "cuda_devices": [
+        {
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+          "total_memory_gb": 7.96,
+          "compute_capability": "12.0",
+          "multi_processor_count": 20,
+          "kernel_execution_verified": true,
+          "kernel_error": null
+        }
+      ]
+    },
+    "transformers": {
+      "installed": true,
+      "version": "5.24.1"
+    },
+    "safetensors": {
+      "installed": true,
+      "version": "0.8.0"
+    },
+    "numpy": {
+      "installed": true,
+      "version": "2.5.5"
+    },
+    "scipy": {
+      "installed": true,
+      "version": "1.18.1"
+    },
+    "pytest": {
+      "installed": true,
+      "version": "9.2.0"
+    },
+    "hypothesis": {
+      "installed": true,
+      "version": "6.170.17"
+    },
+    "ruff": {
+      "installed": true,
+      "version": "0.17.6"
+    },
+    "mypy": {
+      "installed": true,
+      "version": "2.4.1"
+    },
+    "fastapi": {
+      "installed": true,
+      "version": "0.165.0"
+    },
+    "pydantic": {
+      "installed": true,
+      "version": "2.14.4"
+    },
+    "uvicorn": {
+      "installed": true,
+      "version": "0.54.0"
+    },
+    "httpx": {
+      "installed": true,
+      "version": "0.29.0"
+    },
+    "psutil": {
+      "installed": true,
+      "version": "7.2.2"
+    },
+    "huggingface_hub": {
+      "installed": true,
+      "version": "2.5.0"
+    },
+    "playwright": {
+      "installed": true,
+      "version": "1.65.2"
+    }
+  },
+  "frontend_packages": {
+    "package_json_present": true,
+    "dependencies": {
+      "lucide-react": "^0.475.0",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+      "@playwright/test": "^1.50.1",
+      "@testing-library/jest-dom": "^6.6.3",
+      "@testing-library/react": "^16.2.0",
+      "@types/react": "^18.3.18",
+      "@types/react-dom": "^18.3.5",
+      "@vitejs/plugin-react": "^4.3.4",
+      "jsdom": "^26.0.0",
+      "typescript": "^5.7.3",
+      "vite": "^6.1.0",
+      "vitest": "^3.0.5"
+    }
+  }
+}
