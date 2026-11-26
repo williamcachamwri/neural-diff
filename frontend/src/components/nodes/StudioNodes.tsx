@@ -3,6 +3,7 @@ import { Handle, type NodeProps, Position } from "@xyflow/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import type { ViewId } from "../../types/api";
+import { formatCategoryShort, formatVerdict } from "../../utils/format";
 
 export interface StudioNodePayload extends Record<string, unknown> {
   nodeIndex: string;
@@ -181,13 +182,13 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                       key={it.label}
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "62px 1fr 34px",
+                        gridTemplateColumns: "68px 1fr 34px",
                         alignItems: "center",
                         gap: 6,
                       }}
                     >
-                      <span className="mono" style={{ fontSize: 9.5, color: "var(--text-muted)" }}>
-                        {it.label.slice(0, 8)}
+                      <span style={{ fontSize: 10.5, color: "var(--text-muted)" }}>
+                        {formatCategoryShort(it.label)}
                       </span>
                       <div
                         style={{
@@ -276,8 +277,8 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                           payload.visual.verdict === "PASSED" ? "dot-ok" : "dot-danger"
                         }`}
                       />
-                      <span className="mono" style={{ color: "var(--text-main)", fontSize: 11 }}>
-                        {payload.visual.verdict}
+                      <span style={{ color: "var(--text-main)", fontSize: 11.5, fontWeight: 500 }}>
+                        {formatVerdict(payload.visual.verdict)}
                       </span>
                     </span>
                     <span style={{ fontSize: 10.5, color: "var(--text-muted)" }}>
