@@ -19,12 +19,20 @@ import type {
   ViewId,
 } from "../../types/api";
 import { StudioModuleNode, type StudioNodePayload } from "../nodes/StudioNodes";
-import { SignalEdge } from "./SignalEdge";
+import { SignalEdge, type SignalEdgeData } from "./SignalEdge";
 
 const NODE_TYPES = { studioModule: StudioModuleNode };
 const EDGE_TYPES = { signal: SignalEdge };
 
-const HEAT_ROLES = ["attn_q", "attn_k", "attn_v", "attn_o", "mlp_gate", "mlp_down"];
+const HEATMAP_ROLES = [
+  "attn_q",
+  "attn_k",
+  "attn_v",
+  "attn_o",
+  "mlp_gate",
+  "mlp_up",
+  "mlp_down",
+];
 
 interface WorkflowCanvasProps {
   activeBundle: ComparisonBundle | null;
@@ -41,34 +49,33 @@ function buildStudioNodes(
   modelA: string,
   modelB: string,
   activeView: ViewId,
-  onInspect: (v: ViewId) => void
+  onInspect: (view: ViewId) => void
 ): Node[] {
   const metaA = bundle?.model_a;
   const metaB = bundle?.model_b;
   const comp = bundle?.structural?.compatibility;
   const st = bundle?.structural;
   const td = bundle?.tensor_diff;
+  const na = bundle?.neuron_attention;
   const act = bundle?.activation;
   const beh = bundle?.behavioral;
   const reg = bundle?.regression;
 
-  // Build 6xN matrix for Layer Probe inline micro-heatmap
-  const layerList = td?.layer_summaries ?? [];
-  let maxRel = 1e-5;
-  const matrix: number[][] = HEAT_ROLES.map((role) =>
-    layerList.slice(0, 24).map((ls) => {
-      const v = ls.role_breakdown[role]?.mean_relative_l2 ?? 0;
-      if (v > maxRel) maxRel = v;
+  const layers = td?.layer_summaries ?? [];
+  let maxHeat = 1e-6;
+  const heatMatrix: number[][] = HEATMAP_ROLES.map((r) =>
+    layers.map((ls) => {
+      const v = ls.role_breakdown[r]?.mean_relative_l2 ?? 0;
+      if (v > maxHeat) maxHeat = v;
       return v;
     })
   );
 
-  // Build CKA & Cosine arrays for Activation Oscilloscope
-  const actKeys = act
+  const layerKeys = act
     ? Object.keys(act.summary.mean_hidden_cka_by_layer).sort((a, b) => Number(a) - Number(b))
     : [];
-  const ckaSeries = actKeys.map((k) => act?.summary.mean_hidden_cka_by_layer[k] ?? 1);
-  const cosSeries = actKeys.map((k) => act?.summary.mean_hidden_cosine_by_layer[k] ?? 1);
+  const ckaSeries = layerKeys.map((k) => act?.summary.mean_hidden_cka_by_layer[k] ?? 1);
+  const cosSeries = layerKeys.map((k) => act?.summary.mean_hidden_cosine_by_layer[k] ?? 1);
 
   const behBars = (beh?.category_summaries ?? []).map((cs) => ({
     label: cs.category,
@@ -77,8 +84,8 @@ function buildStudioNodes(
   }));
 
   const verdictStr = reg?.verdict ?? "READY";
-  const verdictColor =
-    verdictStr === "PASSED" ? "#34d399" : verdictStr === "READY" ? "#e5b869" : "#fb7185";
+  const verdictDot =
+    verdictStr === "PASSED" ? "#4ade80" : verdictStr === "READY" ? "#a1a1aa" : "#f87171";
 
   const defs: Array<{
     id: string;
@@ -88,29 +95,29 @@ function buildStudioNodes(
   }> = [
     {
       id: "node-loader-a",
-      pos: { x: 75, y: 82 },
+      pos: { x: 48, y: 64 },
       matchViews: ["compare"],
       data: {
         nodeIndex: "01",
-        title: "Checkpoint Loader A",
-        accentColor: "#e5b869",
+        title: "Checkpoint A",
+        accentColor: "#e4e4e7",
         targetView: "compare",
-        outSocket: [{ id: "out-a", label: "MODEL_A", color: "#e5b869" }],
+        outSocket: [{ id: "out-a", label: "model_a", color: "#a1a1aa" }],
         rows: [
-          { key: "Model ID", value: (metaA?.model_id ?? modelA).slice(0, 24), highlight: "#f5efe4" },
+          { key: "Model", value: (metaA?.model_id ?? modelA).slice(0, 24), highlight: "#f4f4f5" },
           {
             key: "Parameters",
-            value: metaA ? `${(metaA.total_parameters / 1e6).toFixed(1)}M` : "Pending",
+            value: metaA ? `${(metaA.total_parameters / 1e6).toFixed(1)}M` : "—",
           },
           {
-            key: "Format / Dtype",
+            key: "Precision",
             value: metaA
-              ? `${metaA.shard_count}sh • ${metaA.dtypes_present[0] ?? "fp32"}`
+              ? `${metaA.shard_count} shard · ${metaA.dtypes_present[0] ?? "fp32"}`
               : "Safetensors",
           },
           {
             key: "Revision",
-            value: metaA?.revision ? metaA.revision.slice(0, 10) : "local/verified",
+            value: metaA?.revision ? metaA.revision.slice(0, 10) : "local",
           },
         ],
         onInspect,
@@ -118,29 +125,29 @@ function buildStudioNodes(
     },
     {
       id: "node-loader-b",
-      pos: { x: 75, y: 332 },
+      pos: { x: 48, y: 318 },
       matchViews: ["compare"],
       data: {
         nodeIndex: "02",
-        title: "Checkpoint Loader B",
-        accentColor: "#e5b869",
+        title: "Checkpoint B",
+        accentColor: "#e4e4e7",
         targetView: "compare",
-        outSocket: [{ id: "out-b", label: "MODEL_B", color: "#e5b869" }],
+        outSocket: [{ id: "out-b", label: "model_b", color: "#a1a1aa" }],
         rows: [
-          { key: "Model ID", value: (metaB?.model_id ?? modelB).slice(0, 24), highlight: "#f5efe4" },
+          { key: "Model", value: (metaB?.model_id ?? modelB).slice(0, 24), highlight: "#f4f4f5" },
           {
             key: "Parameters",
-            value: metaB ? `${(metaB.total_parameters / 1e6).toFixed(1)}M` : "Pending",
+            value: metaB ? `${(metaB.total_parameters / 1e6).toFixed(1)}M` : "—",
           },
           {
-            key: "Format / Dtype",
+            key: "Precision",
             value: metaB
-              ? `${metaB.shard_count}sh • ${metaB.dtypes_present[0] ?? "fp32"}`
+              ? `${metaB.shard_count} shard · ${metaB.dtypes_present[0] ?? "fp32"}`
               : "Safetensors",
           },
           {
             key: "Revision",
-            value: metaB?.revision ? metaB.revision.slice(0, 10) : "local/verified",
+            value: metaB?.revision ? metaB.revision.slice(0, 10) : "local",
           },
         ],
         onInspect,
@@ -148,38 +155,38 @@ function buildStudioNodes(
     },
     {
       id: "node-compat",
-      pos: { x: 420, y: 82 },
+      pos: { x: 386, y: 64 },
       matchViews: ["compatibility"],
       data: {
         nodeIndex: "03",
-        title: "Compatibility Gate",
-        accentColor: "#d4d4d8",
+        title: "Compatibility",
+        accentColor: "#a1a1aa",
         targetView: "compatibility",
         inSocket: [
-          { id: "in-a", label: "MODEL_A", color: "#e5b869" },
-          { id: "in-b", label: "MODEL_B", color: "#e5b869" },
+          { id: "in-a", label: "a", color: "#a1a1aa" },
+          { id: "in-b", label: "b", color: "#a1a1aa" },
         ],
-        outSocket: [{ id: "out-compat", label: "ALIGNED", color: "#d4d4d8" }],
+        outSocket: [{ id: "out-compat", label: "aligned", color: "#a1a1aa" }],
         rows: [
           {
-            key: "Shape Aligned",
+            key: "Aligned tensors",
             value: comp
               ? `${comp.shape_matched_tensor_count} / ${comp.shared_tensor_count}`
               : "—",
+            highlight: "#f4f4f5",
           },
           {
-            key: "Jaccard Overlap",
+            key: "Key overlap",
             value: comp ? `${(comp.jaccard_key_overlap * 100).toFixed(1)}%` : "—",
-            highlight: "#34d399",
           },
         ],
         visual: {
           kind: "status-leds",
           leds: [
-            { label: "TENSORS", ok: comp?.compatible_for_direct_tensor_diff ?? true },
-            { label: "GQA HEADS", ok: comp?.compatible_for_head_neuron_analysis ?? true },
-            { label: "HOOK CKA", ok: comp?.compatible_for_activation_diff ?? true },
-            { label: "BEHAVIOR", ok: comp?.compatible_for_behavioral_diff ?? true },
+            { label: "Tensor diff", ok: comp?.compatible_for_direct_tensor_diff ?? true },
+            { label: "Head slicing", ok: comp?.compatible_for_head_neuron_analysis ?? true },
+            { label: "Linear CKA", ok: comp?.compatible_for_activation_diff ?? true },
+            { label: "Behavioral", ok: comp?.compatible_for_behavioral_diff ?? true },
           ],
         },
         onInspect,
@@ -187,35 +194,35 @@ function buildStudioNodes(
     },
     {
       id: "node-structural",
-      pos: { x: 420, y: 338 },
+      pos: { x: 386, y: 318 },
       matchViews: ["structural"],
       data: {
         nodeIndex: "04",
-        title: "Structural Topology",
-        accentColor: "#a78bfa",
+        title: "Topology",
+        accentColor: "#a1a1aa",
         targetView: "structural",
-        inSocket: [{ id: "in-st", label: "MODELS", color: "#e5b869" }],
-        outSocket: [{ id: "out-st", label: "TOPOLOGY", color: "#a78bfa" }],
+        inSocket: [{ id: "in-st", label: "models", color: "#a1a1aa" }],
+        outSocket: [{ id: "out-st", label: "graph", color: "#a1a1aa" }],
         rows: [
           {
-            key: "Param Delta",
+            key: "Param delta",
             value: st
               ? `${st.delta_parameters >= 0 ? "+" : ""}${st.delta_parameters.toLocaleString()}`
               : "0",
           },
           {
-            key: "+Add / -Rem / ~Ren",
+            key: "Key changes",
             value: st
               ? `+${st.added_tensors.length} / -${st.removed_tensors.length} / ~${st.inferred_renames.length}`
               : "+0 / -0 / ~0",
           },
           {
-            key: "Shape / Dtype Δ",
-            value: st ? `${st.shape_changes.length} / ${st.dtype_changes.length}` : "0 / 0",
+            key: "Shape · Dtype",
+            value: st ? `${st.shape_changes.length} · ${st.dtype_changes.length}` : "0 · 0",
           },
           {
-            key: "Indexed Layers",
-            value: st ? `${st.layer_deltas.length} blocks` : "—",
+            key: "Blocks",
+            value: st ? `${st.layer_deltas.length} layers` : "—",
           },
         ],
         onInspect,
@@ -223,40 +230,40 @@ function buildStudioNodes(
     },
     {
       id: "node-tensor",
-      pos: { x: 765, y: 42 },
+      pos: { x: 724, y: 24 },
       matchViews: ["tensors"],
       data: {
         nodeIndex: "05",
-        title: "Float64 Tensor Diff",
-        accentColor: "#34d399",
+        title: "Tensor Math",
+        accentColor: "#d6c5a9",
         targetView: "tensors",
-        inSocket: [{ id: "in-td", label: "ALIGNED", color: "#d4d4d8" }],
-        outSocket: [{ id: "out-td", label: "METRICS", color: "#34d399" }],
+        inSocket: [{ id: "in-td", label: "aligned", color: "#a1a1aa" }],
+        outSocket: [{ id: "out-td", label: "metrics", color: "#d6c5a9" }],
         rows: [
           {
-            key: "Changed Params",
+            key: "Changed weights",
             value: td ? `${td.summary.global_changed_pct.toFixed(2)}%` : "—",
-            highlight: "#e5b869",
+            highlight: "#f4f4f5",
           },
           {
-            key: "Mean Cosine",
+            key: "Mean cosine",
             value:
               td?.summary.global_mean_cosine != null
                 ? td.summary.global_mean_cosine.toFixed(6)
                 : "—",
           },
           {
-            key: "Mean Rel L2",
+            key: "Mean rel L2",
             value:
               td?.summary.global_mean_relative_l2 != null
                 ? td.summary.global_mean_relative_l2.toFixed(6)
                 : "—",
           },
           {
-            key: "Max |Δ| / NaN",
+            key: "Max |Δ| · Numerics",
             value: td
-              ? `${td.summary.global_max_abs_diff?.toFixed(4) ?? "0"} • ${
-                  td.summary.has_any_nan_or_inf ? "WARN" : "CLEAN"
+              ? `${td.summary.global_max_abs_diff?.toFixed(4) ?? "0"} · ${
+                  td.summary.has_any_nan_or_inf ? "NaN" : "Clean"
                 }`
               : "—",
           },
@@ -266,125 +273,128 @@ function buildStudioNodes(
     },
     {
       id: "node-layers",
-      pos: { x: 765, y: 242 },
+      pos: { x: 724, y: 254 },
       matchViews: ["layers"],
       data: {
         nodeIndex: "06",
-        title: "Layer & GQA Head Probe",
-        accentColor: "#fb923c",
+        title: "Layer & Head Scope",
+        accentColor: "#d6c5a9",
         targetView: "layers",
-        inSocket: [{ id: "in-ly", label: "METRICS", color: "#34d399" }],
-        outSocket: [{ id: "out-ly", label: "HEATMAP", color: "#fb923c" }],
+        inSocket: [{ id: "in-ly", label: "metrics", color: "#d6c5a9" }],
+        outSocket: [{ id: "out-ly", label: "heatmap", color: "#d6c5a9" }],
         rows: [
           {
-            key: "Head Projections",
-            value: bundle?.neuron_attention
-              ? `${bundle.neuron_attention.attention_projections.length} sliced`
-              : `${layerList.length} layers`,
+            key: "Head projections",
+            value: na ? `${na.attention_projections.length} sliced` : "—",
           },
           {
-            key: "Peak Submodule L2",
-            value: layerList.length > 0 ? maxRel.toFixed(5) : "—",
-            highlight: "#fb923c",
+            key: "Peak rel L2",
+            value: layers.length > 0 ? maxHeat.toFixed(5) : "—",
+            highlight: "#d6c5a9",
           },
         ],
-        visual:
-          layerList.length > 0
-            ? { kind: "heatmap", matrix, maxVal: maxRel }
-            : undefined,
+        visual: {
+          kind: "heatmap",
+          matrix: heatMatrix,
+          maxVal: maxHeat,
+        },
         onInspect,
       },
     },
     {
-      id: "node-activation",
-      pos: { x: 765, y: 452 },
+      id: "node-activations",
+      pos: { x: 724, y: 472 },
       matchViews: ["activations"],
       data: {
         nodeIndex: "07",
-        title: "Activation CKA Scope",
-        accentColor: "#7dd3fc",
+        title: "Activation CKA",
+        accentColor: "#e4e4e7",
         targetView: "activations",
-        inSocket: [{ id: "in-act", label: "TOPOLOGY", color: "#a78bfa" }],
-        outSocket: [{ id: "out-act", label: "CKA_TRACE", color: "#7dd3fc" }],
+        inSocket: [{ id: "in-act", label: "graph", color: "#a1a1aa" }],
+        outSocket: [{ id: "out-act", label: "cka", color: "#e4e4e7" }],
         rows: [
           {
-            key: "Pooled Final CKA",
+            key: "Final-layer CKA",
             value:
               act?.summary.cross_prompt_pooled_cka_final_layer != null
                 ? act.summary.cross_prompt_pooled_cka_final_layer.toFixed(5)
-                : "Not selected",
-            highlight: "#7dd3fc",
+                : "—",
+            highlight: "#f4f4f5",
           },
           {
-            key: "Next-Tok JS Div",
+            key: "Logit JS div",
             value:
               act?.summary.mean_final_token_js_divergence != null
                 ? act.summary.mean_final_token_js_divergence.toFixed(5)
                 : "—",
           },
         ],
-        visual:
-          ckaSeries.length > 1
-            ? { kind: "oscilloscope", cka: ckaSeries, cos: cosSeries }
-            : undefined,
+        visual: {
+          kind: "oscilloscope",
+          cka: ckaSeries,
+          cos: cosSeries,
+        },
         onInspect,
       },
     },
     {
-      id: "node-behavior",
-      pos: { x: 1115, y: 65 },
+      id: "node-behavioral",
+      pos: { x: 1062, y: 48 },
       matchViews: ["behavioral"],
       data: {
         nodeIndex: "08",
-        title: "8-Suite Behavioral Eval",
-        accentColor: "#2dd4bf",
+        title: "Behavioral Suite",
+        accentColor: "#e4e4e7",
         targetView: "behavioral",
-        inSocket: [{ id: "in-beh", label: "ALIGNED", color: "#d4d4d8" }],
-        outSocket: [{ id: "out-beh", label: "SCORES", color: "#2dd4bf" }],
+        inSocket: [{ id: "in-beh", label: "aligned", color: "#a1a1aa" }],
+        outSocket: [{ id: "out-beh", label: "scores", color: "#e4e4e7" }],
         rows: [
           {
-            key: "Pass Rate A → B",
+            key: "Pass rate",
             value: beh
               ? `${(beh.overall_statistics.pass_rate_a * 100).toFixed(1)}% → ${(
                   beh.overall_statistics.pass_rate_b * 100
                 ).toFixed(1)}%`
-              : "Not executed",
-            highlight: "#34d399",
+              : "—",
+            highlight:
+              beh && beh.overall_statistics.pass_rate_delta >= 0 ? "#4ade80" : "#f87171",
           },
           {
-            key: "Mean Δ / Judge",
+            key: "Mean score Δ",
             value: beh
-              ? `${beh.overall_statistics.mean_score_delta >= 0 ? "+" : ""}${beh.overall_statistics.mean_score_delta.toFixed(3)} • Determ.`
-              : "Zero-LLM-Judge",
+              ? `${beh.overall_statistics.mean_score_delta >= 0 ? "+" : ""}${beh.overall_statistics.mean_score_delta.toFixed(3)}`
+              : "—",
           },
         ],
-        visual: behBars.length > 0 ? { kind: "bars", items: behBars } : undefined,
+        visual: {
+          kind: "bars",
+          items: behBars,
+        },
         onInspect,
       },
     },
     {
       id: "node-regression",
-      pos: { x: 1115, y: 368 },
+      pos: { x: 1062, y: 368 },
       matchViews: ["regression", "reports"],
       data: {
         nodeIndex: "09",
-        title: "Regression & Report Sink",
-        accentColor: verdictColor,
+        title: "Regression Gate",
+        accentColor: verdictDot,
         targetView: "regression",
         inSocket: [
-          { id: "in-r1", label: "METRICS", color: "#34d399" },
-          { id: "in-r2", label: "CKA_TRACE", color: "#7dd3fc" },
-          { id: "in-r3", label: "SCORES", color: "#2dd4bf" },
+          { id: "in-reg-td", label: "metrics", color: "#d6c5a9" },
+          { id: "in-reg-act", label: "cka", color: "#e4e4e7" },
+          { id: "in-reg-beh", label: "scores", color: "#e4e4e7" },
         ],
-        outSocket: [{ id: "out-rep", label: "BUNDLE", color: verdictColor }],
         rows: [
           {
             key: "Policy",
-            value: String(reg?.thresholds.policy_name ?? "production-default-v1").slice(0, 22),
+            value: reg ? String(reg.thresholds.policy_name ?? "default") : "default-v1",
           },
           {
-            key: "CLI Repros",
-            value: reg ? `${reg.failure_reproductions.length} generated` : "0",
+            key: "Repro commands",
+            value: reg ? `${reg.failure_reproductions.length}` : "0",
           },
         ],
         visual: {
@@ -407,9 +417,11 @@ function buildStudioNodes(
   }));
 }
 
-function buildStudioEdges(routingMode: "bezier" | "pcb", bundle: ComparisonBundle | null): Edge[] {
-  const hasAct = Boolean(bundle?.activation);
-  const hasBeh = Boolean(bundle?.behavioral);
+function buildStudioEdges(
+  routing: "bezier" | "pcb",
+  bundle: ComparisonBundle | null
+): Edge[] {
+  const pulse = bundle !== null;
   const specs: Array<{
     id: string;
     source: string;
@@ -417,7 +429,6 @@ function buildStudioEdges(routingMode: "bezier" | "pcb", bundle: ComparisonBundl
     target: string;
     targetHandle: string;
     color: string;
-    active: boolean;
   }> = [
     {
       id: "e-a-compat",
@@ -425,8 +436,7 @@ function buildStudioEdges(routingMode: "bezier" | "pcb", bundle: ComparisonBundl
       sourceHandle: "out-a",
       target: "node-compat",
       targetHandle: "in-a",
-      color: "#e5b869",
-      active: true,
+      color: "#a1a1aa",
     },
     {
       id: "e-b-compat",
@@ -434,8 +444,7 @@ function buildStudioEdges(routingMode: "bezier" | "pcb", bundle: ComparisonBundl
       sourceHandle: "out-b",
       target: "node-compat",
       targetHandle: "in-b",
-      color: "#e5b869",
-      active: true,
+      color: "#a1a1aa",
     },
     {
       id: "e-b-struct",
@@ -443,71 +452,63 @@ function buildStudioEdges(routingMode: "bezier" | "pcb", bundle: ComparisonBundl
       sourceHandle: "out-b",
       target: "node-structural",
       targetHandle: "in-st",
-      color: "#a78bfa",
-      active: true,
+      color: "#71717a",
     },
     {
-      id: "e-compat-tensor",
+      id: "e-compat-td",
       source: "node-compat",
       sourceHandle: "out-compat",
       target: "node-tensor",
       targetHandle: "in-td",
-      color: "#34d399",
-      active: true,
+      color: "#d6c5a9",
     },
     {
-      id: "e-tensor-layers",
+      id: "e-td-layers",
       source: "node-tensor",
       sourceHandle: "out-td",
       target: "node-layers",
       targetHandle: "in-ly",
-      color: "#fb923c",
-      active: true,
+      color: "#d6c5a9",
     },
     {
-      id: "e-struct-act",
+      id: "e-st-act",
       source: "node-structural",
       sourceHandle: "out-st",
-      target: "node-activation",
+      target: "node-activations",
       targetHandle: "in-act",
-      color: "#7dd3fc",
-      active: hasAct,
+      color: "#a1a1aa",
     },
     {
       id: "e-compat-beh",
       source: "node-compat",
       sourceHandle: "out-compat",
-      target: "node-behavior",
+      target: "node-behavioral",
       targetHandle: "in-beh",
-      color: "#2dd4bf",
-      active: hasBeh,
+      color: "#a1a1aa",
     },
     {
-      id: "e-tensor-reg",
+      id: "e-td-reg",
       source: "node-tensor",
       sourceHandle: "out-td",
       target: "node-regression",
-      targetHandle: "in-r1",
-      color: "#34d399",
-      active: true,
+      targetHandle: "in-reg-td",
+      color: "#d6c5a9",
     },
     {
       id: "e-act-reg",
-      source: "node-activation",
+      source: "node-activations",
       sourceHandle: "out-act",
       target: "node-regression",
-      targetHandle: "in-r2",
-      color: "#7dd3fc",
-      active: hasAct,
+      targetHandle: "in-reg-act",
+      color: "#a1a1aa",
     },
     {
       id: "e-beh-reg",
-      source: "node-behavior",
+      source: "node-behavioral",
       sourceHandle: "out-beh",
       target: "node-regression",
-      targetHandle: "in-r3",
-      color: "#2dd4bf",
-      active: hasBeh,
+      targetHandle: "in-reg-beh",
+      color: "#e4e4e7",
     },
   ];
 
@@ -518,14 +519,16 @@ function buildStudioEdges(routingMode: "bezier" | "pcb", bundle: ComparisonBundl
     target: s.target,
     targetHandle: s.targetHandle,
     type: "signal",
-    data: { color: s.color, routingMode, active: s.active },
+    data: {
+      color: s.color,
+      routing,
+      animatedPulse: pulse,
+    } satisfies SignalEdgeData,
   }));
 }
 
 const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
   activeBundle,
-  health,
-  experiments,
   modelA,
   modelB,
   activeView,
@@ -534,9 +537,16 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
   const [routingMode, setRoutingMode] = useState<"bezier" | "pcb">("bezier");
   const { fitView } = useReactFlow();
 
+  const onInspect = useCallback(
+    (view: ViewId) => {
+      onSelectView(view);
+    },
+    [onSelectView]
+  );
+
   const computedNodes = useMemo(
-    () => buildStudioNodes(activeBundle, modelA, modelB, activeView, onSelectView),
-    [activeBundle, modelA, modelB, activeView, onSelectView]
+    () => buildStudioNodes(activeBundle, modelA, modelB, activeView, onInspect),
+    [activeBundle, modelA, modelB, activeView, onInspect]
   );
   const computedEdges = useMemo(
     () => buildStudioEdges(routingMode, activeBundle),
@@ -563,16 +573,9 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
   const handleResetLayout = useCallback(() => {
     setNodes(computedNodes);
     setTimeout(() => {
-      void fitView({ padding: 0.12, duration: 480 });
+      void fitView({ padding: 0.12, duration: 420 });
     }, 30);
   }, [computedNodes, setNodes, fitView]);
-
-  const realCount = experiments.filter(
-    (e) => e.experiment_type === "REAL MODEL EXPERIMENT" && e.status === "completed"
-  ).length;
-  const synthCount = experiments.filter(
-    (e) => e.experiment_type === "SYNTHETIC FIXTURE EXPERIMENT" && e.status === "completed"
-  ).length;
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
@@ -599,69 +602,57 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
         <Background
           id="minor-dots"
           variant={BackgroundVariant.Dots}
-          gap={22}
-          size={1.25}
-          color="#24242c"
+          gap={24}
+          size={1}
+          color="#1e1e24"
         />
         <MiniMap
           pannable
           zoomable
           nodeColor={(n) => {
             const p = n.data as StudioNodePayload | undefined;
-            return p?.accentColor ?? "#e5b869";
+            return p?.accentColor ?? "#52525b";
           }}
-          maskColor="rgba(7, 7, 10, 0.76)"
-          style={{ bottom: 16, right: 16, width: 185, height: 118 }}
+          maskColor="rgba(9, 9, 11, 0.8)"
+          style={{ bottom: 14, right: 16, width: 170, height: 108 }}
         />
       </ReactFlow>
 
-      {/* Bottom-Left Studio Telemetry & Cable Routing Bar */}
-      <div className="canvas-bottom-hud">
-        <div className="hud-pill mono">
-          <span
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: 99,
-              background: "var(--ok)",
-              boxShadow: "0 0 8px #34d399",
-            }}
-          />
-          <span>{health ? health.device.toUpperCase() : "CUDA:0"}</span>
-          <span style={{ color: "var(--text-muted)" }}>|</span>
-          <span>
-            {health
-              ? `${(health.hardware.cuda_total_vram_mb / 1024).toFixed(1)} GB VRAM`
-              : "RTX 5050"}
-          </span>
-          <span style={{ color: "var(--text-muted)" }}>|</span>
-          <span style={{ color: "var(--gold)" }}>{realCount} Real</span>
-          <span>•</span>
-          <span>{synthCount} Synth</span>
-        </div>
-
+      {/* Subtle Cable & Viewport Controls integrated into Bottom-Right beside MiniMap */}
+      <div
+        style={{
+          position: "absolute",
+          right: 196,
+          bottom: 14,
+          zIndex: 20,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          background: "var(--bg-chrome)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid var(--border-subtle)",
+          borderRadius: 9,
+          padding: "4px 8px",
+        }}
+      >
         <button
           type="button"
-          className="hud-pill"
-          style={{ cursor: "pointer" }}
+          className="canvas-footer-btn"
           onClick={() => setRoutingMode((m) => (m === "bezier" ? "pcb" : "bezier"))}
-          title="Toggle ComfyUI Bezier Spline vs Nodes 2.0 Orthogonal PCB Cable Routing"
+          title="Switch wire routing geometry"
         >
-          {routingMode === "bezier" ? <Spline size={13} color="#e5b869" /> : <GitCommitHorizontal size={13} color="#e5b869" />}
-          <span className="mono">
-            Cables: {routingMode === "bezier" ? "Bezier Spline" : "Orthogonal PCB"}
-          </span>
+          {routingMode === "bezier" ? <Spline size={12} /> : <GitCommitHorizontal size={12} />}
+          <span>Cables: {routingMode === "bezier" ? "Bezier Spline" : "Orthogonal PCB"}</span>
         </button>
-
+        <span className="studio-divider-v" style={{ height: 12 }} />
         <button
           type="button"
-          className="hud-pill"
-          style={{ cursor: "pointer" }}
+          className="canvas-footer-btn"
           onClick={handleResetLayout}
-          title="Snap DAG nodes to studio grid and fit viewport"
+          title="Reset node layout"
         >
-          <Maximize2 size={12} color="#d4d4d8" />
-          <span className="mono">Fit DAG</span>
+          <Maximize2 size={11} />
+          <span>Fit</span>
         </button>
       </div>
     </div>
@@ -669,7 +660,6 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
 };
 
 export const WorkflowCanvas: React.FC<WorkflowCanvasProps> = (props) => {
-  // Ensure ResizeObserver exists in headless unit-test environments (e.g. Vitest jsdom)
   if (typeof globalThis.ResizeObserver === "undefined") {
     return (
       <div

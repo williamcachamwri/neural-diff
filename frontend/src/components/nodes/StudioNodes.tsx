@@ -37,50 +37,33 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
           id={pin.id}
           type="target"
           position={Position.Left}
-          style={{
-            top: `${38 + idx * 22}px`,
-            background: pin.color,
-            boxShadow: `0 0 10px ${pin.color}66`,
-          }}
+          style={{ top: `${36 + idx * 20}px` }}
           title={pin.label}
         />
       ))}
 
-      {/* Header */}
+      {/* Minimal Editorial Node Header */}
       <div className="comfy-node-header">
         <div className="comfy-node-title-wrap">
-          <span
-            className="comfy-node-led"
-            style={{
-              background: payload.accentColor,
-              boxShadow: `0 0 10px ${payload.accentColor}`,
-            }}
-          />
+          <span className="comfy-node-dot" style={{ background: payload.accentColor }} />
           <span className="comfy-node-title">{payload.title}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <span className="comfy-node-id">{payload.nodeIndex}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+          <span className="comfy-node-id" style={{ marginRight: 3 }}>
+            {payload.nodeIndex}
+          </span>
           <button
             type="button"
-            className="nodrag"
+            className="nodrag comfy-node-icon-btn"
             aria-label={`Collapse ${payload.title}`}
             onClick={(e) => {
               e.stopPropagation();
               setCollapsed((c) => !c);
             }}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--text-muted)",
-              cursor: "pointer",
-              padding: 2,
-              display: "grid",
-              placeItems: "center",
-            }}
           >
             <motion.span
               animate={{ rotate: collapsed ? -90 : 0 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
               style={{ display: "grid" }}
             >
               <ChevronDown size={13} />
@@ -88,24 +71,14 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
           </button>
           <button
             type="button"
-            className="nodrag"
+            className="nodrag comfy-node-icon-btn"
             aria-label={`Inspect ${payload.title}`}
             onClick={(e) => {
               e.stopPropagation();
               payload.onInspect(payload.targetView);
             }}
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 5,
-              color: "var(--gold)",
-              cursor: "pointer",
-              padding: "2px 4px",
-              display: "grid",
-              placeItems: "center",
-            }}
           >
-            <ArrowUpRight size={12} />
+            <ArrowUpRight size={13} />
           </button>
         </div>
       </div>
@@ -127,29 +100,29 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                   <span className="comfy-kv-key">{r.key}</span>
                   <span
                     className="comfy-kv-val"
-                    style={r.highlight ? { color: r.highlight, fontWeight: 600 } : undefined}
+                    style={r.highlight ? { color: r.highlight, fontWeight: 500 } : undefined}
                   >
                     {r.value}
                   </span>
                 </div>
               ))}
 
-              {/* Inline Visual 1: 24-Layer Pixel Matrix Heatmap */}
+              {/* Inline Visual 1: Monochrome + Warm Champagne 24-Layer Pixel Matrix */}
               {payload.visual?.kind === "heatmap" && payload.visual.matrix.length > 0 && (
                 <div
                   style={{
-                    background: "#09090c",
-                    border: "1px solid var(--border-subtle)",
-                    borderRadius: 8,
+                    background: "#0b0b0e",
+                    border: "1px solid var(--border-faint)",
+                    borderRadius: 7,
                     padding: 6,
-                    marginTop: 2,
+                    marginTop: 3,
                   }}
                 >
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateRows: `repeat(${payload.visual.matrix.length}, 6px)`,
-                      gap: 2,
+                      gridTemplateRows: `repeat(${payload.visual.matrix.length}, 5.5px)`,
+                      gap: 1.5,
                     }}
                   >
                     {payload.visual.matrix.map((rowVals, rIdx) => (
@@ -162,20 +135,19 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                         }}
                       >
                         {rowVals.map((v, cIdx) => {
-                          const norm = Math.min(
-                            1,
-                            Math.max(0, v / Math.max(payload.visual && payload.visual.kind === "heatmap" ? payload.visual.maxVal : 1, 1e-6))
-                          );
-                          const alpha = (0.14 + norm * 0.86).toFixed(2);
+                          const maxVal =
+                            payload.visual && payload.visual.kind === "heatmap"
+                              ? payload.visual.maxVal
+                              : 1;
+                          const norm = Math.min(1, Math.max(0, v / Math.max(maxVal, 1e-6)));
+                          const lum = Math.round(28 + norm * 195);
+                          const warmB = Math.round(32 + norm * 145);
                           return (
                             <span
                               key={cIdx}
                               style={{
-                                borderRadius: 1.5,
-                                background:
-                                  norm > 0.68
-                                    ? `rgba(229, 184, 105, ${alpha})`
-                                    : `rgba(52, 211, 153, ${alpha})`,
+                                borderRadius: 1,
+                                background: `rgb(${lum}, ${Math.round(lum * 0.94)}, ${warmB})`,
                               }}
                             />
                           );
@@ -190,41 +162,58 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
               {payload.visual?.kind === "oscilloscope" && payload.visual.cka.length > 1 && (
                 <div
                   style={{
-                    background: "#09090c",
-                    border: "1px solid var(--border-subtle)",
-                    borderRadius: 8,
+                    background: "#0b0b0e",
+                    border: "1px solid var(--border-faint)",
+                    borderRadius: 7,
                     padding: "6px 8px 4px",
+                    marginTop: 3,
                   }}
                 >
-                  <OscilloscopeMini
-                    cka={payload.visual.cka}
-                    cos={payload.visual.cos}
-                  />
+                  <OscilloscopeMini cka={payload.visual.cka} cos={payload.visual.cos} />
                 </div>
               )}
 
-              {/* Inline Visual 3: 8-Suite Behavioral Meter Tracks */}
+              {/* Inline Visual 3: Behavioral Domain Meter Tracks */}
               {payload.visual?.kind === "bars" && payload.visual.items.length > 0 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 2 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4.5, marginTop: 3 }}>
                   {payload.visual.items.slice(0, 6).map((it) => (
                     <div
                       key={it.label}
-                      style={{ display: "grid", gridTemplateColumns: "58px 1fr 38px", alignItems: "center", gap: 6 }}
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "62px 1fr 34px",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
                     >
                       <span className="mono" style={{ fontSize: 9.5, color: "var(--text-muted)" }}>
-                        {it.label.slice(0, 7)}
+                        {it.label.slice(0, 8)}
                       </span>
-                      <div style={{ height: 5, background: "#09090c", borderRadius: 99, overflow: "hidden", position: "relative" }}>
+                      <div
+                        style={{
+                          height: 4,
+                          background: "#1b1b21",
+                          borderRadius: 99,
+                          overflow: "hidden",
+                        }}
+                      >
                         <div
                           style={{
                             width: `${Math.round(it.b * 100)}%`,
                             height: "100%",
-                            background: it.b >= it.a ? "var(--ok)" : "var(--danger)",
+                            background: it.b >= it.a ? "#d4d4d8" : "var(--danger)",
                             borderRadius: 99,
                           }}
                         />
                       </div>
-                      <span className="mono" style={{ fontSize: 9.5, textAlign: "right", color: "var(--text-secondary)" }}>
+                      <span
+                        className="mono"
+                        style={{
+                          fontSize: 9.5,
+                          textAlign: "right",
+                          color: "var(--text-secondary)",
+                        }}
+                      >
                         {Math.round(it.b * 100)}%
                       </span>
                     </div>
@@ -232,9 +221,18 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                 </div>
               )}
 
-              {/* Inline Visual 4: Compatibility Hardware LEDs */}
+              {/* Inline Visual 4: Clean Minimal Compatibility Indicators */}
               {payload.visual?.kind === "status-leds" && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5, marginTop: 2 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "5px 10px",
+                    marginTop: 4,
+                    paddingTop: 6,
+                    borderTop: "1px solid var(--border-faint)",
+                  }}
+                >
                   {payload.visual.leds.map((l) => (
                     <div
                       key={l.label}
@@ -242,62 +240,48 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                        background: "#0b0b0f",
-                        border: "1px solid var(--border-subtle)",
-                        borderRadius: 6,
-                        padding: "4px 7px",
-                        fontSize: 10,
+                        fontSize: 10.5,
+                        color: "var(--text-secondary)",
                       }}
                     >
                       <span
                         style={{
-                          width: 6,
-                          height: 6,
+                          width: 5,
+                          height: 5,
                           borderRadius: 99,
-                          background: l.ok ? "var(--ok)" : "var(--warn)",
-                          boxShadow: `0 0 6px ${l.ok ? "#34d399" : "#f59e0b"}`,
+                          background: l.ok ? "var(--ok)" : "var(--text-faint)",
                         }}
                       />
-                      <span className="mono" style={{ fontSize: 9.5 }}>{l.label}</span>
+                      <span>{l.label}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Inline Visual 5: Regression Verdict & Direct Artifact Export */}
+              {/* Inline Visual 5: Quiet Regression Verdict & Export Links */}
               {payload.visual?.kind === "verdict" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 2 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 3 }}>
                   <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      padding: "6px 9px",
-                      borderRadius: 8,
-                      background:
-                        payload.visual.verdict === "PASSED"
-                          ? "rgba(52, 211, 153, 0.1)"
-                          : "rgba(251, 113, 133, 0.1)",
-                      border: `1px solid ${
-                        payload.visual.verdict === "PASSED"
-                          ? "rgba(52, 211, 153, 0.35)"
-                          : "rgba(251, 113, 133, 0.35)"
-                      }`,
+                      paddingTop: 5,
+                      borderTop: "1px solid var(--border-faint)",
                     }}
                   >
-                    <span
-                      className="mono"
-                      style={{
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        color:
-                          payload.visual.verdict === "PASSED" ? "var(--ok)" : "var(--danger)",
-                      }}
-                    >
-                      {payload.visual.verdict}
+                    <span className="status-inline" style={{ fontSize: 11 }}>
+                      <span
+                        className={`dot ${
+                          payload.visual.verdict === "PASSED" ? "dot-ok" : "dot-danger"
+                        }`}
+                      />
+                      <span className="mono" style={{ color: "var(--text-main)", fontSize: 11 }}>
+                        {payload.visual.verdict}
+                      </span>
                     </span>
-                    <span className="mono" style={{ fontSize: 10, color: "var(--text-muted)" }}>
-                      {payload.visual.findings} finding(s)
+                    <span style={{ fontSize: 10.5, color: "var(--text-muted)" }}>
+                      {payload.visual.findings} finding{payload.visual.findings === 1 ? "" : "s"}
                     </span>
                   </div>
                   {payload.visual.comparisonId && (
@@ -305,17 +289,23 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                       {(["html", "markdown", "json"] as const).map((fmt) => (
                         <a
                           key={fmt}
-                          href={`/api/comparisons/${encodeURIComponent(payload.visual && payload.visual.kind === "verdict" && payload.visual.comparisonId ? payload.visual.comparisonId : "")}/export/${fmt}`}
+                          href={`/api/comparisons/${encodeURIComponent(
+                            payload.visual &&
+                              payload.visual.kind === "verdict" &&
+                              payload.visual.comparisonId
+                              ? payload.visual.comparisonId
+                              : ""
+                          )}/export/${fmt}`}
                           download
                           onClick={(e) => e.stopPropagation()}
                           style={{
                             flex: 1,
                             textAlign: "center",
                             padding: "4px 0",
-                            borderRadius: 6,
-                            background: "#0b0b0f",
-                            border: "1px solid var(--border)",
-                            color: "var(--ivory)",
+                            borderRadius: 5,
+                            background: "rgba(255,255,255,0.03)",
+                            border: "1px solid var(--border-subtle)",
+                            color: "var(--text-secondary)",
                             fontSize: 10,
                             fontFamily: "JetBrains Mono, monospace",
                             textDecoration: "none",
@@ -333,12 +323,10 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
         )}
       </AnimatePresence>
 
-      {/* Footer Typed Socket Labels */}
+      {/* Footer Socket Labels */}
       <div className="comfy-socket-bar">
-        <span>{inPins.map((p) => `● ${p.label}`).join("  ") || "SOURCE"}</span>
-        <span style={{ color: payload.accentColor }}>
-          {outPins.map((p) => `${p.label} ●`).join("  ") || "SINK"}
-        </span>
+        <span>{inPins.map((p) => p.label).join(" · ") || "input"}</span>
+        <span>{outPins.map((p) => p.label).join(" · ") || "output"}</span>
       </div>
 
       {/* Output Handles */}
@@ -348,11 +336,7 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
           id={pin.id}
           type="source"
           position={Position.Right}
-          style={{
-            top: `${38 + idx * 22}px`,
-            background: pin.color,
-            boxShadow: `0 0 10px ${pin.color}66`,
-          }}
+          style={{ top: `${36 + idx * 20}px` }}
           title={pin.label}
         />
       ))}
@@ -361,8 +345,8 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
 };
 
 const OscilloscopeMini: React.FC<{ cka: number[]; cos: number[] }> = ({ cka, cos }) => {
-  const w = 244;
-  const h = 42;
+  const w = 240;
+  const h = 38;
   const toPath = (arr: number[]) => {
     if (arr.length === 0) return "";
     const minV = Math.min(...arr, 0.85);
@@ -378,9 +362,16 @@ const OscilloscopeMini: React.FC<{ cka: number[]; cos: number[] }> = ({ cka, cos
 
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h}>
-      <line x1="0" y1={h / 2} x2={w} y2={h / 2} stroke="rgba(255,255,255,0.06)" strokeDasharray="2 3" />
-      <path d={toPath(cos)} fill="none" stroke="#e5b869" strokeWidth="1.4" strokeOpacity="0.65" />
-      <path d={toPath(cka)} fill="none" stroke="#7dd3fc" strokeWidth="1.9" />
+      <line
+        x1="0"
+        y1={h / 2}
+        x2={w}
+        y2={h / 2}
+        stroke="rgba(255,255,255,0.05)"
+        strokeDasharray="2 3"
+      />
+      <path d={toPath(cos)} fill="none" stroke="#71717a" strokeWidth="1.25" />
+      <path d={toPath(cka)} fill="none" stroke="#e4e4e7" strokeWidth="1.65" />
     </svg>
   );
 };
