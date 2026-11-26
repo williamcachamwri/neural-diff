@@ -5,9 +5,10 @@ from __future__ import annotations
 import gc
 import threading
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
-from typing import Any, Iterator
+from typing import Any
 
 from core.exceptions import OperationCancelledError, ResourceExhaustedError
 
@@ -88,32 +89,37 @@ class ResourceManager:
         try:
             import torch
 
-            if self.preferred_device in ("auto", "cuda") or self.preferred_device.startswith("cuda"):
-                if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                    target = "cuda:0" if self.preferred_device in ("auto", "cuda") else self.preferred_device
-                    idx = int(target.split(":")[1]) if ":" in target else 0
-                    free_bytes, _total_bytes = torch.cuda.mem_get_info(idx)
-                    free_mb = free_bytes / (1024**2)
-                    if free_mb >= self.min_free_vram_mb:
-                        # Execute actual tensor op to confirm architecture kernel availability (e.g. sm_120)
-                        probe = torch.tensor([1.0, 2.0], device=target)
-                        if float(torch.sum(probe).item()) == 3.0:
-                            self._resolved_device = target
-                            self._device_reason = (
-                                f"Verified CUDA kernel execution on {torch.cuda.get_device_name(idx)} "
-                                f"({free_mb:.0f} MB free VRAM)."
-                            )
-                            return target
-                    else:
+            if (
+                self.preferred_device in ("auto", "cuda")
+                or self.preferred_device.startswith("cuda")
+            ) and torch.cuda.is_available() and torch.cuda.device_count() > 0:
+                target = "cuda:0" if self.preferred_device in ("auto", "cuda") else self.preferred_device
+                idx = int(target.split(":")[1]) if ":" in target else 0
+                free_bytes, _total_bytes = torch.cuda.mem_get_info(idx)
+                free_mb = free_bytes / (1024**2)
+                if free_mb >= self.min_free_vram_mb:
+                    # Execute actual tensor op to confirm architecture kernel availability (e.g. sm_120)
+                    probe = torch.tensor([1.0, 2.0], device=target)
+                    if float(torch.sum(probe).item()) == 3.0:
+                        self._resolved_device = target
                         self._device_reason = (
-                            f"CUDA free VRAM ({free_mb:.0f} MB) below threshold ({self.min_free_vram_mb:.0f} MB); falling back to CPU."
+                            f"Verified CUDA kernel execution on {torch.cuda.get_device_name(idx)} "
+                            f"({free_mb:.0f} MB free VRAM)."
                         )
+                        return target
+                else:
+                    self._device_reason = (
+                        f"CUDA free VRAM ({free_mb:.0f} MB) below threshold ({self.min_free_vram_mb:.0f} MB); falling back to CPU."
+                    )
 
-            if self.preferred_device in ("auto", "mps"):
-                if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-                    self._resolved_device = "mps"
-                    self._device_reason = "Apple Metal (MPS) backend available."
-                    return "mps"
+            if (
+                self.preferred_device in ("auto", "mps")
+                and hasattr(torch.backends, "mps")
+                and torch.backends.mps.is_available()
+            ):
+                self._resolved_device = "mps"
+                self._device_reason = "Apple Metal (MPS) backend available."
+                return "mps"
         except Exception as exc:
             self._device_reason = f"GPU probe failed ({type(exc).__name__}: {exc}); falling back to CPU."
 
@@ -150,8 +156,8 @@ class ResourceManager:
                 cuda_alloc_mb = torch.cuda.memory_allocated(0) / (1024**2)
                 cuda_res_mb = torch.cuda.memory_reserved(0) / (1024**2)
                 cuda_total_mb = torch.cuda.get_device_properties(0).total_memory / (1024**2)
-        except Exception:
-            pass
+        except Exception as exc:
+            _ = exc
 
         return ResourceSnapshot(
             timestamp_monotonic=time.perf_counter(),
@@ -187,8 +193,8 @@ class ResourceManager:
 
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-        except Exception:
-            pass
+        except Exception as exc:
+            _ = exc
 
     @contextmanager
     def managed_execution(

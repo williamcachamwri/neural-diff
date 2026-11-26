@@ -8,7 +8,6 @@ import threading
 from pathlib import Path
 from typing import Any
 
-
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "neural_diff.db"
 
 DEFAULT_SETTINGS: dict[str, Any] = {

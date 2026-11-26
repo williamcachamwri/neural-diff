@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from safetensors import safe_open
 
 from adapters.architectures.registry import classify_tensor_role
 from core.exceptions import MalformedCheckpointError, ModelNotFoundError
@@ -20,6 +19,7 @@ from core.security import (
     validate_safetensors_header,
 )
 from core.types import TensorDescriptor
+from safetensors import safe_open
 
 _SAFETENSORS_TO_TORCH_DTYPE_NAME: dict[str, str] = {
     "F64": "float64",
@@ -150,12 +150,12 @@ class MultiSafetensorsReader(CheckpointReader):
                 self._custom_meta.setdefault(f"{shard_name}:{k}", v)
 
         for tensor_name, shard_name in weight_map.items():
-            reader = shard_readers.get(shard_name)
-            if reader is None:
+            shard_reader = shard_readers.get(shard_name)
+            if shard_reader is None:
                 raise MalformedCheckpointError(
                     f"Shard '{shard_name}' referenced by tensor '{tensor_name}' is missing."
                 )
-            shard_descs = reader.descriptors()
+            shard_descs = shard_reader.descriptors()
             if tensor_name not in shard_descs:
                 raise MalformedCheckpointError(
                     f"Shard index maps '{tensor_name}' to '{shard_name}', but tensor is absent in shard."

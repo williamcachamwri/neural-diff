@@ -103,10 +103,7 @@ def summarize_tensor_chunks(
             nan_count += nan_c
             pos_inf_count += pinf_c
             neg_inf_count += ninf_c
-            if nan_c or pinf_c or ninf_c:
-                finite_vals = f64[torch.isfinite(f64)]
-            else:
-                finite_vals = f64
+            finite_vals = f64[torch.isfinite(f64)] if (nan_c or pinf_c or ninf_c) else f64
         else:
             finite_vals = flat.to(torch.float64)
 

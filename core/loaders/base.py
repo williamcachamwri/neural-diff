@@ -37,7 +37,7 @@ class CheckpointReader(ABC):
     def custom_metadata(self) -> dict[str, str]:
         """Return string-valued checkpoint metadata dictionary when present."""
 
-    def close(self) -> None:
+    def close(self) -> None:  # noqa: B027
         """Release underlying file descriptors or memory-mapped handles."""
 
 

@@ -13,7 +13,6 @@ from core.cli import main as cli_main
 from core.orchestrator import ComparisonOrchestrator, ComparisonRequestConfig
 from core.regression_engine.engine import RegressionBaseline, RegressionEngine
 from core.regression_engine.thresholds import RegressionThresholds
-from core.report_engine.exporter import ReportEngine
 from core.resource_manager import CancellationToken, OperationCancelledError
 from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
 

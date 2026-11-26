@@ -208,6 +208,9 @@ class TensorDiffEngine:
         token: CancellationToken | None,
     ) -> TensorComparisonRecord:
         notes: list[str] = []
+        dist_a: TensorDistributionSummary | None = None
+        dist_b: TensorDistributionSummary | None = None
+        shift: DistributionShiftSummary | None = None
         if da is not None and db is None:
             dist_a = (
                 summarize_tensor_chunks(

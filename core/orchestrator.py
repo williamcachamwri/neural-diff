@@ -6,7 +6,6 @@ import datetime as dt
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 
 from core.activation_analysis.comparator import ActivationDiffEngine
@@ -96,7 +95,7 @@ class ComparisonOrchestrator:
         )
         loader = ModelLoader(policy=self.policy)
         comp_id = comparison_id or f"ndiff-{uuid.uuid4().hex[:10]}"
-        created_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+        created_utc = dt.datetime.now(dt.UTC).isoformat()
 
         total_steps = len(selected) + 1
         completed_steps = 0

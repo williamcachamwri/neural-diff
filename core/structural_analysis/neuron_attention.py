@@ -286,15 +286,15 @@ class NeuronAttentionAnalyzer:
                     ha = ta.reshape(da.shape[0], heads, head_dim).permute(1, 0, 2).reshape(heads, -1)
                     hb = tb.reshape(da.shape[0], heads, head_dim).permute(1, 0, 2).reshape(heads, -1)
 
-                cos, rel_l2, norm_a, norm_b, max_abs = _vector_batch_metrics(ha, hb)
+                cos_v, rel_l2_v, norm_a_v, norm_b_v, max_abs_v = _vector_batch_metrics(ha, hb)
                 head_slices = [
                     HeadSliceDiff(
                         head_index=h_idx,
-                        cosine_similarity=round(float(cos[h_idx].item()), 8),
-                        relative_l2=round(float(rel_l2[h_idx].item()), 8),
-                        frobenius_norm_a=round(float(norm_a[h_idx].item()), 6),
-                        frobenius_norm_b=round(float(norm_b[h_idx].item()), 6),
-                        max_abs_diff=round(float(max_abs[h_idx].item()), 8),
+                        cosine_similarity=round(float(cos_v[h_idx].item()), 8),
+                        relative_l2=round(float(rel_l2_v[h_idx].item()), 8),
+                        frobenius_norm_a=round(float(norm_a_v[h_idx].item()), 6),
+                        frobenius_norm_b=round(float(norm_b_v[h_idx].item()), 6),
+                        max_abs_diff=round(float(max_abs_v[h_idx].item()), 8),
                     )
                     for h_idx in range(heads)
                 ]
@@ -306,9 +306,9 @@ class NeuronAttentionAnalyzer:
                         role=role.value,
                         num_heads=heads,
                         head_dim=head_dim,
-                        mean_head_cosine=round(float(cos.mean().item()), 8),
-                        min_head_cosine=round(float(cos.min().item()), 8),
-                        max_head_relative_l2=round(float(rel_l2.max().item()), 8),
+                        mean_head_cosine=round(float(cos_v.mean().item()), 8),
+                        min_head_cosine=round(float(cos_v.min().item()), 8),
+                        max_head_relative_l2=round(float(rel_l2_v.max().item()), 8),
                         most_diverged_heads=ranked_heads[: min(5, heads)],
                         all_heads=head_slices,
                     )
@@ -329,18 +329,18 @@ class NeuronAttentionAnalyzer:
                 mat_a = ta.transpose(0, 1).contiguous() if basis_axis == 1 else ta
                 mat_b = tb.transpose(0, 1).contiguous() if basis_axis == 1 else tb
 
-                cos, rel_l2, norm_a, norm_b, _max_abs = _vector_batch_metrics(mat_a, mat_b)
+                m_cos, m_rel_l2, m_norm_a, m_norm_b, _max_abs = _vector_batch_metrics(mat_a, mat_b)
                 basis_dim = int(mat_a.shape[0])
-                p95_rel = float(torch.quantile(rel_l2, 0.95).item()) if basis_dim > 0 else 0.0
+                p95_rel = float(torch.quantile(m_rel_l2, 0.95).item()) if basis_dim > 0 else 0.0
                 k = min(self.top_k, basis_dim)
-                top_vals, top_idxs = torch.topk(rel_l2, k=k)
+                top_vals, top_idxs = torch.topk(m_rel_l2, k=k)
                 top_list = [
                     {
                         "basis_index": int(top_idxs[i].item()),
                         "relative_l2": round(float(top_vals[i].item()), 8),
-                        "cosine_similarity": round(float(cos[top_idxs[i]].item()), 8),
-                        "norm_a": round(float(norm_a[top_idxs[i]].item()), 6),
-                        "norm_b": round(float(norm_b[top_idxs[i]].item()), 6),
+                        "cosine_similarity": round(float(m_cos[top_idxs[i]].item()), 8),
+                        "norm_a": round(float(m_norm_a[top_idxs[i]].item()), 6),
+                        "norm_b": round(float(m_norm_b[top_idxs[i]].item()), 6),
                     }
                     for i in range(k)
                 ]
@@ -351,9 +351,9 @@ class NeuronAttentionAnalyzer:
                         role=role.value,
                         basis_axis=basis_axis,
                         basis_dimension=basis_dim,
-                        mean_basis_cosine=round(float(cos.mean().item()), 8),
+                        mean_basis_cosine=round(float(m_cos.mean().item()), 8),
                         p95_relative_l2=round(p95_rel, 8),
-                        max_relative_l2=round(float(rel_l2.max().item()), 8),
+                        max_relative_l2=round(float(m_rel_l2.max().item()), 8),
                         top_shifted_indices=top_list,
                     )
                 )

@@ -125,7 +125,7 @@ class RegressionBaseline:
         }
         return cls(
             baseline_id=baseline_id,
-            created_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+            created_at_utc=dt.datetime.now(dt.UTC).isoformat(),
             model_id=behavioral.model_b_id if use_b else behavioral.model_a_id,
             revision=behavioral.revision_b if use_b else behavioral.revision_a,
             suite_id=behavioral.suite_id,
@@ -251,22 +251,25 @@ class RegressionEngine:
                         threshold_value=0,
                     )
                 )
-        elif structural is not None:
-            if self.thresholds.forbid_missing_tensors and len(structural.removed_tensors) > 0:
-                findings.append(
-                    RegressionFinding(
-                        finding_id=_next_id("REG-STR"),
-                        domain="structural",
-                        severity=Severity.HIGH,
-                        epistemic_status=EpistemicStatus.OBSERVED,
-                        title="Removed tensors detected in candidate model",
-                        description=f"{len(structural.removed_tensors)} tensor(s) were removed.",
-                        metric_name="removed_tensors",
-                        baseline_value=0,
-                        candidate_value=len(structural.removed_tensors),
-                        threshold_value=0,
-                    )
+        elif (
+            structural is not None
+            and self.thresholds.forbid_missing_tensors
+            and len(structural.removed_tensors) > 0
+        ):
+            findings.append(
+                RegressionFinding(
+                    finding_id=_next_id("REG-STR"),
+                    domain="structural",
+                    severity=Severity.HIGH,
+                    epistemic_status=EpistemicStatus.OBSERVED,
+                    title="Removed tensors detected in candidate model",
+                    description=f"{len(structural.removed_tensors)} tensor(s) were removed.",
+                    metric_name="removed_tensors",
+                    baseline_value=0,
+                    candidate_value=len(structural.removed_tensors),
+                    threshold_value=0,
                 )
+            )
 
         # 2. Activation stability checks
         if activation is not None:

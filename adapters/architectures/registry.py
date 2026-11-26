@@ -45,9 +45,8 @@ def classify_tensor_role(tensor_name: str) -> tuple[int | None, CanonicalRole]:
     ):
         return (layer_idx, CanonicalRole.EMBEDDING)
 
-    if any(tok in lower for tok in ("lm_head", "embed_out", "output.weight")):
-        if layer_idx is None:
-            return (None, CanonicalRole.LM_HEAD)
+    if layer_idx is None and any(tok in lower for tok in ("lm_head", "embed_out", "output.weight")):
+        return (None, CanonicalRole.LM_HEAD)
 
     # Normalization layers
     if any(
@@ -148,8 +147,8 @@ def extract_architecture_metadata(directory: Path | None) -> ArchitectureMetadat
             tc = tok_cfg.get("tokenizer_class")
             if isinstance(tc, str):
                 tokenizer_class = tc
-        except Exception:
-            pass
+        except Exception as exc:
+            _ = exc
 
     tok_json_path = directory / "tokenizer.json"
     if tok_json_path.is_file():
@@ -160,8 +159,8 @@ def extract_architecture_metadata(directory: Path | None) -> ArchitectureMetadat
                 base_vocab_len = len(model_sec["vocab"])
                 added_len = len(tok_json.get("added_tokens", [])) if isinstance(tok_json.get("added_tokens"), list) else 0
                 tokenizer_vocab_size = base_vocab_len + added_len
-        except Exception:
-            pass
+        except Exception as exc:
+            _ = exc
 
     sanitized_raw = {
         k: v

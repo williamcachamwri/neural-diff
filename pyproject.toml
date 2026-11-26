@@ -75,6 +75,9 @@ src = ["core", "adapters", "benchmarks", "api", "tests", "scripts"]
 select = ["E", "F", "I", "B", "UP", "SIM", "S"]
 ignore = ["E501", "S101", "S603", "S310"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["core", "adapters", "benchmarks", "api", "tests", "scripts"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101", "S105", "S106", "S108", "S301"]
 "scripts/**/*.py" = ["S603", "S607"]
@@ -92,6 +95,7 @@ exclude = ["frontend/", "build/", "dist/", ".venv/"]
 minversion = "8.0"
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
   "unit: fast mathematical and component unit tests",
   "integration: multi-module, API, and checkpoint pipeline tests",

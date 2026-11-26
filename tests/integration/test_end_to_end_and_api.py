@@ -146,3 +146,116 @@ def test_full_fastapi_workflow_comparisons_filtering_exports_and_settings(tmp_pa
     )
     assert put_s.status_code == 200
     assert put_s.json()["allow_pytorch_weights_only"] is False
+
+
+@pytest.mark.integration
+def test_local_pretrained_qwen2_activation_behavioral_and_baseline_api(tmp_path: Path) -> None:
+    """Build two real tiny Qwen2ForCausalLM + PreTrainedTokenizerFast checkpoints and run full 6-module API."""
+    from tokenizers import Tokenizer
+    from tokenizers.models import WordLevel
+    from tokenizers.pre_tokenizers import Whitespace
+    from transformers import PreTrainedTokenizerFast, Qwen2Config, Qwen2ForCausalLM
+
+    vocab = {
+        "<pad>": 0,
+        "<eos>": 1,
+        "<unk>": 2,
+        "Question": 3,
+        "Answer": 4,
+        "149": 5,
+        "Au": 6,
+        "TCP": 7,
+        "404": 8,
+    }
+    for i in range(9, 96):
+        vocab[f"w{i}"] = i
+
+    tok_backend = Tokenizer(WordLevel(vocab=vocab, unk_token="<unk>"))
+    tok_backend.pre_tokenizer = Whitespace()
+    fast_tok = PreTrainedTokenizerFast(
+        tokenizer_object=tok_backend,
+        eos_token="<eos>",
+        pad_token="<pad>",
+        unk_token="<unk>",
+    )
+
+    cfg = Qwen2Config(
+        vocab_size=96,
+        hidden_size=32,
+        intermediate_size=64,
+        num_hidden_layers=2,
+        num_attention_heads=4,
+        num_key_value_heads=2,
+        max_position_embeddings=128,
+        pad_token_id=0,
+        eos_token_id=1,
+        bos_token_id=1,
+    )
+
+    torch.manual_seed(303)
+    m_a = Qwen2ForCausalLM(cfg)
+    torch.manual_seed(404)
+    m_b = Qwen2ForCausalLM(cfg)
+
+    dir_a = tmp_path / "tiny_qwen_a"
+    dir_b = tmp_path / "tiny_qwen_b"
+    m_a.save_pretrained(str(dir_a), safe_serialization=True)
+    fast_tok.save_pretrained(str(dir_a))
+    m_b.save_pretrained(str(dir_b), safe_serialization=True)
+    fast_tok.save_pretrained(str(dir_b))
+
+    policy = SecurityPolicy(allowed_roots=[tmp_path])
+    app = create_app(db_path=tmp_path / "full6.db", policy=policy)
+    client = TestClient(app)
+
+    run_resp = client.post(
+        "/api/comparisons/run",
+        json={
+            "model_a": str(dir_a),
+            "model_b": str(dir_b),
+            "modules": ["structural", "tensor", "neuron", "activation", "behavioral", "regression"],
+            "experiment_type": "SYNTHETIC FIXTURE EXPERIMENT",
+            "preferred_device": "cpu",
+            "activation_prompts": ["Question Answer", "Question 149"],
+            "behavioral_categories": ["conciseness", "math_reasoning"],
+            "behavioral_max_cases": 4,
+            "max_new_tokens": 8,
+            "local_files_only": True,
+            "async_job": False,
+        },
+    )
+    assert run_resp.status_code == 200
+    comp = run_resp.json()
+    cid = comp["comparison_id"]
+    assert comp["bundle"]["activation"]["summary"]["prompt_count"] == 2
+    assert comp["bundle"]["behavioral"]["overall_statistics"]["n_cases"] == 4
+
+    # Create and delete versioned baseline via REST API
+    bsl_resp = client.post(
+        "/api/baselines/from-comparison",
+        json={"comparison_id": cid, "baseline_id": "tiny-qwen-bsl", "side": "b"},
+    )
+    assert bsl_resp.status_code == 200
+    assert len(client.get("/api/baselines").json()["baselines"]) == 1
+
+    # Re-run referencing persisted baseline_id
+    run2 = client.post(
+        "/api/comparisons/run",
+        json={
+            "model_a": str(dir_a),
+            "model_b": str(dir_b),
+            "modules": ["behavioral", "regression"],
+            "preferred_device": "cpu",
+            "behavioral_categories": ["conciseness", "math_reasoning"],
+            "behavioral_max_cases": 4,
+            "max_new_tokens": 8,
+            "baseline_id": "tiny-qwen-bsl",
+            "local_files_only": True,
+        },
+    )
+    assert run2.status_code == 200
+    assert run2.json()["bundle"]["regression"]["baseline_comparison"]["baseline_id"] == "tiny-qwen-bsl"
+
+    del_resp = client.delete("/api/baselines/tiny-qwen-bsl")
+    assert del_resp.status_code == 200
+    assert del_resp.json()["deleted"] is True

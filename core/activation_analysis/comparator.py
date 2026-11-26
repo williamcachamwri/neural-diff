@@ -6,15 +6,15 @@ import math
 import platform
 import re
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import safetensors
 import torch
 import transformers
 from torch import nn
 
+import safetensors
 from core.activation_analysis.metrics import (
     ActivationLayerComparison,
     compare_activation_tensors,
@@ -446,6 +446,9 @@ class ActivationDiffEngine:
                 add_special_tokens=True,
             )
             ids = [int(x) for x in enc["input_ids"]]
+            if not ids:
+                fallback_id = int(tokenizer.bos_token_id or tokenizer.eos_token_id or 0)
+                ids = [fallback_id]
             toks = [str(tokenizer.decode([tid])) for tid in ids]
             tokenized.append((p, ids, toks))
 
@@ -468,7 +471,7 @@ class ActivationDiffEngine:
                 low_cpu_mem_usage=True,
             )
 
-        model.to(device)
+        nn.Module.to(model, device)
         try:
             traces = capture_module_traces(
                 model,
@@ -635,10 +638,10 @@ class ActivationDiffEngine:
             idx: (round(sum(hidden_cka_accum[idx]) / len(hidden_cka_accum[idx]), 8) if idx in hidden_cka_accum else None)
             for idx in all_h_layers
         }
-        mean_m_cos = {
+        mean_m_cos: dict[int, float | None] = {
             idx: round(sum(vals) / len(vals), 8) for idx, vals in sorted(mlp_cos_accum.items()) if vals
         }
-        mean_a_cos = {
+        mean_a_cos: dict[int, float | None] = {
             idx: round(sum(vals) / len(vals), 8) for idx, vals in sorted(attn_cos_accum.items()) if vals
         }
 

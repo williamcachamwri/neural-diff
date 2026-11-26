@@ -11,10 +11,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import safetensors
 import torch
 import transformers
 
+import safetensors
 from core import __version__
 from core.activation_analysis.comparator import ActivationDiffReport
 from core.behavioral_analysis.runner import BehavioralDiffReport
@@ -156,7 +156,7 @@ class ComparisonBundle:
 
 def default_reproducibility_metadata() -> dict[str, Any]:
     return {
-        "captured_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "captured_at_utc": dt.datetime.now(dt.UTC).isoformat(),
         "python_version": sys.version.split()[0],
         "platform": platform.platform(),
         "torch_version": torch.__version__,

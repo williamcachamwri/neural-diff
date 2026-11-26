@@ -9,13 +9,13 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-import safetensors
 import torch
 import transformers
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
+import safetensors
 from api.schemas import (
     CreateBaselineRequest,
     InspectModelRequest,
@@ -117,8 +117,12 @@ def create_app(
 
     def _effective_policy() -> SecurityPolicy:
         settings = store.get_settings()
+        roots = list(base_policy.allowed_roots)
+        db_parent = store.db_path.parent.resolve()
+        if db_parent not in roots:
+            roots.append(db_parent)
         return SecurityPolicy(
-            allowed_roots=list(base_policy.allowed_roots),
+            allowed_roots=roots,
             allow_pytorch_weights_only=bool(settings.get("allow_pytorch_weights_only", True)),
             reject_symlinks_outside_roots=base_policy.reject_symlinks_outside_roots,
             max_header_bytes=base_policy.max_header_bytes,
@@ -257,7 +261,7 @@ def create_app(
             b_dict = store.get_baseline(req.baseline_id)
             if b_dict is None:
                 raise ModelNotFoundError(f"Baseline '{req.baseline_id}' not found.")
-            tmp_dir = REPO_ROOT / "data" / "baselines"
+            tmp_dir = store.db_path.parent / "baselines"
             tmp_dir.mkdir(parents=True, exist_ok=True)
             baseline_file = tmp_dir / f"{req.baseline_id}.json"
             RegressionBaseline(**b_dict).save(baseline_file)
@@ -348,7 +352,7 @@ def create_app(
     @app.post("/api/comparisons/run")
     def run_comparison(req: RunComparisonRequest) -> dict[str, Any]:
         comp_id = f"ndiff-{uuid.uuid4().hex[:10]}"
-        now_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+        now_utc = dt.datetime.now(dt.UTC).isoformat()
         token = CancellationToken()
 
         store.create_job(
@@ -449,20 +453,21 @@ def create_app(
             recs = [r for r in recs if r["status"] == status]
 
         if sort_by == "name":
-            recs.sort(key=lambda r: r["name"])
+            recs.sort(key=lambda r: str(r["name"]))
         elif sort_by == "cosine_similarity":
-            recs.sort(
-                key=lambda r: (
-                    (r.get("metrics") or {}).get("cosine_similarity")
-                    if (r.get("metrics") or {}).get("cosine_similarity") is not None
-                    else 2.0
-                )
-            )
+            def _cos_key(rec: dict[str, Any]) -> float:
+                m = rec.get("metrics")
+                val = m.get("cosine_similarity") if isinstance(m, dict) else None
+                return float(val) if isinstance(val, (int, float)) else 2.0
+
+            recs.sort(key=_cos_key)
         else:
-            recs.sort(
-                key=lambda r: float((r.get("metrics") or {}).get(sort_by) or -1.0),
-                reverse=True,
-            )
+            def _metric_key(rec: dict[str, Any]) -> float:
+                m = rec.get("metrics")
+                val = m.get(sort_by) if isinstance(m, dict) else None
+                return float(val) if isinstance(val, (int, float)) else -1.0
+
+            recs.sort(key=_metric_key, reverse=True)
 
         total = len(recs)
         return {"total": total, "offset": offset, "limit": limit, "records": recs[offset : offset + limit]}
@@ -511,7 +516,7 @@ def create_app(
         }
         baseline = RegressionBaseline(
             baseline_id=req.baseline_id,
-            created_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+            created_at_utc=dt.datetime.now(dt.UTC).isoformat(),
             model_id=meta["model_id"],
             revision=meta.get("revision"),
             suite_id=beh["suite_id"],

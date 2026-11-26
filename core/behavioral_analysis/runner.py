@@ -277,7 +277,7 @@ class BehavioralDiffEngine:
             dtype=torch_dtype,
             low_cpu_mem_usage=True,
         )
-        model.to(device)
+        torch.nn.Module.to(model, device)
         model.eval()
 
         has_chat_template = bool(getattr(tokenizer, "chat_template", None))
@@ -307,6 +307,10 @@ class BehavioralDiffEngine:
                     enc = tokenizer(formatted, return_tensors="pt")
                     input_ids = enc["input_ids"].to(device)
                     attention_mask = enc["attention_mask"].to(device)
+                    if int(input_ids.shape[1]) == 0:
+                        fb_id = int(tokenizer.bos_token_id or tokenizer.eos_token_id or 0)
+                        input_ids = torch.tensor([[fb_id]], dtype=torch.long, device=device)
+                        attention_mask = torch.ones_like(input_ids, device=device)
                     prompt_len = int(input_ids.shape[1])
 
                     torch.manual_seed(self.seed)
