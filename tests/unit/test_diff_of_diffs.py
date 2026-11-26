@@ -5,6 +5,7 @@ import pytest
 from core.regression_engine.diff_of_diffs import RunSnapshot, compare_run_history
 
 
+@pytest.mark.unit
 def test_history_flags_net_regression_and_locates_worst_step() -> None:
     runs = [
         RunSnapshot("r1", 0.5, {"math": 0.8, "json": 0.9}),
@@ -23,6 +24,7 @@ def test_history_flags_net_regression_and_locates_worst_step() -> None:
     assert cmp.to_dict()["epistemic_status"] == "OBSERVED"
 
 
+@pytest.mark.unit
 def test_history_requires_two_runs_and_valid_tolerance() -> None:
     with pytest.raises(ValueError):
         compare_run_history([RunSnapshot("only", 1.0, {"a": 1.0})])
@@ -31,6 +33,7 @@ def test_history_requires_two_runs_and_valid_tolerance() -> None:
         compare_run_history(two, drop_tolerance=-1)
 
 
+@pytest.mark.unit
 def test_categories_present_in_one_run_only_are_skipped() -> None:
     runs = [RunSnapshot("a", 1.0, {"x": 1.0}), RunSnapshot("b", 1.0, {"x": 1.0, "new": 0.2})]
     cmp = compare_run_history(runs)
