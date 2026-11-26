@@ -21,6 +21,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: "vendor-xyflow", test: /node_modules[\\/]@xyflow/ },
+            { name: "vendor-motion", test: /node_modules[\\/]framer-motion/ },
+            { name: "vendor-react", test: /node_modules[\\/](react|react-dom)/ },
+          ],
+        },
+      },
+    },
+  },
   test: {
     environment: "jsdom",
     globals: true,
