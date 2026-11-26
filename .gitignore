@@ -27,10 +27,8 @@ test-results/
 models_cache/
 *.gguf
 
-# Runtime SQLite databases (keep test fixtures)
-data/*.db
-data/*.db-journal
-data/*.db-wal
+# Runtime SQLite databases & generated local demo fixtures
+data/
 
 # Secrets & local environment overrides
 .env

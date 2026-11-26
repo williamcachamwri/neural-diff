@@ -75,12 +75,18 @@ export const ModelComparisonView: React.FC<Props> = ({
       return;
     }
 
+    const autoSynth =
+      modelA.toLowerCase().includes("synth") ||
+      modelA.toLowerCase().includes("fixture") ||
+      modelB.toLowerCase().includes("synth") ||
+      modelB.toLowerCase().includes("fixture");
+
     try {
       const job = await apiClient.runComparison({
         model_a: modelA.trim(),
         model_b: modelB.trim(),
         modules,
-        experiment_type: experimentType,
+        experiment_type: autoSynth ? "SYNTHETIC FIXTURE EXPERIMENT" : experimentType,
         preferred_device: device,
         tolerances: {
           atol: Number(atol) || 1e-6,

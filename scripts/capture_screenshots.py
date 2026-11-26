@@ -91,6 +91,18 @@ def main() -> int:
     npm = shutil.which("npm") or "npm"
     npx = shutil.which("npx") or "npx"
 
+    # Ensure any synthetic fixture run in SQLite is strictly badged as SYNTHETIC FIXTURE EXPERIMENT
+    db_file = REPO_ROOT / "data" / "neural_diff.db"
+    if db_file.is_file():
+        import sqlite3
+
+        with sqlite3.connect(str(db_file)) as conn:
+            conn.execute(
+                "UPDATE experiments SET experiment_type = 'SYNTHETIC FIXTURE EXPERIMENT' "
+                "WHERE lower(model_a_id) LIKE '%synth%' OR lower(model_a_id) LIKE '%fixture%'"
+            )
+            conn.commit()
+
     # Build fresh production frontend bundle before starting preview server
     subprocess.run([npm, "--prefix", "frontend", "run", "build"], cwd=str(REPO_ROOT), check=True)
 
@@ -100,8 +112,10 @@ def main() -> int:
     backend_fh = backend_log_path.open("w", encoding="utf-8")
     frontend_fh = frontend_log_path.open("w", encoding="utf-8")
 
+    os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(REPO_ROOT / ".cache" / "ms-playwright"))
     env = dict(os.environ)
     env["HF_HOME"] = str(REPO_ROOT / ".cache" / "huggingface")
+    env["PLAYWRIGHT_BROWSERS_PATH"] = os.environ["PLAYWRIGHT_BROWSERS_PATH"]
     env["VITE_API_ORIGIN"] = "http://127.0.0.1:8000"
     env["PLAYWRIGHT_BASE_URL"] = "http://127.0.0.1:4173"
 
@@ -130,7 +144,7 @@ def main() -> int:
         # 1. Execute Playwright E2E test suite against live servers
         e2e_started = dt.datetime.now(dt.UTC).isoformat()
         e2e_proc = subprocess.run(
-            [npx, "--prefix", "frontend", "playwright", "test"],
+            [npx, "playwright", "test"],
             cwd=str(REPO_ROOT / "frontend"),
             capture_output=True,
             text=True,
@@ -381,13 +395,19 @@ def main() -> int:
         )
         return 0
     finally:
-        frontend_proc.terminate()
-        backend_proc.terminate()
         for p in (frontend_proc, backend_proc):
-            try:
-                p.wait(timeout=5)
-            except Exception:
-                p.kill()
+            if sys.platform == "win32":
+                subprocess.run(
+                    ["taskkill", "/F", "/T", "/PID", str(p.pid)],
+                    capture_output=True,
+                    check=False,
+                )
+            else:
+                p.terminate()
+                try:
+                    p.wait(timeout=5)
+                except Exception:
+                    p.kill()
         backend_fh.close()
         frontend_fh.close()
 

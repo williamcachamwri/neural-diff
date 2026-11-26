@@ -277,11 +277,19 @@ def create_app(
             if e["status"] == "completed" and e["comparison_id"] != comp_id
         ]
 
+        inferred_synth = any(
+            marker in req.model_a.lower() or marker in req.model_b.lower()
+            for marker in ("synth", "fixture", "demo_fixtures")
+        )
+        effective_exp_type = (
+            "SYNTHETIC FIXTURE EXPERIMENT" if inferred_synth else req.experiment_type
+        )
+
         cfg = ComparisonRequestConfig(
             model_a=req.model_a,
             model_b=req.model_b,
             modules=req.modules,
-            experiment_type=req.experiment_type,
+            experiment_type=effective_exp_type,
             tolerances=DiffTolerances(
                 atol=req.tolerances.atol,
                 rtol=req.tolerances.rtol,
@@ -355,10 +363,18 @@ def create_app(
         now_utc = dt.datetime.now(dt.UTC).isoformat()
         token = CancellationToken()
 
+        inferred_synth = any(
+            marker in req.model_a.lower() or marker in req.model_b.lower()
+            for marker in ("synth", "fixture", "demo_fixtures")
+        )
+        effective_exp_type = (
+            "SYNTHETIC FIXTURE EXPERIMENT" if inferred_synth else req.experiment_type
+        )
+
         store.create_job(
             comparison_id=comp_id,
             created_at_utc=now_utc,
-            experiment_type=req.experiment_type,
+            experiment_type=effective_exp_type,
             model_a_id=req.model_a,
             model_b_id=req.model_b,
             selected_modules=req.modules,
