@@ -20,7 +20,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -200,7 +199,7 @@ def _probe_python_packages() -> dict[str, Any]:
 
 def collect_environment_audit(stage: str) -> dict[str, Any]:
     """Collect a full, factual snapshot of the machine and toolchain."""
-    now_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    now_utc = dt.datetime.now(dt.UTC).isoformat()
     mem = _detect_memory_bytes()
     arch = platform.machine()
     is_apple_silicon = sys.platform == "darwin" and arch in ("arm64", "aarch64")

@@ -66,7 +66,7 @@ def run_secret_scan() -> dict[str, Any]:
                     )
 
     return {
-        "scanned_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "scanned_at_utc": dt.datetime.now(dt.UTC).isoformat(),
         "files_scanned": scanned_count,
         "findings_count": len(findings),
         "findings": findings,
@@ -76,7 +76,7 @@ def run_secret_scan() -> dict[str, Any]:
 def run_cmd_capture(cmd: list[str], log_path: Path, cwd: Path = REPO_ROOT) -> int:
     header = (
         f"=== Command: {' '.join(cmd)} ===\n"
-        f"Executed (UTC): {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n"
+        f"Executed (UTC): {dt.datetime.now(dt.UTC).isoformat()}\n\n"
     )
     proc = subprocess.run(
         cmd,

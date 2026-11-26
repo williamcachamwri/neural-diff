@@ -19,7 +19,7 @@ TESTS_EVIDENCE_DIR = REPO_ROOT / "evidence" / "tests"
 
 
 def run_step(name: str, cmd: list[str], log_filename: str) -> dict[str, Any]:
-    started = dt.datetime.now(dt.timezone.utc).isoformat()
+    started = dt.datetime.now(dt.UTC).isoformat()
     proc = subprocess.run(
         cmd,
         cwd=str(REPO_ROOT),
@@ -29,7 +29,7 @@ def run_step(name: str, cmd: list[str], log_filename: str) -> dict[str, Any]:
         encoding="utf-8",
         errors="replace",
     )
-    ended = dt.datetime.now(dt.timezone.utc).isoformat()
+    ended = dt.datetime.now(dt.UTC).isoformat()
     log_path = TESTS_EVIDENCE_DIR / log_filename
     body = (
         f"=== Suite: {name} ===\n"
@@ -89,7 +89,7 @@ def main() -> int:
 
     results = [run_step(name, cmd, log_file) for name, cmd, log_file in suites]
     summary = {
-        "executed_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "executed_at_utc": dt.datetime.now(dt.UTC).isoformat(),
         "all_passed": all(r["passed"] for r in results),
         "suites": results,
     }
