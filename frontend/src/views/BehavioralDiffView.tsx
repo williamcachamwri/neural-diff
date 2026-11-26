@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { ComparisonBundle } from "../types/api";
+import { formatCategory, formatStatus } from "../utils/format";
 
 interface Props {
   activeBundle: ComparisonBundle | null;
@@ -8,22 +9,38 @@ interface Props {
 export const BehavioralDiffView: React.FC<Props> = ({ activeBundle }) => {
   const beh = activeBundle?.behavioral;
   const [catFilter, setCatFilter] = useState("");
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+
+  const visibleCases = useMemo(() => {
+    if (!beh) return [];
+    return catFilter
+      ? beh.cases.filter((c) => c.case.category === catFilter)
+      : beh.cases;
+  }, [beh, catFilter]);
 
   if (!activeBundle || !beh) {
     return (
       <div className="panel" data-testid="view-behavioral">
-        <h2 className="panel-title">Behavioral Intelligence Diff</h2>
-        <p style={{ color: "var(--text-muted)" }}>
-          Run a comparison with the <code>behavioral</code> module enabled to execute the 8 deterministic evaluation suites.
+        <h2 className="panel-title">Behavioral Evaluation</h2>
+        <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
+          Run a comparison with behavioral evaluation enabled to inspect paired prompt responses.
         </p>
       </div>
     );
   }
 
   const st = beh.overall_statistics;
-  const visibleCases = catFilter
-    ? beh.cases.filter((c) => c.case.category === catFilter)
-    : beh.cases;
+  const meanLatA =
+    beh.cases.length > 0
+      ? beh.cases.reduce((acc, c) => acc + c.latency_ms_a, 0) / beh.cases.length
+      : 0;
+  const meanLatB =
+    beh.cases.length > 0
+      ? beh.cases.reduce((acc, c) => acc + c.latency_ms_b, 0) / beh.cases.length
+      : 0;
+
+  const activeCase =
+    visibleCases.find((c) => c.case.case_id === selectedCaseId) ?? visibleCases[0] ?? null;
 
   return (
     <div data-testid="view-behavioral">
@@ -34,161 +51,373 @@ export const BehavioralDiffView: React.FC<Props> = ({ activeBundle }) => {
             {(st.pass_rate_a * 100).toFixed(1)}% → {(st.pass_rate_b * 100).toFixed(1)}%
           </div>
           <div className="kpi-sub">
-            Delta: {st.pass_rate_delta >= 0 ? "+" : ""}
-            {(st.pass_rate_delta * 100).toFixed(1)}% ({st.n_cases} paired cases)
+            {st.pass_rate_delta >= 0 ? "+" : ""}
+            {(st.pass_rate_delta * 100).toFixed(1)} pts · {st.n_cases} paired prompts
           </div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Mean Score Delta (B − A)</div>
+          <div className="kpi-label">Mean Score Δ</div>
           <div className="kpi-value">
             {st.mean_score_delta >= 0 ? "+" : ""}
-            {st.mean_score_delta.toFixed(4)}
+            {st.mean_score_delta.toFixed(3)}
           </div>
           <div className="kpi-sub">
-            95% Bootstrap CI: [{st.bootstrap_ci95_low.toFixed(3)}, {st.bootstrap_ci95_high.toFixed(3)}]
+            95% CI [{st.bootstrap_ci95_low.toFixed(3)}, {st.bootstrap_ci95_high.toFixed(3)}]
           </div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Paired Wins / Ties / Losses</div>
+          <div className="kpi-label">Paired Outcomes</div>
           <div className="kpi-value">
-            {st.b_wins}W / {st.ties}T / {st.a_wins}L
+            {st.b_wins}W · {st.ties}T · {st.a_wins}L
           </div>
-          <div className="kpi-sub">McNemar two-sided p = {st.mcnemar_p_value.toFixed(4)}</div>
+          <div className="kpi-sub">McNemar p = {st.mcnemar_p_value.toFixed(3)}</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Judge Methodology</div>
-          <div className="kpi-value" style={{ fontSize: 16 }}>
-            100% DETERMINISTIC
+          <div className="kpi-label">Mean Generation Latency</div>
+          <div className="kpi-value">
+            {Math.round(meanLatA)} → {Math.round(meanLatB)} ms
           </div>
-          <div className="kpi-sub">Zero external LLM judge calls</div>
+          <div className="kpi-sub">Greedy decoding · seed 42</div>
         </div>
       </div>
 
+      {/* Domain Suite Breakdown with Visual Paired Bars */}
       <div className="panel">
         <div className="panel-header">
-          <h3 className="panel-title">8-Suite Domain Breakdown ({beh.suite_id}@{beh.suite_version})</h3>
-          <span className="badge badge-ok">OBSERVED</span>
+          <div>
+            <h3 className="panel-title">Evaluation Suites</h3>
+            <div className="panel-subtitle" style={{ marginTop: 2 }}>
+              Click any suite row to filter the prompt inspector below
+            </div>
+          </div>
+          <span className="mono" style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            {beh.suite_id} · v{beh.suite_version}
+          </span>
         </div>
+
         <div className="data-table-wrap">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Domain Suite</th>
-                <th>Cases</th>
-                <th>Pass Rate A</th>
-                <th>Pass Rate B</th>
-                <th>Mean Score A</th>
-                <th>Mean Score B</th>
-                <th>Delta</th>
-                <th>Improved / Regressed</th>
+                <th>Suite</th>
+                <th className="num">Cases</th>
+                <th style={{ width: 170 }}>Score Profile (A vs B)</th>
+                <th className="num">Mean A</th>
+                <th className="num">Mean B</th>
+                <th className="num">Delta</th>
+                <th className="num">Won / Lost</th>
               </tr>
             </thead>
             <tbody>
-              {beh.category_summaries.map((cs) => (
-                <tr
-                  key={cs.category}
-                  style={{ cursor: "pointer" }}
-                  onClick={() =>
-                    setCatFilter((prev) => (prev === cs.category ? "" : cs.category))
-                  }
-                >
-                  <td className="mono">{cs.category}</td>
-                  <td className="num">{cs.case_count}</td>
-                  <td className="num">{(cs.pass_rate_a * 100).toFixed(0)}%</td>
-                  <td className="num">{(cs.pass_rate_b * 100).toFixed(0)}%</td>
-                  <td className="num">{cs.mean_score_a.toFixed(3)}</td>
-                  <td className="num">{cs.mean_score_b.toFixed(3)}</td>
-                  <td className="num">
-                    <span
-                      className={`badge ${
-                        cs.mean_score_delta > 0.01
-                          ? "badge-ok"
-                          : cs.mean_score_delta < -0.01
-                            ? "badge-danger"
-                            : "badge-info"
-                      }`}
+              {beh.category_summaries.map((cs) => {
+                const isSelected = catFilter === cs.category;
+                return (
+                  <tr
+                    key={cs.category}
+                    className={isSelected ? "is-active-row" : ""}
+                    style={{ cursor: "pointer" }}
+                    onClick={() =>
+                      setCatFilter((prev) => (prev === cs.category ? "" : cs.category))
+                    }
+                  >
+                    <td style={{ fontWeight: 500, color: "var(--text-main)" }}>
+                      {formatCategory(cs.category)}
+                    </td>
+                    <td className="num" style={{ color: "var(--text-muted)" }}>
+                      {cs.case_count}
+                    </td>
+                    <td>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                        <div
+                          style={{
+                            height: 3.5,
+                            background: "rgba(255,255,255,0.05)",
+                            borderRadius: 99,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${Math.round(cs.mean_score_a * 100)}%`,
+                              height: "100%",
+                              background: "#71717a",
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            height: 3.5,
+                            background: "rgba(255,255,255,0.05)",
+                            borderRadius: 99,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${Math.round(cs.mean_score_b * 100)}%`,
+                              height: "100%",
+                              background:
+                                cs.mean_score_delta < -0.01 ? "var(--danger)" : "#e4e4e7",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="num" style={{ color: "var(--text-muted)" }}>
+                      {cs.mean_score_a.toFixed(3)}
+                    </td>
+                    <td className="num">{cs.mean_score_b.toFixed(3)}</td>
+                    <td
+                      className="num"
+                      style={{
+                        color:
+                          cs.mean_score_delta > 0.01
+                            ? "var(--ok)"
+                            : cs.mean_score_delta < -0.01
+                              ? "var(--danger)"
+                              : "var(--text-muted)",
+                      }}
                     >
                       {cs.mean_score_delta >= 0 ? "+" : ""}
                       {cs.mean_score_delta.toFixed(3)}
-                    </span>
-                  </td>
-                  <td className="num">
-                    +{cs.improved_cases} / -{cs.regressed_cases}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="num" style={{ color: "var(--text-muted)" }}>
+                      +{cs.improved_cases} / -{cs.regressed_cases}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div className="panel">
-        <div className="panel-header">
-          <h3 className="panel-title">
-            Side-by-Side Paired Output Diff ({visibleCases.length} cases)
-          </h3>
-          <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)}>
-            <option value="">All 8 Categories</option>
+      {/* Master-Detail Paired Response Workbench (Eliminates 24 Triple-Nested Boxes) */}
+      <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "14px 20px",
+            borderBottom: "1px solid var(--border-subtle)",
+          }}
+        >
+          <h3 className="panel-title">Paired Prompt Responses ({visibleCases.length})</h3>
+          <select
+            value={catFilter}
+            onChange={(e) => setCatFilter(e.target.value)}
+            style={{ padding: "5px 10px", fontSize: 12 }}
+          >
+            <option value="">All suites ({beh.cases.length})</option>
             {beh.category_summaries.map((c) => (
               <option key={c.category} value={c.category}>
-                {c.category}
+                {formatCategory(c.category)}
               </option>
             ))}
           </select>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {visibleCases.map((pc) => (
-            <div key={pc.case.case_id} className="panel" style={{ marginBottom: 0 }}>
-              <div className="panel-header" style={{ marginBottom: 8 }}>
-                <div>
-                  <span className="mono" style={{ fontWeight: 700, marginRight: 8 }}>
-                    {pc.case.case_id}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "250px 1fr",
+            minHeight: 340,
+          }}
+        >
+          {/* Left Master List */}
+          <div
+            style={{
+              borderRight: "1px solid var(--border-subtle)",
+              maxHeight: 420,
+              overflowY: "auto",
+            }}
+          >
+            {visibleCases.map((pc) => {
+              const selected = activeCase?.case.case_id === pc.case.case_id;
+              const delta = pc.eval_b.score - pc.eval_a.score;
+              return (
+                <button
+                  key={pc.case.case_id}
+                  type="button"
+                  onClick={() => setSelectedCaseId(pc.case.case_id)}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
+                    borderBottom: "1px solid var(--border-faint)",
+                    background: selected ? "rgba(255,255,255,0.055)" : "transparent",
+                    padding: "10px 14px",
+                    cursor: "pointer",
+                    color: "var(--text-main)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 3,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span className="mono" style={{ fontSize: 11.5, fontWeight: 500 }}>
+                      {pc.case.case_id}
+                    </span>
+                    <span
+                      className="mono"
+                      style={{
+                        fontSize: 11,
+                        color:
+                          delta > 0.01
+                            ? "var(--ok)"
+                            : delta < -0.01
+                              ? "var(--danger)"
+                              : "var(--text-muted)",
+                      }}
+                    >
+                      {delta >= 0 ? "+" : ""}
+                      {delta.toFixed(2)}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      color: "var(--text-muted)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {formatCategory(pc.case.category)} · {formatStatus(pc.status_change)}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right Detail Pane */}
+          {activeCase && (
+            <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "baseline",
+                    marginBottom: 6,
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-main)" }}>
+                    {activeCase.case.description}
                   </span>
-                  <span className="badge badge-info" style={{ marginRight: 8 }}>
-                    {pc.case.category}
-                  </span>
-                  <span style={{ color: "var(--text-muted)", fontSize: 12.5 }}>
-                    {pc.case.description}
+                  <span className="mono" style={{ fontSize: 11.5, color: "var(--text-muted)" }}>
+                    Score {activeCase.eval_a.score.toFixed(2)} → {activeCase.eval_b.score.toFixed(2)}
                   </span>
                 </div>
-                <span
-                  className={`badge ${
-                    pc.status_change === "improved" || pc.status_change === "both_passed"
-                      ? "badge-ok"
-                      : pc.status_change === "regressed"
-                        ? "badge-danger"
-                        : "badge-warn"
-                  }`}
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    color: "var(--text-secondary)",
+                    padding: "10px 12px",
+                    background: "var(--bg-surface-subtle)",
+                    borderRadius: 6,
+                    border: "1px solid var(--border-faint)",
+                  }}
                 >
-                  {pc.status_change} ({pc.eval_a.score.toFixed(2)} → {pc.eval_b.score.toFixed(2)})
-                </span>
+                  {activeCase.case.prompt}
+                </div>
               </div>
-              <div className="mono" style={{ fontSize: 12.5, color: "var(--accent)" }}>
-                Prompt: {pc.case.prompt}
-              </div>
-              <div className="diff-pair">
-                <div className="diff-box">
-                  <strong>
-                    Model A ({pc.eval_a.passed ? "PASS" : "FAIL"} • {pc.latency_ms_a.toFixed(0)} ms)
-                  </strong>
-                  <div style={{ marginTop: 6 }}>{pc.output_a || "(empty output)"}</div>
-                  <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--text-muted)" }}>
-                    {pc.eval_a.rationale}
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 16,
+                  flex: 1,
+                }}
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: 11.5,
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    <span className="status-inline">
+                      <span className={`dot ${activeCase.eval_a.passed ? "dot-ok" : ""}`} />
+                      <span>Model A</span>
+                    </span>
+                    <span className="mono">
+                      {activeCase.eval_a.score.toFixed(2)} · {Math.round(activeCase.latency_ms_a)} ms
+                    </span>
+                  </div>
+                  <div
+                    className="mono"
+                    style={{
+                      flex: 1,
+                      fontSize: 12,
+                      lineHeight: 1.6,
+                      color: "var(--text-secondary)",
+                      padding: "12px 14px",
+                      background: "var(--bg-surface-subtle)",
+                      border: "1px solid var(--border-faint)",
+                      borderRadius: 6,
+                      whiteSpace: "pre-wrap",
+                      maxHeight: 240,
+                      overflowY: "auto",
+                    }}
+                  >
+                    {activeCase.output_a || "—"}
                   </div>
                 </div>
-                <div className="diff-box">
-                  <strong>
-                    Model B ({pc.eval_b.passed ? "PASS" : "FAIL"} • {pc.latency_ms_b.toFixed(0)} ms)
-                  </strong>
-                  <div style={{ marginTop: 6 }}>{pc.output_b || "(empty output)"}</div>
-                  <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--text-muted)" }}>
-                    {pc.eval_b.rationale}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: 11.5,
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    <span className="status-inline">
+                      <span
+                        className={`dot ${
+                          activeCase.eval_b.passed ? "dot-ok" : "dot-danger"
+                        }`}
+                      />
+                      <span>Model B</span>
+                    </span>
+                    <span className="mono">
+                      {activeCase.eval_b.score.toFixed(2)} · {Math.round(activeCase.latency_ms_b)} ms
+                    </span>
+                  </div>
+                  <div
+                    className="mono"
+                    style={{
+                      flex: 1,
+                      fontSize: 12,
+                      lineHeight: 1.6,
+                      color: "var(--text-main)",
+                      padding: "12px 14px",
+                      background: "var(--bg-surface-subtle)",
+                      border: "1px solid var(--border-subtle)",
+                      borderRadius: 6,
+                      whiteSpace: "pre-wrap",
+                      maxHeight: 240,
+                      overflowY: "auto",
+                    }}
+                  >
+                    {activeCase.output_b || "—"}
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
