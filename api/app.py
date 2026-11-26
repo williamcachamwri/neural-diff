@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
 import safetensors
+from api.routes.diagnostics import build_diagnostics_router
 from api.schemas import (
     CreateBaselineRequest,
     InspectModelRequest,
@@ -561,6 +562,10 @@ def create_app(
     @app.put("/api/settings")
     def put_settings(req: RuntimeSettingsUpdate) -> dict[str, Any]:
         return store.update_settings(req.model_dump())
+
+    app.include_router(
+        build_diagnostics_router(store=store, policy_provider=_effective_policy)
+    )
 
     return app
 

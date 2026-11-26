@@ -1,1 +1,1 @@
-﻿"""NEURAL DIFF package module."""
+﻿"""Modular FastAPI route builders for NEURAL DIFF."""
