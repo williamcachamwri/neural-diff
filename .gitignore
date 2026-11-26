@@ -1,0 +1,44 @@
+# Virtual environments & Python artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+coverage.xml
+htmlcov/
+
+# Frontend dependencies & build outputs
+node_modules/
+frontend/node_modules/
+frontend/dist/
+playwright-report/
+test-results/
+
+# Local model cache & large raw model weights (not small test fixtures)
+.cache/
+models_cache/
+*.gguf
+
+# Runtime SQLite databases (keep test fixtures)
+data/*.db
+data/*.db-journal
+data/*.db-wal
+
+# Secrets & local environment overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS & editor files
+.DS_Store
+Thumbs.db

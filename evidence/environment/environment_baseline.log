@@ -1,0 +1,52 @@
+============================================================================
+NEURAL DIFF ENVIRONMENT AUDIT — STAGE: baseline
+Captured (UTC): 2026-11-26T18:16:52.617397+00:00
+============================================================================
+
+[OS & CPU]
+  Platform       : Windows-11-10.0.26320-SP0
+  Architecture   : AMD64
+  Processor      : Intel64 Family 6 Model 183 Stepping 1, GenuineIntel
+  Logical CPUs   : 16
+  Apple Silicon  : False
+
+[MEMORY & STORAGE]
+  Total RAM (GB) : 15.71
+  Avail RAM (GB) : 4.14
+  workspace_drive: D:\LLM — 98.1 GB free / 200.05 GB total
+  home_drive     : C:\Users\MSl — 43.34 GB free / 247.94 GB total
+
+[PYTHON RUNTIME]
+  Executable     : C:\Users\MSl\AppData\Local\Python\pythoncore-3.15-64\python.exe
+  Version        : 3.15.2 (tags/v3.15.2:5e58eaa, Oct 25 2026, 17:27:03) [MSC v.1951 64 bit (AMD64)]
+  Python >= 3.11 : True
+  Virtualenv     : False
+
+[CLI TOOLS]
+  python      : [AVAILABLE] rc=0 | Python 3.15.2
+  uv          : [MISSING/UNAVAILABLE] rc=None | uv not found on PATH
+  pip         : [AVAILABLE] rc=0 | pip 26.2.2 from C:\Users\MSl\AppData\Local\Python\pythoncore-3.15-64\Lib\site-packages\pip (python 3.15)
+  git         : [AVAILABLE] rc=0 | git version 2.56.0.windows.4
+  node        : [AVAILABLE] rc=0 | v26.13.0
+  npm         : [AVAILABLE] rc=0 | 11.20.0
+  npx         : [AVAILABLE] rc=0 | 11.20.0
+  docker      : [MISSING/UNAVAILABLE] rc=None | docker not found on PATH
+  nvidia_smi  : [AVAILABLE] rc=0 | NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 6142 MiB, 12.0
+
+[PYTHON PACKAGES]
+  torch           : NOT INSTALLED
+  transformers    : NOT INSTALLED
+  safetensors     : NOT INSTALLED
+  numpy           : NOT INSTALLED
+  scipy           : NOT INSTALLED
+  pytest          : NOT INSTALLED
+  hypothesis      : NOT INSTALLED
+  ruff            : NOT INSTALLED
+  mypy            : NOT INSTALLED
+  fastapi         : NOT INSTALLED
+  pydantic        : NOT INSTALLED
+  uvicorn         : NOT INSTALLED
+  httpx           : NOT INSTALLED
+  psutil          : NOT INSTALLED
+  huggingface_hub : NOT INSTALLED
+  playwright      : NOT INSTALLED

@@ -1,0 +1,238 @@
+{
+  "captured_at_utc": "2026-11-26T18:16:52.617397+00:00",
+  "stage": "baseline",
+  "os": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26320",
+    "platform": "Windows-11-10.0.26320-SP0",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 16
+  },
+  "apple_silicon_metal": {
+    "apple_silicon_hardware": false,
+    "metal_mps_supported": false
+  },
+  "memory": {
+    "total_gb": 15.71,
+    "available_gb": 4.14,
+    "total_bytes": 16870060032,
+    "available_bytes": 4443779072
+  },
+  "storage": {
+    "workspace_drive": {
+      "path": "D:\\LLM",
+      "total_gb": 200.05,
+      "used_gb": 101.95,
+      "free_gb": 98.1
+    },
+    "home_drive": {
+      "path": "C:\\Users\\MSl",
+      "total_gb": 247.94,
+      "used_gb": 204.6,
+      "free_gb": 43.34
+    }
+  },
+  "python_runtime": {
+    "executable": "C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64\\python.exe",
+    "version": "3.15.2 (tags/v3.15.2:5e58eaa, Oct 25 2026, 17:27:03) [MSC v.1951 64 bit (AMD64)]",
+    "version_info": [
+      3,
+      15,
+      2
+    ],
+    "meets_3_11_plus": true,
+    "in_virtualenv": false,
+    "prefix": "C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64"
+  },
+  "cli_tools": {
+    "python": {
+      "command": [
+        "C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64\\python.exe",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64\\python.exe",
+      "returncode": 0,
+      "stdout": "Python 3.15.2",
+      "stderr": ""
+    },
+    "uv": {
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "available": false,
+      "executable": null,
+      "returncode": null,
+      "stdout": "",
+      "stderr": "uv not found on PATH"
+    },
+    "pip": {
+      "command": [
+        "C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64\\python.exe",
+        "-m",
+        "pip",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64\\python.exe",
+      "returncode": 0,
+      "stdout": "pip 26.2.2 from C:\\Users\\MSl\\AppData\\Local\\Python\\pythoncore-3.15-64\\Lib\\site-packages\\pip (python 3.15)",
+      "stderr": ""
+    },
+    "git": {
+      "command": [
+        "git",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\Git\\cmd\\git.EXE",
+      "returncode": 0,
+      "stdout": "git version 2.56.0.windows.4",
+      "stderr": ""
+    },
+    "node": {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\nodejs\\node.EXE",
+      "returncode": 0,
+      "stdout": "v26.13.0",
+      "stderr": ""
+    },
+    "npm": {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\nodejs\\npm.CMD",
+      "returncode": 0,
+      "stdout": "11.20.0",
+      "stderr": ""
+    },
+    "npx": {
+      "command": [
+        "npx",
+        "--version"
+      ],
+      "available": true,
+      "executable": "C:\\Program Files\\nodejs\\npx.CMD",
+      "returncode": 0,
+      "stdout": "11.20.0",
+      "stderr": ""
+    },
+    "docker": {
+      "command": [
+        "docker",
+        "--version"
+      ],
+      "available": false,
+      "executable": null,
+      "returncode": null,
+      "stdout": "",
+      "stderr": "docker not found on PATH"
+    },
+    "nvidia_smi": {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=name,driver_version,memory.total,memory.free,compute_cap",
+        "--format=csv,noheader"
+      ],
+      "available": true,
+      "executable": "C:\\WINDOWS\\system32\\nvidia-smi.EXE",
+      "returncode": 0,
+      "stdout": "NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 6142 MiB, 12.0",
+      "stderr": ""
+    }
+  },
+  "python_packages": {
+    "torch": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'torch'"
+    },
+    "transformers": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'transformers'"
+    },
+    "safetensors": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'safetensors'"
+    },
+    "numpy": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'numpy'"
+    },
+    "scipy": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'scipy'"
+    },
+    "pytest": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'pytest'"
+    },
+    "hypothesis": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'hypothesis'"
+    },
+    "ruff": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'ruff'"
+    },
+    "mypy": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'mypy'"
+    },
+    "fastapi": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'fastapi'"
+    },
+    "pydantic": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'pydantic'"
+    },
+    "uvicorn": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'uvicorn'"
+    },
+    "httpx": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'httpx'"
+    },
+    "psutil": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'psutil'"
+    },
+    "huggingface_hub": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'huggingface_hub'"
+    },
+    "playwright": {
+      "installed": false,
+      "version": null,
+      "error": "ModuleNotFoundError: No module named 'playwright'"
+    }
+  },
+  "frontend_packages": {
+    "package_json_present": false
+  }
+}
