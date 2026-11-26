@@ -1,7 +1,7 @@
 === Suite: frontend_production_build ===
 Command: C:\Program Files\nodejs\npm.CMD --prefix frontend run build
-Started (UTC): 2026-11-26T19:39:46.908814+00:00
-Completed (UTC): 2026-11-26T19:39:49.496472+00:00
+Started (UTC): 2026-11-26T20:19:20.513062+00:00
+Completed (UTC): 2026-11-26T20:19:22.944008+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -11,14 +11,28 @@ Exit Code: 0
 
 [36mvite v8.4.0 [32mbuilding client environment for production...[36m[39m
 transforming...
-✓ 1589 modules transformed.
+✓ 2039 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                   0.41 kB │ gzip:  0.29 kB
-dist/assets/index-CznTFl2b.css    5.32 kB │ gzip:  1.66 kB
-dist/assets/index-D4W1Sh8y.js   215.83 kB │ gzip: 62.18 kB
+dist/index.html                             0.75 kB │ gzip:   0.38 kB
+dist/assets/index-Crrykd6C.css             30.05 kB │ gzip:   5.80 kB
+dist/assets/vendor-react-DFRwdqk7.js        0.19 kB │ gzip:   0.15 kB
+dist/assets/rolldown-runtime-Dl_DZoUm.js    0.59 kB │ gzip:   0.35 kB
+dist/assets/index-Ds6VaKBd.js              88.91 kB │ gzip:  20.87 kB
+dist/assets/vendor-motion-DD7wNfE4.js     142.73 kB │ gzip:  48.15 kB
+dist/assets/vendor-xyflow-D8P8YiNY.js     386.77 kB │ gzip: 129.78 kB
 
-[32m✓ built in 333ms[39m
+[32m✓ built in 350ms[39m
 
 --- STDERR ---
+[33m[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use no memo" in "node_modules/react-compiler-runtime/dist/index.js" may not be preserved when bundling.
+    ╭─[ node_modules/react-compiler-runtime/dist/index.js:14:1 ]
+    │
+ 14 │ "use no memo";
+    │ ───────┬──────  
+    │        ╰──────── module level directive may not be preserved
+    │ 
+    │ Help: For more information, see https://rolldown.rs/in-depth/directives#other-directives
+────╯
+[39m
 

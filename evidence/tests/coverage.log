@@ -1,7 +1,7 @@
 === Suite: full_coverage ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api --cov-report=term-missing -v
-Started (UTC): 2026-11-26T19:39:15.882537+00:00
-Completed (UTC): 2026-11-26T19:39:41.003972+00:00
+Started (UTC): 2026-11-26T20:18:53.867829+00:00
+Completed (UTC): 2026-11-26T20:19:15.588073+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -14,48 +14,53 @@ configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
-collecting ... collected 40 items
+collecting ... collected 45 items
 
 tests/integration/test_end_to_end_and_api.py::test_sharded_safetensors_vs_safe_pytorch_checkpoint_equivalence PASSED [  2%]
-tests/integration/test_end_to_end_and_api.py::test_full_fastapi_workflow_comparisons_filtering_exports_and_settings PASSED [  5%]
-tests/integration/test_end_to_end_and_api.py::test_local_pretrained_qwen2_activation_behavioral_and_baseline_api PASSED [  7%]
-tests/property/test_tensor_properties.py::test_tensor_reflexivity_identity PASSED [ 10%]
-tests/property/test_tensor_properties.py::test_tensor_symmetry_invariants PASSED [ 12%]
-tests/property/test_tensor_properties.py::test_cosine_positive_scale_and_negation_invariance PASSED [ 15%]
-tests/property/test_tensor_properties.py::test_l2_triangle_inequality PASSED [ 17%]
-tests/property/test_tensor_properties.py::test_chunk_partition_invariance PASSED [ 20%]
-tests/property/test_tensor_properties.py::test_linear_cka_planar_rotation_invariance PASSED [ 22%]
-tests/regression/test_golden_fixtures.py::test_deterministic_synthetic_pair_golden_metrics PASSED [ 25%]
-tests/security/test_security_controls.py::test_path_traversal_null_bytes_and_unc_rejected PASSED [ 27%]
-tests/security/test_security_controls.py::test_shard_index_traversal_rejected PASSED [ 30%]
-tests/security/test_security_controls.py::test_malformed_and_adversarial_safetensors_headers PASSED [ 32%]
-tests/security/test_security_controls.py::test_unsafe_pickle_rce_gadget_rejected_before_execution PASSED [ 35%]
-tests/security/test_security_controls.py::test_api_security_headers_payload_limit_and_traversal_blocking PASSED [ 37%]
-tests/unit/test_activation_and_cka.py::test_linear_cka_orthogonal_and_scale_invariance PASSED [ 40%]
-tests/unit/test_activation_and_cka.py::test_activation_diff_engine_on_tiny_causal_modules PASSED [ 42%]
-tests/unit/test_behavioral_evaluators.py::test_vietnamese_evaluator PASSED [ 45%]
-tests/unit/test_behavioral_evaluators.py::test_code_preservation_evaluator PASSED [ 47%]
-tests/unit/test_behavioral_evaluators.py::test_json_reliability_evaluator_distinguishes_bool_from_int PASSED [ 50%]
-tests/unit/test_behavioral_evaluators.py::test_math_instruction_conciseness_refusal_and_factual_evaluators PASSED [ 52%]
-tests/unit/test_behavioral_evaluators.py::test_paired_statistical_significance PASSED [ 55%]
-tests/unit/test_evaluator_edge_cases.py::test_math_fractions_gsm8k_hash_and_zero_division PASSED [ 57%]
-tests/unit/test_evaluator_edge_cases.py::test_instruction_and_json_array_edge_cases PASSED [ 60%]
-tests/unit/test_evaluator_edge_cases.py::test_resource_manager_headroom_guard_and_cpu_mode PASSED [ 62%]
-tests/unit/test_evaluator_edge_cases.py::test_chunked_microbenchmark_runner_produces_real_measurements PASSED [ 65%]
-tests/unit/test_loaders_and_adapters.py::test_multi_file_safetensors_and_wide_row_chunking PASSED [ 67%]
-tests/unit/test_loaders_and_adapters.py::test_pytorch_sharded_index_and_disabled_policy PASSED [ 70%]
-tests/unit/test_loaders_and_adapters.py::test_hf_directory_untrusted_py_ignore_and_snapshot_sha PASSED [ 72%]
-tests/unit/test_regression_and_reports.py::test_regression_engine_verdicts_baselines_and_reproductions PASSED [ 75%]
-tests/unit/test_regression_and_reports.py::test_report_exports_and_cli_commands PASSED [ 77%]
-tests/unit/test_regression_and_reports.py::test_cancellation_token_stops_orchestrator PASSED [ 80%]
-tests/unit/test_structural_and_neuron.py::test_canonical_tensor_role_classification PASSED [ 82%]
-tests/unit/test_structural_and_neuron.py::test_structural_diff_renames_shapes_dtypes_and_cross_arch_guard PASSED [ 85%]
-tests/unit/test_structural_and_neuron.py::test_neuron_attention_head_and_mlp_analysis PASSED [ 87%]
-tests/unit/test_tensor_metrics.py::test_identical_tensors_exact_equality PASSED [ 90%]
-tests/unit/test_tensor_metrics.py::test_known_hand_calculated_differences PASSED [ 92%]
-tests/unit/test_tensor_metrics.py::test_zero_vector_and_nan_inf_edge_cases PASSED [ 95%]
-tests/unit/test_tensor_metrics.py::test_bfloat16_and_heterogeneous_chunk_alignment PASSED [ 97%]
-tests/unit/test_tensor_metrics.py::test_distribution_summary_and_shift PASSED [100%]
+tests/integration/test_end_to_end_and_api.py::test_full_fastapi_workflow_comparisons_filtering_exports_and_settings PASSED [  4%]
+tests/integration/test_end_to_end_and_api.py::test_local_pretrained_qwen2_activation_behavioral_and_baseline_api PASSED [  6%]
+tests/property/test_tensor_properties.py::test_tensor_reflexivity_identity PASSED [  8%]
+tests/property/test_tensor_properties.py::test_tensor_symmetry_invariants PASSED [ 11%]
+tests/property/test_tensor_properties.py::test_cosine_positive_scale_and_negation_invariance PASSED [ 13%]
+tests/property/test_tensor_properties.py::test_l2_triangle_inequality PASSED [ 15%]
+tests/property/test_tensor_properties.py::test_chunk_partition_invariance PASSED [ 17%]
+tests/property/test_tensor_properties.py::test_linear_cka_planar_rotation_invariance PASSED [ 20%]
+tests/regression/test_golden_fixtures.py::test_deterministic_synthetic_pair_golden_metrics PASSED [ 22%]
+tests/security/test_security_controls.py::test_path_traversal_null_bytes_and_unc_rejected PASSED [ 24%]
+tests/security/test_security_controls.py::test_shard_index_traversal_rejected PASSED [ 26%]
+tests/security/test_security_controls.py::test_malformed_and_adversarial_safetensors_headers PASSED [ 28%]
+tests/security/test_security_controls.py::test_unsafe_pickle_rce_gadget_rejected_before_execution PASSED [ 31%]
+tests/security/test_security_controls.py::test_api_security_headers_payload_limit_and_traversal_blocking PASSED [ 33%]
+tests/unit/test_activation_and_cka.py::test_linear_cka_orthogonal_and_scale_invariance PASSED [ 35%]
+tests/unit/test_activation_and_cka.py::test_activation_diff_engine_on_tiny_causal_modules PASSED [ 37%]
+tests/unit/test_behavioral_evaluators.py::test_vietnamese_evaluator PASSED [ 40%]
+tests/unit/test_behavioral_evaluators.py::test_code_preservation_evaluator PASSED [ 42%]
+tests/unit/test_behavioral_evaluators.py::test_json_reliability_evaluator_distinguishes_bool_from_int PASSED [ 44%]
+tests/unit/test_behavioral_evaluators.py::test_math_instruction_conciseness_refusal_and_factual_evaluators PASSED [ 46%]
+tests/unit/test_behavioral_evaluators.py::test_paired_statistical_significance PASSED [ 48%]
+tests/unit/test_evaluator_edge_cases.py::test_math_fractions_gsm8k_hash_and_zero_division PASSED [ 51%]
+tests/unit/test_evaluator_edge_cases.py::test_instruction_and_json_array_edge_cases PASSED [ 53%]
+tests/unit/test_evaluator_edge_cases.py::test_resource_manager_headroom_guard_and_cpu_mode PASSED [ 55%]
+tests/unit/test_evaluator_edge_cases.py::test_chunked_microbenchmark_runner_produces_real_measurements PASSED [ 57%]
+tests/unit/test_histograms.py::test_paired_histogram_identical_and_disjoint_distributions PASSED [ 60%]
+tests/unit/test_loaders_and_adapters.py::test_multi_file_safetensors_and_wide_row_chunking PASSED [ 62%]
+tests/unit/test_loaders_and_adapters.py::test_pytorch_sharded_index_and_disabled_policy PASSED [ 64%]
+tests/unit/test_loaders_and_adapters.py::test_hf_directory_untrusted_py_ignore_and_snapshot_sha PASSED [ 66%]
+tests/unit/test_regression_and_reports.py::test_regression_engine_verdicts_baselines_and_reproductions PASSED [ 68%]
+tests/unit/test_regression_and_reports.py::test_report_exports_and_cli_commands PASSED [ 71%]
+tests/unit/test_regression_and_reports.py::test_cancellation_token_stops_orchestrator PASSED [ 73%]
+tests/unit/test_sparsity_pruning.py::test_structured_pruning_and_2_to_4_sparsity_detection PASSED [ 75%]
+tests/unit/test_structural_and_neuron.py::test_canonical_tensor_role_classification PASSED [ 77%]
+tests/unit/test_structural_and_neuron.py::test_structural_diff_renames_shapes_dtypes_and_cross_arch_guard PASSED [ 80%]
+tests/unit/test_structural_and_neuron.py::test_neuron_attention_head_and_mlp_analysis PASSED [ 82%]
+tests/unit/test_task_vector.py::test_svd_effective_rank_distinguishes_lora_from_full_rank PASSED [ 84%]
+tests/unit/test_tensor_metrics.py::test_identical_tensors_exact_equality PASSED [ 86%]
+tests/unit/test_tensor_metrics.py::test_known_hand_calculated_differences PASSED [ 88%]
+tests/unit/test_tensor_metrics.py::test_zero_vector_and_nan_inf_edge_cases PASSED [ 91%]
+tests/unit/test_tensor_metrics.py::test_bfloat16_and_heterogeneous_chunk_alignment PASSED [ 93%]
+tests/unit/test_tensor_metrics.py::test_distribution_summary_and_shift PASSED [ 95%]
+tests/unit/test_tie_weights.py::test_detect_accidental_weight_untying_between_checkpoints PASSED [ 97%]
+tests/unit/test_top_elements.py::test_extract_top_k_element_deltas_2d_and_3d PASSED [100%]
 
 =============================== tests coverage ================================
 ______________ coverage: platform win32, python 3.12.16-final-0 _______________
@@ -72,7 +77,7 @@ adapters\pytorch\loader.py                          97     10    90%   28, 45, 6
 adapters\safetensors\__init__.py                     0      0   100%
 adapters\safetensors\loader.py                     143     19    87%   85, 89-90, 96, 108-109, 128-129, 150, 155, 160, 175, 180, 203, 228-231, 236
 api\__init__.py                                      3      0   100%
-api\app.py                                         258     64    75%   123, 161-211, 263, 373-378, 386-391, 409-417, 421, 427, 442, 445, 448-449, 453, 456, 458-463, 478, 481, 498, 502, 538, 543
+api\app.py                                         262     64    76%   123, 161-211, 263, 389-394, 402-407, 425-433, 437, 443, 458, 461, 464-465, 469, 472, 474-479, 494, 497, 514, 518, 554, 559
 api\routes\__init__.py                               0      0   100%
 api\schemas.py                                      76      3    96%   78, 85, 89
 api\security_middleware.py                          27      3    89%   33-34, 46
@@ -111,21 +116,26 @@ core\regression_engine\thresholds.py                29      5    83%   42-46
 core\report_engine\__init__.py                       3      0   100%
 core\report_engine\exporter.py                     187      6    97%   51, 71, 285, 330, 476-477
 core\resource_manager.py                           141     18    87%   31, 111-129, 134, 159-160, 185, 196-197
-core\security.py                                   219     46    79%   74, 109-111, 125, 163-164, 171, 184-186, 192-194, 205, 215-216, 227-228, 231, 239-240, 246, 261-262, 285, 294-295, 301, 314, 321, 331, 336, 343, 354, 396, 402-409, 412, 431, 444-446, 451, 457-458
+core\security.py                                   219     45    79%   109-111, 125, 163-164, 171, 184-186, 192-194, 205, 215-216, 227-228, 231, 239-240, 246, 261-262, 285, 294-295, 301, 314, 321, 331, 336, 343, 354, 396, 402-409, 412, 431, 444-446, 451, 457-458
 core\statistics\__init__.py                          0      0   100%
 core\statistics\distributions.py                   146     19    87%   16, 92, 108, 112, 118, 134-146, 151, 216
+core\statistics\histograms.py                       49      7    86%   26, 43-46, 62-63
 core\statistics\significance.py                     58      2    97%   48, 52
 core\structural_analysis\__init__.py                 5      0   100%
 core\structural_analysis\compatibility.py           83     10    88%   25-28, 98, 122, 143, 156, 197, 228
 core\structural_analysis\diff.py                   164     10    94%   30-33, 49, 71, 264, 270, 276, 306
 core\structural_analysis\neuron_attention.py       206      7    97%   223, 231-232, 269-270, 273-276
+core\structural_analysis\sparsity_pruning.py        34      3    91%   23, 33, 38
+core\structural_analysis\tie_weights.py             35      3    91%   43, 54, 65
 core\tensor_engine\__init__.py                       4      0   100%
 core\tensor_engine\comparator.py                   175     15    91%   188, 215-224, 243-252, 273, 276-288, 329, 337
 core\tensor_engine\metrics.py                      197     12    94%   32, 88-89, 100-101, 109, 197, 228-229, 235, 263, 346
+core\tensor_engine\task_vector.py                   41      4    90%   27, 39, 44, 59
+core\tensor_engine\top_elements.py                  48      5    90%   23, 38, 46, 57, 76
 core\types.py                                      103      0   100%
 ------------------------------------------------------------------------------
-TOTAL                                             4219    430    90%
-============================= 40 passed in 23.40s =============================
+TOTAL                                             4430    451    90%
+============================= 45 passed in 20.20s =============================
 
 --- STDERR ---
 
