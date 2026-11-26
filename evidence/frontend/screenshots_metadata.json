@@ -1,7 +1,7 @@
 [
   {
     "filename": "evidence/frontend/01-dashboard.png",
-    "timestamp_utc": "2026-11-26T20:19:59.648622+00:00",
+    "timestamp_utc": "2026-11-26T20:41:38.819614+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Application dashboard displaying RTX 5050 CUDA:0 status, memory telemetry, real vs synthetic experiment counts, and recent runs.",
@@ -11,7 +11,7 @@
   },
   {
     "filename": "evidence/frontend/02-model-selection.png",
-    "timestamp_utc": "2026-11-26T20:20:00.596611+00:00",
+    "timestamp_utc": "2026-11-26T20:41:39.727484+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Model A and Model B selection form with verified open-access presets, tolerances, baseline gate selector, and analysis module checkboxes.",
@@ -21,7 +21,7 @@
   },
   {
     "filename": "evidence/frontend/03-compatibility-validation.png",
-    "timestamp_utc": "2026-11-26T20:20:01.848624+00:00",
+    "timestamp_utc": "2026-11-26T20:41:40.956990+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Live compatibility validation of Qwen/Qwen2.5-0.5B vs Qwen/Qwen2.5-0.5B-Instruct (290 aligned tensors, 494,032,768 parameters).",
@@ -31,7 +31,7 @@
   },
   {
     "filename": "evidence/frontend/04-tensor-diff.png",
-    "timestamp_utc": "2026-11-26T20:20:02.905532+00:00",
+    "timestamp_utc": "2026-11-26T20:41:42.087006+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Tensor Explorer displaying float64-accumulated cosine, relative L2, RMSE, max abs diff, and quantile distribution shifts across Qwen2.5-0.5B weights.",
@@ -41,7 +41,7 @@
   },
   {
     "filename": "evidence/frontend/05-structural-diff.png",
-    "timestamp_utc": "2026-11-26T20:20:04.286322+00:00",
+    "timestamp_utc": "2026-11-26T20:41:43.460404+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Git-style Structural Diff view comparing Qwen2.5-0.5B-Instruct (24 layers, 494M params) vs SmolLM2-135M-Instruct (30 layers, 134.5M params), highlighting added/removed keys, shape changes, and layer deltas.",
@@ -51,7 +51,7 @@
   },
   {
     "filename": "evidence/frontend/06-layer-analysis.png",
-    "timestamp_utc": "2026-11-26T20:20:05.572180+00:00",
+    "timestamp_utc": "2026-11-26T20:41:44.836437+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "24-layer submodule Relative L2 heatmap with GQA Attention Head slicing (14 Q heads, 2 KV heads), MLP basis shifts, embedding drift, and polysemanticity caution.",
@@ -61,7 +61,7 @@
   },
   {
     "filename": "evidence/frontend/07-activation-comparison.png",
-    "timestamp_utc": "2026-11-26T20:20:06.446856+00:00",
+    "timestamp_utc": "2026-11-26T20:41:45.741160+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Observational forward-hook Activation Diff across 24 Qwen2.5 layers showing Hidden Cosine, Linear CKA, Attention/MLP alignment, and Top-5 next-token logit probabilities.",
@@ -71,7 +71,7 @@
   },
   {
     "filename": "evidence/frontend/08-behavioral-diff.png",
-    "timestamp_utc": "2026-11-26T20:20:07.335797+00:00",
+    "timestamp_utc": "2026-11-26T20:41:46.770121+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "8-suite deterministic Behavioral Diff showing pass-rate improvement, 95% bootstrap CI, McNemar p-value, domain breakdown, and side-by-side paired model outputs.",
@@ -81,7 +81,7 @@
   },
   {
     "filename": "evidence/frontend/09-regression-report.png",
-    "timestamp_utc": "2026-11-26T20:20:08.559437+00:00",
+    "timestamp_utc": "2026-11-26T20:41:48.109294+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Regression Gate Dashboard demonstrating FAILED_REGRESSION detection, severity badges, deterministic CLI reproduction commands, and versioned baseline management.",
@@ -91,7 +91,7 @@
   },
   {
     "filename": "evidence/frontend/10-benchmark-results.png",
-    "timestamp_utc": "2026-11-26T20:20:09.726806+00:00",
+    "timestamp_utc": "2026-11-26T20:41:49.352094+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Persisted Experiment & Benchmark History distinguishing REAL MODEL EXPERIMENT runs (SmolLM2-135M, Qwen2.5-0.5B, Cross-Arch) from SYNTHETIC FIXTURE runs with wall-clock durations.",
@@ -101,7 +101,7 @@
   },
   {
     "filename": "evidence/frontend/11-report-export.png",
-    "timestamp_utc": "2026-11-26T20:20:11.538886+00:00",
+    "timestamp_utc": "2026-11-26T20:41:51.157986+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Report Viewer rendering the standalone SVG-equipped HTML report preview alongside .html, .md, and .json export controls.",
@@ -111,7 +111,7 @@
   },
   {
     "filename": "evidence/frontend/12-test-execution-summary.png",
-    "timestamp_utc": "2026-11-26T20:20:12.199584+00:00",
+    "timestamp_utc": "2026-11-26T20:41:51.834311+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Rendered summary of actual executed static analysis, unit, Hypothesis property, integration, regression, security, coverage, and Vitest logs.",
@@ -121,7 +121,7 @@
   },
   {
     "filename": "evidence/frontend/13-error-handling.png",
-    "timestamp_utc": "2026-11-26T20:20:14.429860+00:00",
+    "timestamp_utc": "2026-11-26T20:41:53.978096+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Structured application error banner displaying [SECURITY_VALIDATION_ERROR \u2022 HTTP 403] when a disallowed path-traversal checkpoint path is submitted.",
@@ -131,7 +131,7 @@
   },
   {
     "filename": "evidence/frontend/14-settings.png",
-    "timestamp_utc": "2026-11-26T20:20:15.363249+00:00",
+    "timestamp_utc": "2026-11-26T20:41:54.975590+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Runtime & Security Settings view displaying persisted compute device, streaming chunk size, tolerances, and weights_only serialization policy.",
@@ -141,7 +141,7 @@
   },
   {
     "filename": "evidence/frontend/15-final-application-state.png",
-    "timestamp_utc": "2026-11-26T20:20:16.759182+00:00",
+    "timestamp_utc": "2026-11-26T20:41:56.443796+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Final ComfyUI Nodes 2.0 Studio canvas in Orthogonal PCB cable-routing mode with active Qwen2.5-0.5B real model DAG, embedded micro-scopes, and MiniMap.",
