@@ -1,0 +1,22 @@
+﻿=== Command: python -m pip install uv ===
+Timestamp (UTC): 2026-11-26T18:17:10.9337832Z
+
+Collecting uv
+  Downloading uv-0.13.10-py3-none-win_amd64.whl.metadata (11 kB)
+Downloading uv-0.13.10-py3-none-win_amd64.whl (15.7 MB)
+   ---------------------------------------- 15.7/15.7 MB 8.2 MB/s  0:00:01
+Installing collected packages: uv
+Successfully installed uv-0.13.10
+python : 
+At line:5 char:11
++ $output = python -m pip install uv 2>&1
++           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[notice] A new release of pip is available: 26.2.2 -> 26.3
+[notice] To update, run: C:\Users\MSl\AppData\Local\Python\pythoncore-3.15-64\python.exe -m pip install --upgrade pip
+
+
+Exit Code: 0
+
