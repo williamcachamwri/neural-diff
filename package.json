@@ -1,0 +1,14 @@
+{
+  "name": "neural-diff-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Root workspace scripts for NEURAL DIFF frontend and E2E automation",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:test": "npm --prefix frontend run test",
+    "frontend:e2e": "npm --prefix frontend run test:e2e",
+    "frontend:typecheck": "npm --prefix frontend run typecheck"
+  },
+  "license": "MIT"
+}
