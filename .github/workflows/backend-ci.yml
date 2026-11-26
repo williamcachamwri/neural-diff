@@ -1,0 +1,72 @@
+name: Backend Lint, Typecheck & Matrix Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  static-analysis:
+    name: Ruff Lint & MyPy Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Sync locked Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Ruff lint check
+        run: uv run ruff check core adapters benchmarks api tests scripts
+
+      - name: MyPy static type check
+        run: uv run mypy core adapters benchmarks api
+
+  pytest-matrix:
+    name: Pytest Matrix (Python ${{ matrix.python-version }})
+    needs: static-analysis
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python ${{ matrix.python-version }}
+        run: uv sync --locked --python ${{ matrix.python-version }}
+
+      - name: Run Unit, Property (Hypothesis), Integration & Golden Regression suites
+        run: |
+          uv run pytest -m "not security and not real_model" \
+            --cov=core --cov=adapters --cov=benchmarks --cov=api \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage-${{ matrix.python-version }}.xml \
+            --cov-fail-under=85 -v
+
+      - name: Upload XML coverage report
+        uses: actions/upload-artifact@v6
+        with:
+          name: backend-coverage-py${{ matrix.python-version }}
+          path: coverage-${{ matrix.python-version }}.xml
+          retention-days: 14

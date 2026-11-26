@@ -157,6 +157,6 @@ npm --prefix frontend run dev
 
 ## K. Residual Limitations (`PARTIALLY VERIFIED` / Disclosed)
 
-1. **Remote CI Execution:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) is configured for GitHub Actions, and every step was executed locally via `scripts/run_all_tests.py`, which is not equivalent to a remote GitHub-hosted workflow run since no remote origin is configured in this local workspace.
+1. **Remote CI Runner Hardware Scope:** [`.github/workflows/`](../.github/workflows) executes 8 specialized GitHub Actions workflows (`backend-ci.yml`, `frontend-ci.yml`, `e2e-playwright.yml`, `security-audit.yml`, `codeql.yml`, `numerical-benchmarks.yml`, `docs-and-evidence.yml`, `package-and-release.yml`) on `ubuntu-latest` CPU runners; multi-hundred-million-parameter CUDA model benchmarks are executed on local RTX 5050 hardware and archived under `evidence/`.
 2. **Sample Size of Default Behavioral Suite:** `default_suite_v1` contains 24 deterministic prompts (3 per category) for tractable local execution; statistical power for small behavioral differences is correspondingly modest (`McNemar p = 0.1094` on `Qwen2.5-0.5B`).
 3. **Polysemanticity & Intervention Scope:** Parameter basis shifts (`OBSERVED`) do not identify monosemantic features, and `run_residual_patching` (`CAUSALLY VERIFIED`) establishes causal recovery strictly for the tested clean/corrupted prompt pair and residual site.

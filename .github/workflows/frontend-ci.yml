@@ -1,0 +1,80 @@
+name: Frontend Typecheck, Vitest & Bundle Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-verify:
+    name: TypeScript, Vitest & Production Chunk Budget
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install locked frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: TypeScript strict typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Vitest UI & domain formatter tests
+        working-directory: frontend
+        run: npm run test
+
+      - name: Build production Vite bundle
+        working-directory: frontend
+        run: npm run build
+
+      - name: Enforce JS chunk size budget (<500 KB per chunk)
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+
+          dist = Path("frontend/dist")
+          index_html = dist / "index.html"
+          if not index_html.is_file():
+              sys.exit("Missing frontend/dist/index.html")
+
+          js_chunks = sorted((dist / "assets").glob("*.js"))
+          if not js_chunks:
+              sys.exit("No JS chunks emitted under frontend/dist/assets/")
+
+          max_kb = 500.0
+          oversized = []
+          for chunk in js_chunks:
+              kb = chunk.stat().st_size / 1024.0
+              print(f"{chunk.name}: {kb:.1f} KB")
+              if kb > max_kb:
+                  oversized.append((chunk.name, kb))
+
+          if oversized:
+              sys.exit(f"Chunks exceeded {max_kb} KB budget: {oversized}")
+          PY
+
+      - name: Upload production frontend bundle
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7

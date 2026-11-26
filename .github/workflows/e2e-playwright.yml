@@ -1,0 +1,87 @@
+name: Full-Stack Playwright E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-playwright-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  playwright-e2e:
+    name: Live FastAPI + Vite Studio Chromium E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python backend environment
+        run: uv sync --locked --python 3.12
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies & build studio
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Playwright Chromium browser
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Seed Safetensors fixtures, start FastAPI + Vite preview, and run E2E
+        run: |
+          uv run python scripts/seed_demo_fixtures.py
+          uv run uvicorn api.app:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+          BACKEND_PID=$!
+          npm --prefix frontend run preview -- --host 127.0.0.1 --port 4173 > /tmp/frontend.log 2>&1 &
+          FRONTEND_PID=$!
+          trap "kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true" EXIT
+
+          READY=0
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:8000/api/health >/dev/null 2>&1 && curl -fsS http://127.0.0.1:4173/ >/dev/null 2>&1; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$READY" -ne 1 ]; then
+            echo "=== Backend startup log ==="
+            cat /tmp/backend.log || true
+            echo "=== Frontend preview log ==="
+            cat /tmp/frontend.log || true
+            exit 1
+          fi
+
+          npm --prefix frontend run test:e2e
+
+      - name: Upload E2E failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-e2e-diagnostics
+          path: |
+            /tmp/backend.log
+            /tmp/frontend.log
+            frontend/test-results/
+          retention-days: 7

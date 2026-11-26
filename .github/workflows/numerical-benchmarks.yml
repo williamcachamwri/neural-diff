@@ -1,0 +1,44 @@
+name: Numerical & Mechanistic Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: numerical-benchmarks-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark-gate:
+    name: Tensor, SVD Rank, 2:4 Sparsity, CKA & Causal Patching Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Run deterministic numerical & mechanistic invariants benchmark
+        run: uv run python scripts/run_ci_benchmarks.py --output /tmp/ci-benchmark-results.json
+
+      - name: Verify standalone LoRA vs Full-SFT effective rank example
+        run: uv run python examples/detect_lora_effective_rank.py
+
+      - name: Upload numerical benchmark JSON report
+        uses: actions/upload-artifact@v6
+        with:
+          name: ci-numerical-benchmarks
+          path: /tmp/ci-benchmark-results.json
+          retention-days: 14

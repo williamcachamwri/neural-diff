@@ -100,6 +100,11 @@ def run_cmd_capture(cmd: list[str], log_path: Path, cwd: Path = REPO_ROOT) -> in
 
 
 def main() -> int:
+    if "--secret-scan-only" in sys.argv:
+        secret_report = run_secret_scan()
+        print(json.dumps(secret_report, indent=2))
+        return 0 if secret_report["findings_count"] == 0 else 1
+
     SECURITY_EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
 
     secret_report = run_secret_scan()

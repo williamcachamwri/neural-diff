@@ -1,0 +1,94 @@
+name: Package Wheel, CLI Smoke & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: package-and-release-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: write
+
+jobs:
+  build-smoke-and-release:
+    name: Wheel/Sdist Build, Isolated CLI Smoke & Release Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Python sdist & wheel + production frontend archive
+        run: |
+          rm -rf dist
+          uv build --out-dir dist
+          npm --prefix frontend ci
+          npm --prefix frontend run build
+          tar -czf dist/neural-diff-frontend-dist.tar.gz -C frontend dist
+          (cd dist && sha256sum * > SHA256SUMS.txt)
+          cat dist/SHA256SUMS.txt
+
+      - name: Clean-room wheel installation & end-to-end CLI smoke test
+        run: |
+          uv sync --locked --python 3.12
+          uv run python scripts/seed_demo_fixtures.py
+          WHEEL_PATH="$(ls "$GITHUB_WORKSPACE"/dist/neural_diff-*.whl)"
+          uv pip install --reinstall-package neural-diff "$WHEEL_PATH"
+
+          BIN_DIR="$GITHUB_WORKSPACE/.venv/bin"
+          MODEL_A="$GITHUB_WORKSPACE/data/demo_fixtures/synth_model_a"
+          MODEL_B="$GITHUB_WORKSPACE/data/demo_fixtures/synth_model_b"
+
+          # Execute from /tmp so local repo folders are NOT on sys.path
+          cd /tmp
+          "$BIN_DIR/neural-diff" suites
+          "$BIN_DIR/neural-diff" inspect "$MODEL_A" --local-only > /tmp/inspect.json
+          "$BIN_DIR/neural-diff" validate --model-a "$MODEL_A" --model-b "$MODEL_B" --local-only > /tmp/validate.json
+          "$BIN_DIR/neural-diff" svd --model-a "$MODEL_A" --model-b "$MODEL_B" --tensor "model.embed_tokens.weight" --local-only > /tmp/svd.json
+          "$BIN_DIR/neural-diff" compare \
+            --model-a "$MODEL_A" \
+            --model-b "$MODEL_B" \
+            --modules structural,tensor,neuron,regression \
+            --local-only \
+            --output-dir /tmp/cli_reports
+
+          ls -la /tmp/cli_reports
+          compgen -G "/tmp/cli_reports/*.json" >/dev/null
+          compgen -G "/tmp/cli_reports/*.md" >/dev/null
+          compgen -G "/tmp/cli_reports/*.html" >/dev/null
+
+      - name: Upload distributable release artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: neural-diff-release-bundle
+          path: dist/*
+          retention-days: 30
+
+      - name: Publish GitHub Release assets on version tags
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* --title "NEURAL DIFF $TAG" --generate-notes
+          fi

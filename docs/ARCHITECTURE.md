@@ -114,7 +114,7 @@ neural-diff/                        # Mounted at workspace root (d:\LLM)
 ├── scripts/                        # Reproducible environment, test, benchmark, screenshot, & manifest scripts
 ├── examples/                       # Runnable Python & CLI usage examples
 ├── evidence/                       # Verifiable logs, real model results, screenshots, & SHA-256 manifest
-└── .github/workflows/ci.yml        # GitHub Actions multi-job CI workflow
+└── .github/workflows/              # 8 specialized GitHub Actions CI, Security, SAST, Benchmark & Release workflows
 ```
 
 ---

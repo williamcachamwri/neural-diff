@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-11-26T21:02:05.984872+00:00",
+  "generated_at_utc": "2026-11-26T21:23:40.100404+00:00",
   "integrity_scope_notice": "This manifest records post-capture SHA-256 hashes and byte sizes to detect silent file modification or truncation. It establishes post-capture file integrity, not independent cryptographic proof of the underlying execution event.",
   "artifact_count": 73,
   "artifacts": [
@@ -86,9 +86,9 @@
     },
     {
       "relative_path": "evidence/FINAL_ENGINEERING_REPORT.md",
-      "sha256": "cef4de8c8e6ede185a99ce32b7ea8eea36778e565c7b9037d02b52a05a05800c",
-      "size_bytes": 15844,
-      "captured_timestamp_utc": "2026-11-26T20:48:43.628351+00:00",
+      "sha256": "104962673d1ded45e53056cd2598b68f1da6f6309f77567b55ca7caad65ee694",
+      "size_bytes": 15998,
+      "captured_timestamp_utc": "2026-11-26T21:23:29.722241+00:00",
       "category": "summary_document",
       "related_feature": "Project Evidence Index & Engineering Report",
       "related_test_or_experiment": "Phase 17-20 Verification",
