@@ -1,0 +1,116 @@
+{
+  "verified_at_utc": "2026-11-26T18:20:11.843154+00:00",
+  "huggingface_models": {
+    "Qwen/Qwen2.5-0.5B": {
+      "http_status": 200,
+      "sha": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+      "gated": false,
+      "private": false,
+      "pipeline_tag": "text-generation",
+      "license": "apache-2.0",
+      "unauthenticated_config_http_status": 200
+    },
+    "Qwen/Qwen2.5-0.5B-Instruct": {
+      "http_status": 200,
+      "sha": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "gated": false,
+      "private": false,
+      "pipeline_tag": "text-generation",
+      "license": "apache-2.0",
+      "unauthenticated_config_http_status": 200
+    },
+    "HuggingFaceTB/SmolLM2-135M": {
+      "http_status": 200,
+      "sha": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+      "gated": false,
+      "private": false,
+      "pipeline_tag": "text-generation",
+      "license": "apache-2.0",
+      "unauthenticated_config_http_status": 200
+    },
+    "HuggingFaceTB/SmolLM2-135M-Instruct": {
+      "http_status": 200,
+      "sha": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "gated": false,
+      "private": false,
+      "pipeline_tag": "text-generation",
+      "license": "apache-2.0",
+      "unauthenticated_config_http_status": 200
+    },
+    "google/gemma-3-270m": {
+      "http_status": 200,
+      "sha": "9b0cfec892e2bc2afd938c98eabe4e4a7b1e0ca1",
+      "gated": "manual",
+      "private": false,
+      "pipeline_tag": "text-generation",
+      "license": "gemma",
+      "unauthenticated_config_http_status": 401
+    }
+  },
+  "ecosystem_repositories": {
+    "safetensors/safetensors": {
+      "html_url": "https://github.com/safetensors/safetensors",
+      "description": "Simple, safe way to store and distribute tensors",
+      "license": "Apache-2.0",
+      "stargazers_count": 4002,
+      "language": "Rust",
+      "default_branch": "main"
+    },
+    "huggingface/transformers": {
+      "html_url": "https://github.com/huggingface/transformers",
+      "description": "\ud83e\udd17 Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training. ",
+      "license": "Apache-2.0",
+      "stargazers_count": 169362,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    "TransformerLensOrg/TransformerLens": {
+      "html_url": "https://github.com/TransformerLensOrg/TransformerLens",
+      "description": "A library for mechanistic interpretability of GPT-style language models",
+      "license": "MIT",
+      "stargazers_count": 4108,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    "ndif-team/nnsight": {
+      "html_url": "https://github.com/ndif-team/nnsight",
+      "description": "The nnsight package enables interpreting and manipulating the internals of deep learned models.",
+      "license": "MIT",
+      "stargazers_count": 1162,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    "decoderesearch/SAELens": {
+      "html_url": "https://github.com/decoderesearch/SAELens",
+      "description": "Training Sparse Autoencoders on Language Models",
+      "license": "MIT",
+      "stargazers_count": 1592,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    "arcee-ai/mergekit": {
+      "html_url": "https://github.com/arcee-ai/mergekit",
+      "description": "Tools for merging pretrained large language models.",
+      "license": "LGPL-3.0",
+      "stargazers_count": 7494,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    "EleutherAI/lm-evaluation-harness": {
+      "html_url": "https://github.com/EleutherAI/lm-evaluation-harness",
+      "description": "A framework for few-shot evaluation of language models.",
+      "license": "MIT",
+      "stargazers_count": 14543,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    "promptfoo/promptfoo": {
+      "html_url": "https://github.com/promptfoo/promptfoo",
+      "description": "Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, Claude, Gemini, DeepSeek, and more. Simple declarative configs with command line and CI/CD integration.  Used by OpenAI and Anthropic.",
+      "license": "MIT",
+      "stargazers_count": 27713,
+      "language": "TypeScript",
+      "default_branch": "main"
+    }
+  }
+}
