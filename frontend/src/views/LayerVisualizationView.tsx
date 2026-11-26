@@ -41,11 +41,12 @@ export const LayerVisualizationView: React.FC<Props> = ({ activeBundle }) => {
   }
 
   const colorForRelL2 = (val: number | null | undefined): string => {
-    if (val == null) return "#141d33";
+    if (val == null) return "#111116";
     const t = Math.min(1, Math.max(0, val / maxRelL2));
-    const r = Math.round(24 + 220 * t);
-    const g = Math.round(58 + 130 * (1 - Math.abs(t - 0.45)));
-    const b = Math.round(145 * (1 - t) + 42);
+    // Obsidian -> Deep Espresso Bronze -> Warm Champagne Gold -> Luminous Ivory
+    const r = Math.round(20 + 215 * Math.pow(t, 0.85));
+    const g = Math.round(20 + 168 * Math.pow(t, 0.95));
+    const b = Math.round(26 + 85 * Math.pow(t, 1.35));
     return `rgb(${r}, ${g}, ${b})`;
   };
 
