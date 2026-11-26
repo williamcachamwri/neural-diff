@@ -1,0 +1,3612 @@
+{
+  "schema_version": "1.0.0",
+  "application": {
+    "name": "NEURAL DIFF",
+    "version": "0.1.0"
+  },
+  "comparison_id": "ndiff-synth-demo",
+  "created_at_utc": "2026-11-26T19:28:15.261978+00:00",
+  "experiment_type": "SYNTHETIC FIXTURE EXPERIMENT",
+  "selected_modules": [
+    "structural",
+    "tensor",
+    "neuron",
+    "regression"
+  ],
+  "model_a": {
+    "model_id": "synth_model_a",
+    "resolved_path": "D:\\LLM\\data\\demo_fixtures\\synth_model_a",
+    "format": "huggingface_local_dir",
+    "revision": null,
+    "tensor_count": 21,
+    "total_parameters": 26784,
+    "total_bytes": 107136,
+    "shard_count": 1,
+    "dtypes_present": [
+      "float32"
+    ],
+    "architecture": {
+      "architecture_class": "Qwen2ForCausalLM",
+      "model_type": "qwen2",
+      "hidden_size": 32,
+      "intermediate_size": 64,
+      "num_hidden_layers": 2,
+      "num_attention_heads": 4,
+      "num_key_value_heads": 2,
+      "vocab_size": 128,
+      "max_position_embeddings": null,
+      "rms_norm_eps": 1e-06,
+      "tie_word_embeddings": null,
+      "torch_dtype": "float32",
+      "bos_token_id": null,
+      "eos_token_id": null,
+      "tokenizer_class": null,
+      "tokenizer_vocab_size": null,
+      "raw_config": {
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "model_type": "qwen2",
+        "vocab_size": 128,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 4,
+        "num_key_value_heads": 2,
+        "rms_norm_eps": 1e-06,
+        "torch_dtype": "float32"
+      }
+    },
+    "custom_metadata": {
+      "source": "synthetic_fixture_a"
+    },
+    "security_notes": [
+      "Automatic remote/custom Python code execution disabled (trust_remote_code=False).",
+      "Loaded Safetensors via model.safetensors."
+    ]
+  },
+  "model_b": {
+    "model_id": "synth_model_b",
+    "resolved_path": "D:\\LLM\\data\\demo_fixtures\\synth_model_b",
+    "format": "huggingface_local_dir",
+    "revision": null,
+    "tensor_count": 21,
+    "total_parameters": 26784,
+    "total_bytes": 107136,
+    "shard_count": 1,
+    "dtypes_present": [
+      "float32"
+    ],
+    "architecture": {
+      "architecture_class": "Qwen2ForCausalLM",
+      "model_type": "qwen2",
+      "hidden_size": 32,
+      "intermediate_size": 64,
+      "num_hidden_layers": 2,
+      "num_attention_heads": 4,
+      "num_key_value_heads": 2,
+      "vocab_size": 128,
+      "max_position_embeddings": null,
+      "rms_norm_eps": 1e-06,
+      "tie_word_embeddings": null,
+      "torch_dtype": "float32",
+      "bos_token_id": null,
+      "eos_token_id": null,
+      "tokenizer_class": null,
+      "tokenizer_vocab_size": null,
+      "raw_config": {
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "model_type": "qwen2",
+        "vocab_size": 128,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 4,
+        "num_key_value_heads": 2,
+        "rms_norm_eps": 1e-06,
+        "torch_dtype": "float32"
+      }
+    },
+    "custom_metadata": {
+      "source": "synthetic_fixture_b"
+    },
+    "security_notes": [
+      "Automatic remote/custom Python code execution disabled (trust_remote_code=False).",
+      "Loaded Safetensors via model.safetensors."
+    ]
+  },
+  "epistemic_ledger": [
+    {
+      "statement": "Model A (26,784 params) vs Model B (26,784 params) share 21 tensor keys.",
+      "epistemic_status": "OBSERVED",
+      "evidence_source": "Module C \u2014 StructuralDiffEngine",
+      "metric_values": {
+        "shared_tensors": 21,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    {
+      "statement": "99.8507% of aligned parameters exceeded numerical tolerance (mean cosine=0.99866593, max abs diff=0.30177921056747437).",
+      "epistemic_status": "OBSERVED",
+      "evidence_source": "Module B \u2014 TensorDiffEngine",
+      "metric_values": {
+        "changed_pct": 99.850657,
+        "mean_cosine": 0.99866593
+      }
+    },
+    {
+      "statement": "Causal mediation of individual neurons or circuits via counterfactual activation patching was not executed in this observational diff run.",
+      "epistemic_status": "NOT VERIFIED",
+      "evidence_source": "Epistemic boundary declaration (Causal Patching Gate)",
+      "metric_values": {
+        "causally_verified_circuits": 0
+      }
+    }
+  ],
+  "structural": {
+    "epistemic_status": "OBSERVED",
+    "model_a_parameters": 26784,
+    "model_b_parameters": 26784,
+    "delta_parameters": 0,
+    "model_a_bytes": 107136,
+    "model_b_bytes": 107136,
+    "delta_bytes": 0,
+    "counts": {
+      "shared": 21,
+      "added": 0,
+      "removed": 0,
+      "inferred_renames": 0,
+      "shape_changes": 0,
+      "dtype_changes": 0,
+      "layers_compared": 2
+    },
+    "shared_tensors": [
+      "lm_head.weight",
+      "model.embed_tokens.weight",
+      "model.layers.0.input_layernorm.weight",
+      "model.layers.0.mlp.down_proj.weight",
+      "model.layers.0.mlp.gate_proj.weight",
+      "model.layers.0.mlp.up_proj.weight",
+      "model.layers.0.post_attention_layernorm.weight",
+      "model.layers.0.self_attn.k_proj.weight",
+      "model.layers.0.self_attn.o_proj.weight",
+      "model.layers.0.self_attn.q_proj.weight",
+      "model.layers.0.self_attn.v_proj.weight",
+      "model.layers.1.input_layernorm.weight",
+      "model.layers.1.mlp.down_proj.weight",
+      "model.layers.1.mlp.gate_proj.weight",
+      "model.layers.1.mlp.up_proj.weight",
+      "model.layers.1.post_attention_layernorm.weight",
+      "model.layers.1.self_attn.k_proj.weight",
+      "model.layers.1.self_attn.o_proj.weight",
+      "model.layers.1.self_attn.q_proj.weight",
+      "model.layers.1.self_attn.v_proj.weight",
+      "model.norm.weight"
+    ],
+    "added_tensors": [],
+    "removed_tensors": [],
+    "inferred_renames": [],
+    "shape_changes": [],
+    "dtype_changes": [],
+    "layer_deltas": [
+      {
+        "layer_index": 0,
+        "present_in_a": true,
+        "present_in_b": true,
+        "tensor_count_a": 9,
+        "tensor_count_b": 9,
+        "parameters_a": 9280,
+        "parameters_b": 9280,
+        "delta_parameters": 0,
+        "roles_a": [
+          "attn_k",
+          "attn_o",
+          "attn_q",
+          "attn_v",
+          "mlp_down",
+          "mlp_gate",
+          "mlp_up",
+          "norm"
+        ],
+        "roles_b": [
+          "attn_k",
+          "attn_o",
+          "attn_q",
+          "attn_v",
+          "mlp_down",
+          "mlp_gate",
+          "mlp_up",
+          "norm"
+        ]
+      },
+      {
+        "layer_index": 1,
+        "present_in_a": true,
+        "present_in_b": true,
+        "tensor_count_a": 9,
+        "tensor_count_b": 9,
+        "parameters_a": 9280,
+        "parameters_b": 9280,
+        "delta_parameters": 0,
+        "roles_a": [
+          "attn_k",
+          "attn_o",
+          "attn_q",
+          "attn_v",
+          "mlp_down",
+          "mlp_gate",
+          "mlp_up",
+          "norm"
+        ],
+        "roles_b": [
+          "attn_k",
+          "attn_o",
+          "attn_q",
+          "attn_v",
+          "mlp_down",
+          "mlp_gate",
+          "mlp_up",
+          "norm"
+        ]
+      }
+    ],
+    "compatibility": {
+      "epistemic_status": "OBSERVED",
+      "compatible_for_direct_tensor_diff": true,
+      "compatible_for_structural_diff": true,
+      "compatible_for_head_neuron_analysis": true,
+      "compatible_for_activation_diff": true,
+      "compatible_for_behavioral_diff": true,
+      "shared_tensor_count": 21,
+      "shape_matched_tensor_count": 21,
+      "jaccard_key_overlap": 1.0,
+      "issues": [],
+      "summary": "Fully aligned checkpoints (21/21 tensors match in name and shape)."
+    }
+  },
+  "tensor_diff": {
+    "epistemic_status": "OBSERVED",
+    "tolerances": {
+      "atol": 1e-06,
+      "rtol": 1e-05,
+      "zero_threshold": 0.0,
+      "eps": 1e-12
+    },
+    "summary": {
+      "total_union_tensors": 21,
+      "compared_tensors": 21,
+      "identical_tensors": 1,
+      "within_tolerance_tensors": 0,
+      "modified_tensors": 20,
+      "shape_mismatch_tensors": 0,
+      "missing_in_b_tensors": 0,
+      "added_in_b_tensors": 0,
+      "total_compared_parameters": 26784,
+      "total_changed_parameters": 26744,
+      "global_changed_pct": 99.850657,
+      "global_mean_cosine": 0.99866593,
+      "global_mean_relative_l2": 0.04462536,
+      "global_max_abs_diff": 0.30177921056747437,
+      "has_any_nan_or_inf": false
+    },
+    "layer_summaries": [
+      {
+        "layer_index": 0,
+        "tensor_count": 9,
+        "total_parameters": 9280,
+        "changed_parameters": 9245,
+        "changed_pct": 99.622845,
+        "mean_cosine_similarity": 0.99974617,
+        "min_cosine_similarity": 0.9996653521456864,
+        "mean_relative_l2": 0.02129648,
+        "max_relative_l2": 0.025876768498615914,
+        "max_abs_diff": 0.10137295722961426,
+        "role_breakdown": {
+          "attn_k": {
+            "mean_cosine": 0.99969056,
+            "mean_relative_l2": 0.02488572,
+            "max_abs_diff": 0.07179778814315796
+          },
+          "attn_o": {
+            "mean_cosine": 0.99971524,
+            "mean_relative_l2": 0.02386932,
+            "max_abs_diff": 0.09184759855270386
+          },
+          "attn_q": {
+            "mean_cosine": 0.99972024,
+            "mean_relative_l2": 0.02376845,
+            "max_abs_diff": 0.07355436682701111
+          },
+          "attn_v": {
+            "mean_cosine": 0.99966535,
+            "mean_relative_l2": 0.02587677,
+            "max_abs_diff": 0.08249840140342712
+          },
+          "mlp_down": {
+            "mean_cosine": 0.99969176,
+            "mean_relative_l2": 0.02483595,
+            "max_abs_diff": 0.10137295722961426
+          },
+          "mlp_gate": {
+            "mean_cosine": 0.99968476,
+            "mean_relative_l2": 0.0251081,
+            "max_abs_diff": 0.09441745281219482
+          },
+          "mlp_up": {
+            "mean_cosine": 0.99971584,
+            "mean_relative_l2": 0.02384834,
+            "max_abs_diff": 0.09330624341964722
+          },
+          "norm": {
+            "mean_cosine": 0.99991587,
+            "mean_relative_l2": 0.00973783,
+            "max_abs_diff": 0.04778832197189331
+          }
+        }
+      },
+      {
+        "layer_index": 1,
+        "tensor_count": 9,
+        "total_parameters": 9280,
+        "changed_parameters": 9280,
+        "changed_pct": 100.0,
+        "mean_cosine_similarity": 0.99723919,
+        "min_cosine_similarity": 0.9967094661802425,
+        "mean_relative_l2": 0.07472927,
+        "max_relative_l2": 0.08128154312318502,
+        "max_abs_diff": 0.30177921056747437,
+        "role_breakdown": {
+          "attn_k": {
+            "mean_cosine": 0.99710635,
+            "mean_relative_l2": 0.07611898,
+            "max_abs_diff": 0.26525601744651794
+          },
+          "attn_o": {
+            "mean_cosine": 0.99733927,
+            "mean_relative_l2": 0.07312188,
+            "max_abs_diff": 0.30177921056747437
+          },
+          "attn_q": {
+            "mean_cosine": 0.99682538,
+            "mean_relative_l2": 0.07983139,
+            "max_abs_diff": 0.24350404739379883
+          },
+          "attn_v": {
+            "mean_cosine": 0.99670947,
+            "mean_relative_l2": 0.08128154,
+            "max_abs_diff": 0.2743699327111244
+          },
+          "mlp_down": {
+            "mean_cosine": 0.99706579,
+            "mean_relative_l2": 0.07702182,
+            "max_abs_diff": 0.255211740732193
+          },
+          "mlp_gate": {
+            "mean_cosine": 0.99735178,
+            "mean_relative_l2": 0.07297384,
+            "max_abs_diff": 0.24452614784240723
+          },
+          "mlp_up": {
+            "mean_cosine": 0.99725628,
+            "mean_relative_l2": 0.07423099,
+            "max_abs_diff": 0.2614578530192375
+          },
+          "norm": {
+            "mean_cosine": 0.99774919,
+            "mean_relative_l2": 0.06899147,
+            "max_abs_diff": 0.18572860956192017
+          }
+        }
+      }
+    ],
+    "top_diverged_names": [
+      "model.layers.1.self_attn.v_proj.weight",
+      "model.layers.1.self_attn.q_proj.weight",
+      "model.layers.1.mlp.down_proj.weight",
+      "model.layers.1.self_attn.k_proj.weight",
+      "model.layers.1.mlp.up_proj.weight",
+      "model.layers.1.input_layernorm.weight",
+      "model.layers.1.self_attn.o_proj.weight",
+      "model.layers.1.mlp.gate_proj.weight",
+      "model.layers.1.post_attention_layernorm.weight",
+      "model.layers.0.self_attn.v_proj.weight",
+      "lm_head.weight",
+      "model.layers.0.mlp.gate_proj.weight",
+      "model.layers.0.self_attn.k_proj.weight",
+      "model.layers.0.mlp.down_proj.weight",
+      "model.embed_tokens.weight"
+    ],
+    "records": [
+      {
+        "name": "lm_head.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": null,
+        "canonical_role": "lm_head",
+        "shape_a": [
+          128,
+          32
+        ],
+        "shape_b": [
+          128,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 4096,
+          "finite_pair_elements": 4096,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.0932118371129036,
+          "mean_abs_diff": 0.020126856788635905,
+          "rmse": 0.02531200414157711,
+          "l2_diff": 1.619968265060935,
+          "l2_norm_a": 63.18578454144098,
+          "l2_norm_b": 63.20482843525075,
+          "relative_l2": 0.025638176004580016,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.999671486397552,
+          "changed_elements": 4095,
+          "changed_pct": 99.975586,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 4096,
+          "finite_elements": 4096,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.00300591740948164,
+          "std": 0.9872733074634475,
+          "min_val": -3.7507052421569824,
+          "max_val": 3.902043104171753,
+          "p05": -1.6389791071414948,
+          "p50": -0.008251809515058994,
+          "p95": 1.6505742371082306,
+          "p99": 2.223497724533081,
+          "l2_norm": 63.18578454144098,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 4096,
+          "finite_elements": 4096,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.002880853935948835,
+          "std": 0.9875712424258355,
+          "min_val": -3.7640109062194824,
+          "max_val": 3.8874423503875732,
+          "p05": -1.6395773887634277,
+          "p50": -0.006328359246253967,
+          "p95": 1.6404912769794464,
+          "p99": 2.2274810671806335,
+          "l2_norm": 63.20482843525075,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": 0.0001250634735328049,
+          "std_delta": 0.0002979349623879468,
+          "std_ratio": 1.0003017755672474,
+          "median_delta": 0.001923450268805027,
+          "iqr_or_p90_span_delta": -0.009484678506851196,
+          "max_quantile_abs_shift": 0.01008296012878418,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.004201564006507397
+        },
+        "notes": []
+      },
+      {
+        "name": "model.embed_tokens.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": null,
+        "canonical_role": "embedding",
+        "shape_a": [
+          128,
+          32
+        ],
+        "shape_b": [
+          128,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 4096,
+          "finite_pair_elements": 4096,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.0969773530960083,
+          "mean_abs_diff": 0.019931020944433442,
+          "rmse": 0.024981662794323598,
+          "l2_diff": 1.5988264188367103,
+          "l2_norm_a": 65.6482289246056,
+          "l2_norm_b": 65.71259893861748,
+          "relative_l2": 0.02435444862759206,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.999704201174333,
+          "changed_elements": 4092,
+          "changed_pct": 99.902344,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 4096,
+          "finite_elements": 4096,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.01934192187750483,
+          "std": 1.025571202149111,
+          "min_val": -4.068782329559326,
+          "max_val": 3.6555705070495605,
+          "p05": -1.7010636627674103,
+          "p50": -0.02259570173919201,
+          "p95": 1.6601709425449371,
+          "p99": 2.361264991760255,
+          "l2_norm": 65.6482289246056,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 4096,
+          "finite_elements": 4096,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.019748595072314856,
+          "std": 1.0265694195169153,
+          "min_val": -4.039609909057617,
+          "max_val": 3.6738674640655518,
+          "p05": -1.7076719105243683,
+          "p50": -0.018884137272834778,
+          "p95": 1.6672149002552032,
+          "p99": 2.3424265384674103,
+          "l2_norm": 65.71259893861748,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0004066731948100255,
+          "std_delta": 0.000998217367804255,
+          "std_ratio": 1.0009733281957531,
+          "median_delta": 0.003711564466357231,
+          "iqr_or_p90_span_delta": 0.013652205467224121,
+          "max_quantile_abs_shift": 0.018838453292844726,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.005787923311193784
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.input_layernorm.weight",
+        "status": "identical",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "norm",
+        "shape_a": [
+          32
+        ],
+        "shape_b": [
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 32,
+          "finite_pair_elements": 32,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": true,
+          "within_tolerance": true,
+          "max_abs_diff": 0.0,
+          "mean_abs_diff": 0.0,
+          "rmse": 0.0,
+          "l2_diff": 0.0,
+          "l2_norm_a": 5.656854249492381,
+          "l2_norm_b": 5.656854249492381,
+          "relative_l2": 0.0,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9999999999999998,
+          "changed_elements": 0,
+          "changed_pct": 0.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "min_val": 1.0,
+          "max_val": 1.0,
+          "p05": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "l2_norm": 5.656854249492381,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "min_val": 1.0,
+          "max_val": 1.0,
+          "p05": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "l2_norm": 5.656854249492381,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": 0.0,
+          "std_delta": 0.0,
+          "std_ratio": 1.0,
+          "median_delta": 0.0,
+          "iqr_or_p90_span_delta": 0.0,
+          "max_quantile_abs_shift": 0.0,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.0
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.mlp.down_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "mlp_down",
+        "shape_a": [
+          32,
+          64
+        ],
+        "shape_b": [
+          32,
+          64
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 2048,
+          "finite_pair_elements": 2048,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.10137295722961426,
+          "mean_abs_diff": 0.019406813682508073,
+          "rmse": 0.024627241318466588,
+          "l2_diff": 1.1145017176451364,
+          "l2_norm_a": 44.8745328669092,
+          "l2_norm_b": 44.89029322253997,
+          "relative_l2": 0.02483595140590261,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9996917576904687,
+          "changed_elements": 2047,
+          "changed_pct": 99.951172,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.003874343953384596,
+          "std": 0.9915888839942386,
+          "min_val": -3.247472047805786,
+          "max_val": 3.416134834289551,
+          "p05": -1.6081536769866944,
+          "p50": -0.026770969852805138,
+          "p95": 1.6256572127342221,
+          "p99": 2.2164030408859237,
+          "l2_norm": 44.8745328669092,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.004634245853594621,
+          "std": 0.9919338854697481,
+          "min_val": -3.2461822032928467,
+          "max_val": 3.390019416809082,
+          "p05": -1.6019451141357421,
+          "p50": -0.030657973140478134,
+          "p95": 1.6366000413894652,
+          "p99": 2.2102842974662775,
+          "l2_norm": 44.89029322253997,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0007599019002100249,
+          "std_delta": 0.0003450014755095321,
+          "std_ratio": 1.0003479279377556,
+          "median_delta": -0.0038870032876729965,
+          "iqr_or_p90_span_delta": 0.004734265804290594,
+          "max_quantile_abs_shift": 0.010942828655243098,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.007012798264622792
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.mlp.gate_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "mlp_gate",
+        "shape_a": [
+          64,
+          32
+        ],
+        "shape_b": [
+          64,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 2048,
+          "finite_pair_elements": 2048,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.09441745281219482,
+          "mean_abs_diff": 0.019546164245340947,
+          "rmse": 0.02465573336937134,
+          "l2_diff": 1.1157911206790347,
+          "l2_norm_a": 44.43948451824149,
+          "l2_norm_b": 44.41603970782185,
+          "relative_l2": 0.025108102237797685,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9996847644566318,
+          "changed_elements": 2047,
+          "changed_pct": 99.951172,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.006099038297023185,
+          "std": 0.9819642111649077,
+          "min_val": -2.934685230255127,
+          "max_val": 3.553270101547241,
+          "p05": -1.650939279794693,
+          "p50": -0.0011268991511315107,
+          "p95": 1.6039617896080014,
+          "p99": 2.305923638343809,
+          "l2_norm": 44.43948451824149,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.006395879668843918,
+          "std": 0.9814442495887397,
+          "min_val": -2.9370529651641846,
+          "max_val": 3.561621904373169,
+          "p05": -1.6498392641544342,
+          "p50": 0.007192019373178482,
+          "p95": 1.616380989551542,
+          "p99": 2.310347549915313,
+          "l2_norm": 44.41603970782185,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.000296841371820733,
+          "std_delta": -0.0005199615761680709,
+          "std_ratio": 0.9994704882619385,
+          "median_delta": 0.008318918524309993,
+          "iqr_or_p90_span_delta": 0.011319184303281382,
+          "max_quantile_abs_shift": 0.012419199943540571,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.007279378036036436
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.mlp.up_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "mlp_up",
+        "shape_a": [
+          64,
+          32
+        ],
+        "shape_b": [
+          64,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 2048,
+          "finite_pair_elements": 2048,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.09330624341964722,
+          "mean_abs_diff": 0.02032469216953814,
+          "rmse": 0.02535236215892701,
+          "l2_diff": 1.1473169409071686,
+          "l2_norm_a": 48.1088788803009,
+          "l2_norm_b": 48.12905457240898,
+          "relative_l2": 0.023848340838741922,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.999715835429286,
+          "changed_elements": 2048,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.009541046354001992,
+          "std": 1.0630232614259414,
+          "min_val": -3.9131174087524414,
+          "max_val": 3.4963226318359375,
+          "p05": -1.7978134512901305,
+          "p50": 0.011249338742345572,
+          "p95": 1.6984441339969625,
+          "p99": 2.4494317531585685,
+          "l2_norm": 48.1088788803009,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.009112570933439201,
+          "std": 1.0634728611945083,
+          "min_val": -3.9186060428619385,
+          "max_val": 3.489307403564453,
+          "p05": -1.7852196037769317,
+          "p50": 0.010322125628590584,
+          "p95": 1.6877839207649226,
+          "p99": 2.457548689842224,
+          "l2_norm": 48.12905457240898,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": 0.00042847542056279053,
+          "std_delta": 0.00044959976856695505,
+          "std_ratio": 1.0004229444311161,
+          "median_delta": -0.0009272131137549877,
+          "iqr_or_p90_span_delta": -0.023254060745238725,
+          "max_quantile_abs_shift": 0.012593847513198808,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.008060424619664571
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.post_attention_layernorm.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "norm",
+        "shape_a": [
+          32
+        ],
+        "shape_b": [
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 32,
+          "finite_pair_elements": 32,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.04778832197189331,
+          "mean_abs_diff": 0.015098398551344872,
+          "rmse": 0.019475668267812003,
+          "l2_diff": 0.11017101680247622,
+          "l2_norm_a": 5.656854249492381,
+          "l2_norm_b": 5.618882848047273,
+          "relative_l2": 0.019475668267812,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9998317483424263,
+          "changed_elements": 32,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "min_val": 1.0,
+          "max_val": 1.0,
+          "p05": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "l2_norm": 5.656854249492381,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.9931204188615084,
+          "std": 0.018220126723947818,
+          "min_val": 0.9522116780281067,
+          "max_val": 1.0219835042953491,
+          "p05": 0.9615823715925217,
+          "p50": 0.996343344449997,
+          "p95": 1.0178930640220643,
+          "p99": 1.0212565648555756,
+          "l2_norm": 5.618882848047273,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0068795811384916306,
+          "std_delta": 0.018220126723947818,
+          "std_ratio": null,
+          "median_delta": -0.0036566555500030518,
+          "iqr_or_p90_span_delta": 0.056310692429542564,
+          "max_quantile_abs_shift": 0.03841762840747831,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.019989115993181872
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.self_attn.k_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "attn_k",
+        "shape_a": [
+          16,
+          32
+        ],
+        "shape_b": [
+          16,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 512,
+          "finite_pair_elements": 512,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.07179778814315796,
+          "mean_abs_diff": 0.019774854347303972,
+          "rmse": 0.024443515486077965,
+          "l2_diff": 0.5530936177998118,
+          "l2_norm_a": 22.22534509622914,
+          "l2_norm_b": 22.202448926407126,
+          "relative_l2": 0.024885715628040005,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.99969056243994,
+          "changed_elements": 512,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.07671593178525882,
+          "std": 0.9792302796127524,
+          "min_val": -3.5881173610687256,
+          "max_val": 2.8337209224700928,
+          "p05": -1.5523588478565216,
+          "p50": 0.09865739196538925,
+          "p95": 1.6708536267280578,
+          "p99": 2.2893602252006526,
+          "l2_norm": 22.22534509622914,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.07509683726493677,
+          "std": 0.978340927071454,
+          "min_val": -3.5916357040405273,
+          "max_val": 2.813657522201538,
+          "p05": -1.5454963505268096,
+          "p50": 0.09578735381364822,
+          "p95": 1.6551160752773284,
+          "p99": 2.314276444911956,
+          "l2_norm": 22.202448926407126,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0016190945203220508,
+          "std_delta": -0.0008893525412984049,
+          "std_ratio": 0.9990917840677372,
+          "median_delta": -0.002870038151741028,
+          "iqr_or_p90_span_delta": -0.022600048780441195,
+          "max_quantile_abs_shift": 0.024916219711303533,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.008490028977394148
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.self_attn.o_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "attn_o",
+        "shape_a": [
+          32,
+          32
+        ],
+        "shape_b": [
+          32,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 1024,
+          "finite_pair_elements": 1024,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.09184759855270386,
+          "mean_abs_diff": 0.01933043902999998,
+          "rmse": 0.0245757251176425,
+          "l2_diff": 0.78642320376456,
+          "l2_norm_a": 32.94703379895008,
+          "l2_norm_b": 32.95585316552204,
+          "relative_l2": 0.02386931729768101,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9997152398985,
+          "changed_elements": 1024,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.012233454349029671,
+          "std": 1.0295221258351388,
+          "min_val": -3.2112810611724854,
+          "max_val": 3.401017189025879,
+          "p05": -1.7437175989151001,
+          "p50": 0.03943530097603798,
+          "p95": 1.622861289978027,
+          "p99": 2.2931075406074517,
+          "l2_norm": 32.94703379895008,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.011041910865060345,
+          "std": 1.0298112159653967,
+          "min_val": -3.2122182846069336,
+          "max_val": 3.370955467224121,
+          "p05": -1.7527382791042327,
+          "p50": 0.036268968135118484,
+          "p95": 1.6346586227416986,
+          "p99": 2.303657941818237,
+          "l2_norm": 32.95585316552204,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0011915434839693262,
+          "std_delta": 0.0002890901302579074,
+          "std_ratio": 1.000280800308224,
+          "median_delta": -0.0031663328409194946,
+          "iqr_or_p90_span_delta": 0.020818012952803944,
+          "max_quantile_abs_shift": 0.011797332763671564,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.00799478193124122
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.self_attn.q_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "attn_q",
+        "shape_a": [
+          32,
+          32
+        ],
+        "shape_b": [
+          32,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 1024,
+          "finite_pair_elements": 1024,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.07355436682701111,
+          "mean_abs_diff": 0.019794142212163024,
+          "rmse": 0.024664132539865186,
+          "l2_diff": 0.7892522412756859,
+          "l2_norm_a": 33.205872106550494,
+          "l2_norm_b": 33.27445012606418,
+          "relative_l2": 0.02376845392715919,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9997202406718873,
+          "changed_elements": 1023,
+          "changed_pct": 99.902344,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.05050579878195549,
+          "std": 1.0364536735291174,
+          "min_val": -3.3855278491973877,
+          "max_val": 3.2857768535614014,
+          "p05": -1.6372724413871764,
+          "p50": 0.0013071235152892768,
+          "p95": 1.7068285286426543,
+          "p99": 2.4823360323905943,
+          "l2_norm": 33.205872106550494,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.05118458925426239,
+          "std": 1.0385660432039188,
+          "min_val": -3.3813953399658203,
+          "max_val": 3.2802231311798096,
+          "p05": -1.6422711968421935,
+          "p50": 0.006789010018110275,
+          "p95": 1.7113009870052331,
+          "p99": 2.4929875898361207,
+          "l2_norm": 33.27445012606418,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": 0.0006787904723069005,
+          "std_delta": 0.0021123696748013288,
+          "std_ratio": 1.00203807437684,
+          "median_delta": 0.005481886502820998,
+          "iqr_or_p90_span_delta": 0.00947121381759608,
+          "max_quantile_abs_shift": 0.010651557445526372,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.004984366773472286
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.0.self_attn.v_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 0,
+        "canonical_role": "attn_v",
+        "shape_a": [
+          16,
+          32
+        ],
+        "shape_b": [
+          16,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 512,
+          "finite_pair_elements": 512,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.08249840140342712,
+          "mean_abs_diff": 0.01996803912697942,
+          "rmse": 0.025130570060838832,
+          "l2_diff": 0.5686398881632885,
+          "l2_norm_a": 21.97491886182402,
+          "l2_norm_b": 21.98186438601936,
+          "relative_l2": 0.025876768498615914,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9996653521456864,
+          "changed_elements": 512,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.037247898642817745,
+          "std": 0.9704488200695229,
+          "min_val": -2.741931676864624,
+          "max_val": 3.1510283946990967,
+          "p05": -1.3916236281394958,
+          "p50": -0.03112123627215624,
+          "p95": 1.6981947302818292,
+          "p99": 2.3323814201354973,
+          "l2_norm": 21.97491886182402,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.0360934743512189,
+          "std": 0.970799605565729,
+          "min_val": -2.7450802326202393,
+          "max_val": 3.1815545558929443,
+          "p05": -1.3883889615535736,
+          "p50": -0.022467084228992462,
+          "p95": 1.6904906451702113,
+          "p99": 2.3361955761909483,
+          "l2_norm": 21.98186438601936,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0011544242915988434,
+          "std_delta": 0.0003507854962060408,
+          "std_ratio": 1.0003614672808618,
+          "median_delta": 0.008654152043163776,
+          "iqr_or_p90_span_delta": -0.010938751697540106,
+          "max_quantile_abs_shift": 0.008654152043163776,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.00653096791356796
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.input_layernorm.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "norm",
+        "shape_a": [
+          32
+        ],
+        "shape_b": [
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 32,
+          "finite_pair_elements": 32,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.18572860956192017,
+          "mean_abs_diff": 0.0597621314227581,
+          "rmse": 0.07325694515440229,
+          "l2_diff": 0.4144038615015108,
+          "l2_norm_a": 5.656854249492381,
+          "l2_norm_b": 5.551862020629247,
+          "relative_l2": 0.07325694515440229,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9974414632189486,
+          "changed_elements": 32,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "min_val": 1.0,
+          "max_val": 1.0,
+          "p05": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "l2_norm": 5.656854249492381,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.9789287708699703,
+          "std": 0.07016112396694417,
+          "min_val": 0.8142713904380798,
+          "max_val": 1.1380184888839722,
+          "p05": 0.8833478689193726,
+          "p50": 0.9730084538459778,
+          "p95": 1.087635338306427,
+          "p99": 1.1277934062480928,
+          "l2_norm": 5.551862020629247,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.02107122913002968,
+          "std_delta": 0.07016112396694417,
+          "std_ratio": null,
+          "median_delta": -0.026991546154022217,
+          "iqr_or_p90_span_delta": 0.20428746938705444,
+          "max_quantile_abs_shift": 0.12779340624809277,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.07709300518035889
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.mlp.down_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "mlp_down",
+        "shape_a": [
+          32,
+          64
+        ],
+        "shape_b": [
+          32,
+          64
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 2048,
+          "finite_pair_elements": 2048,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.255211740732193,
+          "mean_abs_diff": 0.060019035413574784,
+          "rmse": 0.0745608722986261,
+          "l2_diff": 3.3742398984667337,
+          "l2_norm_a": 43.80888127538511,
+          "l2_norm_b": 44.05348812019523,
+          "relative_l2": 0.07702182297822376,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9970657902801373,
+          "changed_elements": 2048,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.006681720511437561,
+          "std": 0.9680255973127974,
+          "min_val": -3.752411127090454,
+          "max_val": 3.4073257446289062,
+          "p05": -1.5716108858585358,
+          "p50": -0.03173983097076416,
+          "p95": 1.6102886319160459,
+          "p99": 2.302027945518493,
+          "l2_norm": 43.80888127538511,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.0073271764163109765,
+          "std": 0.973426179590834,
+          "min_val": -3.781296730041504,
+          "max_val": 3.4172840118408203,
+          "p05": -1.589848482608795,
+          "p50": -0.04297415353357792,
+          "p95": 1.619156777858734,
+          "p99": 2.3237186312675475,
+          "l2_norm": 44.05348812019523,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0006454559048734154,
+          "std_delta": 0.005400582278036636,
+          "std_ratio": 1.005578966396166,
+          "median_delta": -0.011234322562813759,
+          "iqr_or_p90_span_delta": 0.027105742692946855,
+          "max_quantile_abs_shift": 0.021690685749054417,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.012780021751920353
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.mlp.gate_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "mlp_gate",
+        "shape_a": [
+          64,
+          32
+        ],
+        "shape_b": [
+          64,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 2048,
+          "finite_pair_elements": 2048,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.24452614784240723,
+          "mean_abs_diff": 0.05890233833619618,
+          "rmse": 0.07338373750648701,
+          "l2_diff": 3.3209688588576354,
+          "l2_norm_a": 45.50903334216557,
+          "l2_norm_b": 45.660661151639545,
+          "relative_l2": 0.07297383870776819,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9973517833128285,
+          "changed_elements": 2048,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.013241672507007252,
+          "std": 1.005529880024496,
+          "min_val": -3.2425334453582764,
+          "max_val": 3.024109363555908,
+          "p05": -1.6746826350688935,
+          "p50": 0.04413686878979206,
+          "p95": 1.6299498856067653,
+          "p99": 2.2247288131713865,
+          "l2_norm": 45.50903334216557,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.010060140699806652,
+          "std": 1.0089174432248362,
+          "min_val": -3.147679090499878,
+          "max_val": 3.073089599609375,
+          "p05": -1.6789731919765472,
+          "p50": 0.03111877106130123,
+          "p95": 1.6142448544502248,
+          "p99": 2.274113810062408,
+          "l2_norm": 45.660661151639545,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0031815318072005994,
+          "std_delta": 0.0033875632003401712,
+          "std_ratio": 1.0033689334028122,
+          "median_delta": -0.01301809772849083,
+          "iqr_or_p90_span_delta": -0.011414474248886641,
+          "max_quantile_abs_shift": 0.049384996891021604,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.011004561930895015
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.mlp.up_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "mlp_up",
+        "shape_a": [
+          64,
+          32
+        ],
+        "shape_b": [
+          64,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 2048,
+          "finite_pair_elements": 2048,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.2614578530192375,
+          "mean_abs_diff": 0.059589681159167185,
+          "rmse": 0.07493122819755062,
+          "l2_diff": 3.39100029319198,
+          "l2_norm_a": 45.6817311444727,
+          "l2_norm_b": 45.80797101376632,
+          "relative_l2": 0.07423099362122744,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9972562803361658,
+          "changed_elements": 2048,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.001804765360162719,
+          "std": 1.0094315700225884,
+          "min_val": -3.559255838394165,
+          "max_val": 3.1506495475769043,
+          "p05": -1.5872182369232177,
+          "p50": -0.025660197250545025,
+          "p95": 1.6887399137020112,
+          "p99": 2.4925052332878104,
+          "l2_norm": 45.6817311444727,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 2048,
+          "finite_elements": 2048,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.002152091478137663,
+          "std": 1.0122204289687264,
+          "min_val": -3.4496846199035645,
+          "max_val": 3.0531139373779297,
+          "p05": -1.5954252898693084,
+          "p50": -0.017482122406363487,
+          "p95": 1.6915618777275085,
+          "p99": 2.5043147706985467,
+          "l2_norm": 45.80797101376632,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": 0.0003473261179749443,
+          "std_delta": 0.0027888589461380064,
+          "std_ratio": 1.002762801391357,
+          "median_delta": 0.008178074844181538,
+          "iqr_or_p90_span_delta": 0.011029016971588312,
+          "max_quantile_abs_shift": 0.011809537410736315,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.006402363938589876
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.post_attention_layernorm.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "norm",
+        "shape_a": [
+          32
+        ],
+        "shape_b": [
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 32,
+          "finite_pair_elements": 32,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.16620588302612305,
+          "mean_abs_diff": 0.050324734300374985,
+          "rmse": 0.06472598583297558,
+          "l2_diff": 0.36614546801185155,
+          "l2_norm_a": 5.656854249492381,
+          "l2_norm_b": 5.546736635351288,
+          "relative_l2": 0.06472598583297558,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9980569158752837,
+          "changed_elements": 32,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "min_val": 1.0,
+          "max_val": 1.0,
+          "p05": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "l2_norm": 5.656854249492381,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.9786285124719143,
+          "std": 0.06109593082102479,
+          "min_val": 0.833794116973877,
+          "max_val": 1.131581425666809,
+          "p05": 0.8854956805706025,
+          "p50": 0.9821200668811798,
+          "p95": 1.0710515201091766,
+          "p99": 1.1230985069274904,
+          "l2_norm": 5.546736635351288,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.02137148752808571,
+          "std_delta": 0.06109593082102479,
+          "std_ratio": null,
+          "median_delta": -0.01787993311882019,
+          "iqr_or_p90_span_delta": 0.18555583953857413,
+          "max_quantile_abs_shift": 0.12309850692749036,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.06781192421913144
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.self_attn.k_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "attn_k",
+        "shape_a": [
+          16,
+          32
+        ],
+        "shape_b": [
+          16,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 512,
+          "finite_pair_elements": 512,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.26525601744651794,
+          "mean_abs_diff": 0.05976530886846376,
+          "rmse": 0.07440995851415017,
+          "l2_diff": 1.6837051601012882,
+          "l2_norm_a": 22.119385459339693,
+          "l2_norm_b": 22.141565208782858,
+          "relative_l2": 0.07611898455299808,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9971063543704543,
+          "changed_elements": 512,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.02283130497607999,
+          "std": 0.9772813090900577,
+          "min_val": -2.915987253189087,
+          "max_val": 2.7869372367858887,
+          "p05": -1.6092444896697997,
+          "p50": 0.02173661533743143,
+          "p95": 1.5632878899574278,
+          "p99": 2.2349632334709155,
+          "l2_norm": 22.119385459339693,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.022856700812553754,
+          "std": 0.9782611989475072,
+          "min_val": -2.919045925140381,
+          "max_val": 2.886115550994873,
+          "p05": -1.5643439948558808,
+          "p50": 0.004774978384375572,
+          "p95": 1.596432673931121,
+          "p99": 2.2709488987922644,
+          "l2_norm": 22.141565208782858,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -2.5395836473762756e-05,
+          "std_delta": 0.0009798898574494563,
+          "std_ratio": 1.0010026691888356,
+          "median_delta": -0.01696163695305586,
+          "iqr_or_p90_span_delta": -0.011755710840225753,
+          "max_quantile_abs_shift": 0.04490049481391889,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.031668971913555964
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.self_attn.o_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "attn_o",
+        "shape_a": [
+          32,
+          32
+        ],
+        "shape_b": [
+          32,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 1024,
+          "finite_pair_elements": 1024,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.30177921056747437,
+          "mean_abs_diff": 0.06021967263222905,
+          "rmse": 0.0760303739986717,
+          "l2_diff": 2.4329719679574944,
+          "l2_norm_a": 33.27282989739903,
+          "l2_norm_b": 33.37375655109098,
+          "relative_l2": 0.07312188279325416,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9973392664166006,
+          "changed_elements": 1024,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.06194131997835939,
+          "std": 1.0379293166761001,
+          "min_val": -3.217987298965454,
+          "max_val": 3.2075376510620117,
+          "p05": -1.6493497967720032,
+          "p50": 0.04791300930082798,
+          "p95": 1.7658709764480585,
+          "p99": 2.6439750123023984,
+          "l2_norm": 33.27282989739903,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.06189430457925482,
+          "std": 1.0410916651044682,
+          "min_val": -3.305408477783203,
+          "max_val": 3.1955368518829346,
+          "p05": -1.6471226930618286,
+          "p50": 0.0370529443025589,
+          "p95": 1.7564616441726684,
+          "p99": 2.624892790317534,
+          "l2_norm": 33.37375655109098,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -4.701539910456631e-05,
+          "std_delta": 0.0031623484283680448,
+          "std_ratio": 1.0030467859203507,
+          "median_delta": -0.010860064998269081,
+          "iqr_or_p90_span_delta": -0.011636435985565186,
+          "max_quantile_abs_shift": 0.01908222198486431,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.007498833661277941
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.self_attn.q_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "attn_q",
+        "shape_a": [
+          32,
+          32
+        ],
+        "shape_b": [
+          32,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 1024,
+          "finite_pair_elements": 1024,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.24350404739379883,
+          "mean_abs_diff": 0.06162668884763889,
+          "rmse": 0.07732151135372119,
+          "l2_diff": 2.474288363319078,
+          "l2_norm_a": 30.993927381139333,
+          "l2_norm_b": 31.075962918420746,
+          "relative_l2": 0.0798313919011358,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9968253799452372,
+          "changed_elements": 1024,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.011549717090872491,
+          "std": 0.9684913651925058,
+          "min_val": -3.134229898452759,
+          "max_val": 2.6931819915771484,
+          "p05": -1.6561281085014343,
+          "p50": 0.01984240021556616,
+          "p95": 1.5405752897262561,
+          "p99": 2.123637869358063,
+          "l2_norm": 30.993927381139333,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 1024,
+          "finite_elements": 1024,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.013639013658121257,
+          "std": 0.9710280594579828,
+          "min_val": -3.0967442989349365,
+          "max_val": 2.722911834716797,
+          "p05": -1.674960422515869,
+          "p50": 0.005698288790881634,
+          "p95": 1.5517692327499382,
+          "p99": 2.1587689995765684,
+          "l2_norm": 31.075962918420746,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": 0.0020892965672487662,
+          "std_delta": 0.0025366942654769797,
+          "std_ratio": 1.0026192223871535,
+          "median_delta": -0.014144111424684525,
+          "iqr_or_p90_span_delta": 0.0300262570381169,
+          "max_quantile_abs_shift": 0.03513113021850556,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.014723456154267067
+        },
+        "notes": []
+      },
+      {
+        "name": "model.layers.1.self_attn.v_proj.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": 1,
+        "canonical_role": "attn_v",
+        "shape_a": [
+          16,
+          32
+        ],
+        "shape_b": [
+          16,
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 512,
+          "finite_pair_elements": 512,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.2743699327111244,
+          "mean_abs_diff": 0.06464632480310684,
+          "rmse": 0.08113474077747834,
+          "l2_diff": 1.835869612594164,
+          "l2_norm_a": 22.586549689538245,
+          "l2_norm_b": 22.648590099005823,
+          "relative_l2": 0.08128154312318502,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9967094661802425,
+          "changed_elements": 512,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.0670098392329237,
+          "std": 0.9959421416764292,
+          "min_val": -3.167999744415283,
+          "max_val": 3.1696903705596924,
+          "p05": -1.6610248506069183,
+          "p50": -0.04099021293222904,
+          "p95": 1.584585690498352,
+          "p99": 2.1631680464744565,
+          "l2_norm": 22.586549689538245,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 512,
+          "finite_elements": 512,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": -0.0681872682816902,
+          "std": 0.9986104482959375,
+          "min_val": -3.2150135040283203,
+          "max_val": 3.1553256511688232,
+          "p05": -1.6878204226493836,
+          "p50": -0.052060408517718315,
+          "p95": 1.559163373708725,
+          "p99": 2.2058891248703,
+          "l2_norm": 22.648590099005823,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0011774290487664985,
+          "std_delta": 0.0026683066195082317,
+          "std_ratio": 1.0026791783456586,
+          "median_delta": -0.011070195585489273,
+          "iqr_or_p90_span_delta": 0.00137325525283849,
+          "max_quantile_abs_shift": 0.04272107839584338,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.021096028139193868
+        },
+        "notes": []
+      },
+      {
+        "name": "model.norm.weight",
+        "status": "modified",
+        "epistemic_status": "OBSERVED",
+        "layer_index": null,
+        "canonical_role": "norm",
+        "shape_a": [
+          32
+        ],
+        "shape_b": [
+          32
+        ],
+        "dtype_a": "float32",
+        "dtype_b": "float32",
+        "dtype_changed": false,
+        "metrics": {
+          "num_elements": 32,
+          "finite_pair_elements": 32,
+          "non_finite_pair_elements": 0,
+          "nan_count_a": 0,
+          "nan_count_b": 0,
+          "inf_count_a": 0,
+          "inf_count_b": 0,
+          "exact_equal": false,
+          "within_tolerance": false,
+          "max_abs_diff": 0.05183064937591553,
+          "mean_abs_diff": 0.019592711701989174,
+          "rmse": 0.022908135251867856,
+          "l2_diff": 0.12958798224747486,
+          "l2_norm_a": 5.656854249492381,
+          "l2_norm_b": 5.641495627134711,
+          "relative_l2": 0.022908135251867853,
+          "relative_l2_infinite": false,
+          "cosine_similarity": 0.9997405900984558,
+          "changed_elements": 32,
+          "changed_pct": 100.0,
+          "zero_to_nonzero": 0,
+          "nonzero_to_zero": 0
+        },
+        "distribution_a": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 1.0,
+          "std": 0.0,
+          "min_val": 1.0,
+          "max_val": 1.0,
+          "p05": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "l2_norm": 5.656854249492381,
+          "sampled_quantiles": false
+        },
+        "distribution_b": {
+          "total_elements": 32,
+          "finite_elements": 32,
+          "nan_count": 0,
+          "pos_inf_count": 0,
+          "neg_inf_count": 0,
+          "zero_count": 0,
+          "sparsity_ratio": 0.0,
+          "mean": 0.9970262479037046,
+          "std": 0.022714300763783103,
+          "min_val": 0.9481693506240845,
+          "max_val": 1.0357147455215454,
+          "p05": 0.9646040588617325,
+          "p50": 0.9966065585613251,
+          "p95": 1.0351595342159272,
+          "p99": 1.035685292482376,
+          "l2_norm": 5.641495627134711,
+          "sampled_quantiles": false
+        },
+        "distribution_shift": {
+          "mean_delta": -0.0029737520962953568,
+          "std_delta": 0.022714300763783103,
+          "std_ratio": null,
+          "median_delta": -0.0033934414386749268,
+          "iqr_or_p90_span_delta": 0.07055547535419471,
+          "max_quantile_abs_shift": 0.03568529248237606,
+          "sparsity_delta": 0.0,
+          "wasserstein_1d_approx": 0.024649638930956546
+        },
+        "notes": []
+      }
+    ]
+  },
+  "neuron_attention": {
+    "epistemic_status": "OBSERVED",
+    "epistemic_caution": "Basis coordinate indices in MLP, attention, and embedding matrices are commonly polysemantic under superposition. Observed norm or cosine shifts at index k do NOT establish a monosemantic feature or causal behavioral mechanism without separate sparse decomposition and causal intervention.",
+    "counts": {
+      "attention_projections": 8,
+      "mlp_projections": 6,
+      "embeddings_and_heads": 2,
+      "normalization_layers": 5
+    },
+    "attention_projections": [
+      {
+        "tensor_name": "model.layers.0.self_attn.k_proj.weight",
+        "layer_index": 0,
+        "role": "attn_k",
+        "num_heads": 2,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99969149,
+        "min_head_cosine": 0.99968374,
+        "max_head_relative_l2": 0.02522383,
+        "most_diverged_heads": [
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99968374,
+            "relative_l2": 0.02522383,
+            "frobenius_norm_a": 15.844118,
+            "frobenius_norm_b": 15.808338,
+            "max_abs_diff": 0.07179779
+          },
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99969918,
+            "relative_l2": 0.02453142,
+            "frobenius_norm_a": 15.586208,
+            "frobenius_norm_b": 15.589906,
+            "max_abs_diff": 0.07016248
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99969918,
+            "relative_l2": 0.02453142,
+            "frobenius_norm_a": 15.586208,
+            "frobenius_norm_b": 15.589906,
+            "max_abs_diff": 0.07016248
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99968374,
+            "relative_l2": 0.02522383,
+            "frobenius_norm_a": 15.844118,
+            "frobenius_norm_b": 15.808338,
+            "max_abs_diff": 0.07179779
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.0.self_attn.o_proj.weight",
+        "layer_index": 0,
+        "role": "attn_o",
+        "num_heads": 4,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99971426,
+        "min_head_cosine": 0.99966967,
+        "max_head_relative_l2": 0.02573182,
+        "most_diverged_heads": [
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99966967,
+            "relative_l2": 0.02573182,
+            "frobenius_norm_a": 15.332987,
+            "frobenius_norm_b": 15.308575,
+            "max_abs_diff": 0.08295488
+          },
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99970365,
+            "relative_l2": 0.0244411,
+            "frobenius_norm_a": 17.043022,
+            "frobenius_norm_b": 17.075844,
+            "max_abs_diff": 0.0918476
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99974138,
+            "relative_l2": 0.02273793,
+            "frobenius_norm_a": 16.826389,
+            "frobenius_norm_b": 16.822105,
+            "max_abs_diff": 0.06910302
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99974233,
+            "relative_l2": 0.02272073,
+            "frobenius_norm_a": 16.637745,
+            "frobenius_norm_b": 16.648367,
+            "max_abs_diff": 0.0808349
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99970365,
+            "relative_l2": 0.0244411,
+            "frobenius_norm_a": 17.043022,
+            "frobenius_norm_b": 17.075844,
+            "max_abs_diff": 0.0918476
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99966967,
+            "relative_l2": 0.02573182,
+            "frobenius_norm_a": 15.332987,
+            "frobenius_norm_b": 15.308575,
+            "max_abs_diff": 0.08295488
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99974233,
+            "relative_l2": 0.02272073,
+            "frobenius_norm_a": 16.637745,
+            "frobenius_norm_b": 16.648367,
+            "max_abs_diff": 0.0808349
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99974138,
+            "relative_l2": 0.02273793,
+            "frobenius_norm_a": 16.826389,
+            "frobenius_norm_b": 16.822105,
+            "max_abs_diff": 0.06910302
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.0.self_attn.q_proj.weight",
+        "layer_index": 0,
+        "role": "attn_q",
+        "num_heads": 4,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99971843,
+        "min_head_cosine": 0.99968165,
+        "max_head_relative_l2": 0.02547352,
+        "most_diverged_heads": [
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99968165,
+            "relative_l2": 0.02547352,
+            "frobenius_norm_a": 15.892941,
+            "frobenius_norm_b": 15.943557,
+            "max_abs_diff": 0.07218879
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99969602,
+            "relative_l2": 0.02475312,
+            "frobenius_norm_a": 16.335609,
+            "frobenius_norm_b": 16.365818,
+            "max_abs_diff": 0.07211651
+          },
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99974066,
+            "relative_l2": 0.02291562,
+            "frobenius_norm_a": 16.347422,
+            "frobenius_norm_b": 16.384691,
+            "max_abs_diff": 0.06324962
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99975526,
+            "relative_l2": 0.02216168,
+            "frobenius_norm_a": 17.775097,
+            "frobenius_norm_b": 17.795897,
+            "max_abs_diff": 0.07355437
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99974066,
+            "relative_l2": 0.02291562,
+            "frobenius_norm_a": 16.347422,
+            "frobenius_norm_b": 16.384691,
+            "max_abs_diff": 0.06324962
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99968165,
+            "relative_l2": 0.02547352,
+            "frobenius_norm_a": 15.892941,
+            "frobenius_norm_b": 15.943557,
+            "max_abs_diff": 0.07218879
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99969602,
+            "relative_l2": 0.02475312,
+            "frobenius_norm_a": 16.335609,
+            "frobenius_norm_b": 16.365818,
+            "max_abs_diff": 0.07211651
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99975526,
+            "relative_l2": 0.02216168,
+            "frobenius_norm_a": 17.775097,
+            "frobenius_norm_b": 17.795897,
+            "max_abs_diff": 0.07355437
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.0.self_attn.v_proj.weight",
+        "layer_index": 0,
+        "role": "attn_v",
+        "num_heads": 2,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99966735,
+        "min_head_cosine": 0.99966365,
+        "max_head_relative_l2": 0.02606705,
+        "most_diverged_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99966365,
+            "relative_l2": 0.02606705,
+            "frobenius_norm_a": 15.608014,
+            "frobenius_norm_b": 15.643789,
+            "max_abs_diff": 0.08118218
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99967104,
+            "relative_l2": 0.0256816,
+            "frobenius_norm_a": 15.468904,
+            "frobenius_norm_b": 15.442611,
+            "max_abs_diff": 0.0824984
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99966365,
+            "relative_l2": 0.02606705,
+            "frobenius_norm_a": 15.608014,
+            "frobenius_norm_b": 15.643789,
+            "max_abs_diff": 0.08118218
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99967104,
+            "relative_l2": 0.0256816,
+            "frobenius_norm_a": 15.468904,
+            "frobenius_norm_b": 15.442611,
+            "max_abs_diff": 0.0824984
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.self_attn.k_proj.weight",
+        "layer_index": 1,
+        "role": "attn_k",
+        "num_heads": 2,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99710882,
+        "min_head_cosine": 0.99704427,
+        "max_head_relative_l2": 0.07689501,
+        "most_diverged_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99704427,
+            "relative_l2": 0.07689501,
+            "frobenius_norm_a": 15.896755,
+            "frobenius_norm_b": 15.900332,
+            "max_abs_diff": 0.22144246
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99717331,
+            "relative_l2": 0.07528115,
+            "frobenius_norm_a": 15.380521,
+            "frobenius_norm_b": 15.408709,
+            "max_abs_diff": 0.26525602
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99704427,
+            "relative_l2": 0.07689501,
+            "frobenius_norm_a": 15.896755,
+            "frobenius_norm_b": 15.900332,
+            "max_abs_diff": 0.22144246
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99717331,
+            "relative_l2": 0.07528115,
+            "frobenius_norm_a": 15.380521,
+            "frobenius_norm_b": 15.408709,
+            "max_abs_diff": 0.26525602
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.self_attn.o_proj.weight",
+        "layer_index": 1,
+        "role": "attn_o",
+        "num_heads": 4,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99733275,
+        "min_head_cosine": 0.99712485,
+        "max_head_relative_l2": 0.07589204,
+        "most_diverged_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99712485,
+            "relative_l2": 0.07589204,
+            "frobenius_norm_a": 15.585872,
+            "frobenius_norm_b": 15.606827,
+            "max_abs_diff": 0.23111984
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99718028,
+            "relative_l2": 0.07538366,
+            "frobenius_norm_a": 17.228472,
+            "frobenius_norm_b": 17.303066,
+            "max_abs_diff": 0.30177921
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99729782,
+            "relative_l2": 0.07365286,
+            "frobenius_norm_a": 16.750223,
+            "frobenius_norm_b": 16.792807,
+            "max_abs_diff": 0.22721034
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99772817,
+            "relative_l2": 0.0676257,
+            "frobenius_norm_a": 16.93433,
+            "frobenius_norm_b": 16.995296,
+            "max_abs_diff": 0.21821404
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99712485,
+            "relative_l2": 0.07589204,
+            "frobenius_norm_a": 15.585872,
+            "frobenius_norm_b": 15.606827,
+            "max_abs_diff": 0.23111984
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99729782,
+            "relative_l2": 0.07365286,
+            "frobenius_norm_a": 16.750223,
+            "frobenius_norm_b": 16.792807,
+            "max_abs_diff": 0.22721034
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99772817,
+            "relative_l2": 0.0676257,
+            "frobenius_norm_a": 16.93433,
+            "frobenius_norm_b": 16.995296,
+            "max_abs_diff": 0.21821404
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99718028,
+            "relative_l2": 0.07538366,
+            "frobenius_norm_a": 17.228472,
+            "frobenius_norm_b": 17.303066,
+            "max_abs_diff": 0.30177921
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.self_attn.q_proj.weight",
+        "layer_index": 1,
+        "role": "attn_q",
+        "num_heads": 4,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99684334,
+        "min_head_cosine": 0.99653816,
+        "max_head_relative_l2": 0.0831589,
+        "most_diverged_heads": [
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99653816,
+            "relative_l2": 0.0831589,
+            "frobenius_norm_a": 15.625378,
+            "frobenius_norm_b": 15.602149,
+            "max_abs_diff": 0.24350405
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99678993,
+            "relative_l2": 0.08136282,
+            "frobenius_norm_a": 14.942183,
+            "frobenius_norm_b": 15.110758,
+            "max_abs_diff": 0.22727075
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99679142,
+            "relative_l2": 0.08009756,
+            "frobenius_norm_a": 15.547422,
+            "frobenius_norm_b": 15.451622,
+            "max_abs_diff": 0.23391509
+          },
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99725401,
+            "relative_l2": 0.07474236,
+            "frobenius_norm_a": 15.85812,
+            "frobenius_norm_b": 15.975006,
+            "max_abs_diff": 0.24015671
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99725401,
+            "relative_l2": 0.07474236,
+            "frobenius_norm_a": 15.85812,
+            "frobenius_norm_b": 15.975006,
+            "max_abs_diff": 0.24015671
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99653816,
+            "relative_l2": 0.0831589,
+            "frobenius_norm_a": 15.625378,
+            "frobenius_norm_b": 15.602149,
+            "max_abs_diff": 0.24350405
+          },
+          {
+            "head_index": 2,
+            "cosine_similarity": 0.99678993,
+            "relative_l2": 0.08136282,
+            "frobenius_norm_a": 14.942183,
+            "frobenius_norm_b": 15.110758,
+            "max_abs_diff": 0.22727075
+          },
+          {
+            "head_index": 3,
+            "cosine_similarity": 0.99679142,
+            "relative_l2": 0.08009756,
+            "frobenius_norm_a": 15.547422,
+            "frobenius_norm_b": 15.451622,
+            "max_abs_diff": 0.23391509
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.self_attn.v_proj.weight",
+        "layer_index": 1,
+        "role": "attn_v",
+        "num_heads": 2,
+        "head_dim": 8,
+        "mean_head_cosine": 0.99670744,
+        "min_head_cosine": 0.99639642,
+        "max_head_relative_l2": 0.08488467,
+        "most_diverged_heads": [
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99639642,
+            "relative_l2": 0.08488467,
+            "frobenius_norm_a": 15.82978,
+            "frobenius_norm_b": 15.825533,
+            "max_abs_diff": 0.27436993
+          },
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99701846,
+            "relative_l2": 0.07764473,
+            "frobenius_norm_a": 16.111185,
+            "frobenius_norm_b": 16.202194,
+            "max_abs_diff": 0.20516658
+          }
+        ],
+        "all_heads": [
+          {
+            "head_index": 0,
+            "cosine_similarity": 0.99701846,
+            "relative_l2": 0.07764473,
+            "frobenius_norm_a": 16.111185,
+            "frobenius_norm_b": 16.202194,
+            "max_abs_diff": 0.20516658
+          },
+          {
+            "head_index": 1,
+            "cosine_similarity": 0.99639642,
+            "relative_l2": 0.08488467,
+            "frobenius_norm_a": 15.82978,
+            "frobenius_norm_b": 15.825533,
+            "max_abs_diff": 0.27436993
+          }
+        ]
+      }
+    ],
+    "mlp_projections": [
+      {
+        "tensor_name": "model.layers.0.mlp.down_proj.weight",
+        "layer_index": 0,
+        "role": "mlp_down",
+        "basis_axis": 1,
+        "basis_dimension": 64,
+        "mean_basis_cosine": 0.99968392,
+        "p95_relative_l2": 0.03297105,
+        "max_relative_l2": 0.03735379,
+        "top_shifted_indices": [
+          {
+            "basis_index": 35,
+            "relative_l2": 0.03735379,
+            "cosine_similarity": 0.99934441,
+            "norm_a": 4.986262,
+            "norm_b": 5.028861
+          },
+          {
+            "basis_index": 45,
+            "relative_l2": 0.03397065,
+            "cosine_similarity": 0.99942344,
+            "norm_a": 5.353062,
+            "norm_b": 5.34428
+          },
+          {
+            "basis_index": 38,
+            "relative_l2": 0.03393722,
+            "cosine_similarity": 0.99942398,
+            "norm_a": 4.788936,
+            "norm_b": 4.785315
+          },
+          {
+            "basis_index": 24,
+            "relative_l2": 0.03306519,
+            "cosine_similarity": 0.99955922,
+            "norm_a": 5.123478,
+            "norm_b": 5.046627
+          },
+          {
+            "basis_index": 34,
+            "relative_l2": 0.03243762,
+            "cosine_similarity": 0.99952251,
+            "norm_a": 4.268485,
+            "norm_b": 4.308612
+          },
+          {
+            "basis_index": 11,
+            "relative_l2": 0.03185581,
+            "cosine_similarity": 0.99949324,
+            "norm_a": 4.798525,
+            "norm_b": 4.802061
+          },
+          {
+            "basis_index": 32,
+            "relative_l2": 0.03168821,
+            "cosine_similarity": 0.99950027,
+            "norm_a": 4.41182,
+            "norm_b": 4.400123
+          },
+          {
+            "basis_index": 40,
+            "relative_l2": 0.03168632,
+            "cosine_similarity": 0.99950427,
+            "norm_a": 5.271014,
+            "norm_b": 5.249624
+          },
+          {
+            "basis_index": 37,
+            "relative_l2": 0.03102783,
+            "cosine_similarity": 0.99952054,
+            "norm_a": 4.660184,
+            "norm_b": 4.648708
+          },
+          {
+            "basis_index": 49,
+            "relative_l2": 0.03085666,
+            "cosine_similarity": 0.99952996,
+            "norm_a": 5.112716,
+            "norm_b": 5.128151
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.0.mlp.gate_proj.weight",
+        "layer_index": 0,
+        "role": "mlp_gate",
+        "basis_axis": 0,
+        "basis_dimension": 64,
+        "mean_basis_cosine": 0.99967146,
+        "p95_relative_l2": 0.03232152,
+        "max_relative_l2": 0.03963479,
+        "top_shifted_indices": [
+          {
+            "basis_index": 40,
+            "relative_l2": 0.03963479,
+            "cosine_similarity": 0.99921548,
+            "norm_a": 4.591978,
+            "norm_b": 4.581219
+          },
+          {
+            "basis_index": 6,
+            "relative_l2": 0.0364231,
+            "cosine_similarity": 0.99934262,
+            "norm_a": 4.385075,
+            "norm_b": 4.366857
+          },
+          {
+            "basis_index": 30,
+            "relative_l2": 0.03413995,
+            "cosine_similarity": 0.9994244,
+            "norm_a": 4.348403,
+            "norm_b": 4.362666
+          },
+          {
+            "basis_index": 62,
+            "relative_l2": 0.0323347,
+            "cosine_similarity": 0.99947816,
+            "norm_a": 4.031138,
+            "norm_b": 4.023082
+          },
+          {
+            "basis_index": 63,
+            "relative_l2": 0.03224681,
+            "cosine_similarity": 0.99949932,
+            "norm_a": 4.997648,
+            "norm_b": 4.964005
+          },
+          {
+            "basis_index": 24,
+            "relative_l2": 0.03097537,
+            "cosine_similarity": 0.99954158,
+            "norm_a": 4.47122,
+            "norm_b": 4.43989
+          },
+          {
+            "basis_index": 58,
+            "relative_l2": 0.03084383,
+            "cosine_similarity": 0.99952662,
+            "norm_a": 4.150548,
+            "norm_b": 4.157726
+          },
+          {
+            "basis_index": 19,
+            "relative_l2": 0.03076907,
+            "cosine_similarity": 0.99952847,
+            "norm_a": 5.04928,
+            "norm_b": 5.056855
+          },
+          {
+            "basis_index": 37,
+            "relative_l2": 0.03058185,
+            "cosine_similarity": 0.99954551,
+            "norm_a": 5.452793,
+            "norm_b": 5.478465
+          },
+          {
+            "basis_index": 55,
+            "relative_l2": 0.03052001,
+            "cosine_similarity": 0.99959999,
+            "norm_a": 5.186283,
+            "norm_b": 5.124723
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.0.mlp.up_proj.weight",
+        "layer_index": 0,
+        "role": "mlp_up",
+        "basis_axis": 0,
+        "basis_dimension": 64,
+        "mean_basis_cosine": 0.99971116,
+        "p95_relative_l2": 0.03043355,
+        "max_relative_l2": 0.03329591,
+        "top_shifted_indices": [
+          {
+            "basis_index": 39,
+            "relative_l2": 0.03329591,
+            "cosine_similarity": 0.99946636,
+            "norm_a": 4.668931,
+            "norm_b": 4.696556
+          },
+          {
+            "basis_index": 11,
+            "relative_l2": 0.03258807,
+            "cosine_similarity": 0.99948996,
+            "norm_a": 5.545879,
+            "norm_b": 5.507093
+          },
+          {
+            "basis_index": 24,
+            "relative_l2": 0.03193891,
+            "cosine_similarity": 0.99949092,
+            "norm_a": 4.941279,
+            "norm_b": 4.931395
+          },
+          {
+            "basis_index": 50,
+            "relative_l2": 0.03044102,
+            "cosine_similarity": 0.99960816,
+            "norm_a": 5.312606,
+            "norm_b": 5.374136
+          },
+          {
+            "basis_index": 62,
+            "relative_l2": 0.03039121,
+            "cosine_similarity": 0.99957758,
+            "norm_a": 5.813663,
+            "norm_b": 5.759634
+          },
+          {
+            "basis_index": 13,
+            "relative_l2": 0.02991806,
+            "cosine_similarity": 0.99957043,
+            "norm_a": 5.759247,
+            "norm_b": 5.791441
+          },
+          {
+            "basis_index": 57,
+            "relative_l2": 0.02981842,
+            "cosine_similarity": 0.99956083,
+            "norm_a": 5.330904,
+            "norm_b": 5.346345
+          },
+          {
+            "basis_index": 36,
+            "relative_l2": 0.02940553,
+            "cosine_similarity": 0.99965358,
+            "norm_a": 4.318369,
+            "norm_b": 4.373501
+          },
+          {
+            "basis_index": 9,
+            "relative_l2": 0.02882699,
+            "cosine_similarity": 0.9995845,
+            "norm_a": 5.576979,
+            "norm_b": 5.576245
+          },
+          {
+            "basis_index": 27,
+            "relative_l2": 0.02808204,
+            "cosine_similarity": 0.99962485,
+            "norm_a": 4.924363,
+            "norm_b": 4.891914
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.mlp.down_proj.weight",
+        "layer_index": 1,
+        "role": "mlp_down",
+        "basis_axis": 1,
+        "basis_dimension": 64,
+        "mean_basis_cosine": 0.99693698,
+        "p95_relative_l2": 0.10530696,
+        "max_relative_l2": 0.12986235,
+        "top_shifted_indices": [
+          {
+            "basis_index": 39,
+            "relative_l2": 0.12986235,
+            "cosine_similarity": 0.99220228,
+            "norm_a": 3.979878,
+            "norm_b": 4.09397
+          },
+          {
+            "basis_index": 28,
+            "relative_l2": 0.11298086,
+            "cosine_similarity": 0.99359715,
+            "norm_a": 4.533636,
+            "norm_b": 4.505323
+          },
+          {
+            "basis_index": 4,
+            "relative_l2": 0.10678135,
+            "cosine_similarity": 0.99432266,
+            "norm_a": 4.420158,
+            "norm_b": 4.355594
+          },
+          {
+            "basis_index": 44,
+            "relative_l2": 0.10539599,
+            "cosine_similarity": 0.99516082,
+            "norm_a": 4.549566,
+            "norm_b": 4.700996
+          },
+          {
+            "basis_index": 19,
+            "relative_l2": 0.10480247,
+            "cosine_similarity": 0.99460638,
+            "norm_a": 4.482769,
+            "norm_b": 4.391287
+          },
+          {
+            "basis_index": 14,
+            "relative_l2": 0.0995735,
+            "cosine_similarity": 0.995134,
+            "norm_a": 3.847776,
+            "norm_b": 3.88436
+          },
+          {
+            "basis_index": 15,
+            "relative_l2": 0.09770735,
+            "cosine_similarity": 0.9952299,
+            "norm_a": 4.684364,
+            "norm_b": 4.687253
+          },
+          {
+            "basis_index": 51,
+            "relative_l2": 0.09705434,
+            "cosine_similarity": 0.99533135,
+            "norm_a": 4.017505,
+            "norm_b": 4.039752
+          },
+          {
+            "basis_index": 61,
+            "relative_l2": 0.09608931,
+            "cosine_similarity": 0.99537283,
+            "norm_a": 4.43277,
+            "norm_b": 4.409878
+          },
+          {
+            "basis_index": 6,
+            "relative_l2": 0.093734,
+            "cosine_similarity": 0.9956283,
+            "norm_a": 5.875126,
+            "norm_b": 5.895582
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.mlp.gate_proj.weight",
+        "layer_index": 1,
+        "role": "mlp_gate",
+        "basis_axis": 0,
+        "basis_dimension": 64,
+        "mean_basis_cosine": 0.99730301,
+        "p95_relative_l2": 0.09548917,
+        "max_relative_l2": 0.10388524,
+        "top_shifted_indices": [
+          {
+            "basis_index": 9,
+            "relative_l2": 0.10388524,
+            "cosine_similarity": 0.99497384,
+            "norm_a": 4.578086,
+            "norm_b": 4.681703
+          },
+          {
+            "basis_index": 11,
+            "relative_l2": 0.10174248,
+            "cosine_similarity": 0.99497485,
+            "norm_a": 4.585904,
+            "norm_b": 4.645704
+          },
+          {
+            "basis_index": 23,
+            "relative_l2": 0.09603366,
+            "cosine_similarity": 0.99538016,
+            "norm_a": 4.636779,
+            "norm_b": 4.624219
+          },
+          {
+            "basis_index": 5,
+            "relative_l2": 0.09570929,
+            "cosine_similarity": 0.9957611,
+            "norm_a": 5.071632,
+            "norm_b": 5.18436
+          },
+          {
+            "basis_index": 33,
+            "relative_l2": 0.09424181,
+            "cosine_similarity": 0.99555707,
+            "norm_a": 5.072497,
+            "norm_b": 5.069738
+          },
+          {
+            "basis_index": 51,
+            "relative_l2": 0.0936333,
+            "cosine_similarity": 0.99565214,
+            "norm_a": 4.805628,
+            "norm_b": 4.830419
+          },
+          {
+            "basis_index": 34,
+            "relative_l2": 0.09294775,
+            "cosine_similarity": 0.99569976,
+            "norm_a": 4.785703,
+            "norm_b": 4.728887
+          },
+          {
+            "basis_index": 21,
+            "relative_l2": 0.08605345,
+            "cosine_similarity": 0.99656588,
+            "norm_a": 5.133254,
+            "norm_b": 5.235852
+          },
+          {
+            "basis_index": 53,
+            "relative_l2": 0.08560457,
+            "cosine_similarity": 0.99648237,
+            "norm_a": 4.709523,
+            "norm_b": 4.775256
+          },
+          {
+            "basis_index": 46,
+            "relative_l2": 0.0841001,
+            "cosine_similarity": 0.99667674,
+            "norm_a": 4.333018,
+            "norm_b": 4.409249
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.layers.1.mlp.up_proj.weight",
+        "layer_index": 1,
+        "role": "mlp_up",
+        "basis_axis": 0,
+        "basis_dimension": 64,
+        "mean_basis_cosine": 0.99719644,
+        "p95_relative_l2": 0.09619348,
+        "max_relative_l2": 0.12706147,
+        "top_shifted_indices": [
+          {
+            "basis_index": 23,
+            "relative_l2": 0.12706147,
+            "cosine_similarity": 0.99234182,
+            "norm_a": 3.395171,
+            "norm_b": 3.26806
+          },
+          {
+            "basis_index": 15,
+            "relative_l2": 0.11024763,
+            "cosine_similarity": 0.99493843,
+            "norm_a": 4.695265,
+            "norm_b": 4.884459
+          },
+          {
+            "basis_index": 35,
+            "relative_l2": 0.09879999,
+            "cosine_similarity": 0.99512964,
+            "norm_a": 5.197018,
+            "norm_b": 5.137112
+          },
+          {
+            "basis_index": 28,
+            "relative_l2": 0.09649569,
+            "cosine_similarity": 0.99577892,
+            "norm_a": 5.530278,
+            "norm_b": 5.671647
+          },
+          {
+            "basis_index": 10,
+            "relative_l2": 0.09448096,
+            "cosine_similarity": 0.99556679,
+            "norm_a": 4.742995,
+            "norm_b": 4.679658
+          },
+          {
+            "basis_index": 38,
+            "relative_l2": 0.09336986,
+            "cosine_similarity": 0.99588394,
+            "norm_a": 4.794052,
+            "norm_b": 4.881793
+          },
+          {
+            "basis_index": 53,
+            "relative_l2": 0.09327797,
+            "cosine_similarity": 0.99586636,
+            "norm_a": 4.455242,
+            "norm_b": 4.342291
+          },
+          {
+            "basis_index": 36,
+            "relative_l2": 0.09241246,
+            "cosine_similarity": 0.99589658,
+            "norm_a": 5.306635,
+            "norm_b": 5.384126
+          },
+          {
+            "basis_index": 57,
+            "relative_l2": 0.09047365,
+            "cosine_similarity": 0.99617165,
+            "norm_a": 4.603678,
+            "norm_b": 4.693383
+          },
+          {
+            "basis_index": 18,
+            "relative_l2": 0.08934289,
+            "cosine_similarity": 0.99607044,
+            "norm_a": 5.069288,
+            "norm_b": 5.109061
+          }
+        ]
+      }
+    ],
+    "embeddings_and_heads": [
+      {
+        "tensor_name": "lm_head.weight",
+        "role": "lm_head",
+        "vocab_size": 128,
+        "hidden_size": 32,
+        "mean_token_cosine": 0.99965745,
+        "min_token_cosine": 0.99926853,
+        "changed_token_rows": 128,
+        "changed_token_pct": 100.0,
+        "top_shifted_token_ids": [
+          {
+            "token_id": 47,
+            "relative_l2": 0.03824405,
+            "cosine_similarity": 0.99926853
+          },
+          {
+            "token_id": 110,
+            "relative_l2": 0.03773255,
+            "cosine_similarity": 0.99932003
+          },
+          {
+            "token_id": 113,
+            "relative_l2": 0.03697103,
+            "cosine_similarity": 0.99936134
+          },
+          {
+            "token_id": 32,
+            "relative_l2": 0.03691046,
+            "cosine_similarity": 0.99932456
+          },
+          {
+            "token_id": 31,
+            "relative_l2": 0.0363497,
+            "cosine_similarity": 0.99938339
+          },
+          {
+            "token_id": 76,
+            "relative_l2": 0.03616253,
+            "cosine_similarity": 0.99934798
+          },
+          {
+            "token_id": 26,
+            "relative_l2": 0.03601904,
+            "cosine_similarity": 0.99935687
+          },
+          {
+            "token_id": 0,
+            "relative_l2": 0.03475227,
+            "cosine_similarity": 0.99944979
+          },
+          {
+            "token_id": 43,
+            "relative_l2": 0.03430397,
+            "cosine_similarity": 0.99941385
+          },
+          {
+            "token_id": 66,
+            "relative_l2": 0.0342836,
+            "cosine_similarity": 0.99941325
+          }
+        ]
+      },
+      {
+        "tensor_name": "model.embed_tokens.weight",
+        "role": "embedding",
+        "vocab_size": 128,
+        "hidden_size": 32,
+        "mean_token_cosine": 0.99969363,
+        "min_token_cosine": 0.99924207,
+        "changed_token_rows": 128,
+        "changed_token_pct": 100.0,
+        "top_shifted_token_ids": [
+          {
+            "token_id": 103,
+            "relative_l2": 0.03942581,
+            "cosine_similarity": 0.99924207
+          },
+          {
+            "token_id": 114,
+            "relative_l2": 0.03491698,
+            "cosine_similarity": 0.99940354
+          },
+          {
+            "token_id": 61,
+            "relative_l2": 0.03439321,
+            "cosine_similarity": 0.99940956
+          },
+          {
+            "token_id": 6,
+            "relative_l2": 0.03404181,
+            "cosine_similarity": 0.99945498
+          },
+          {
+            "token_id": 79,
+            "relative_l2": 0.03394039,
+            "cosine_similarity": 0.99943119
+          },
+          {
+            "token_id": 100,
+            "relative_l2": 0.03312851,
+            "cosine_similarity": 0.9995113
+          },
+          {
+            "token_id": 49,
+            "relative_l2": 0.03228201,
+            "cosine_similarity": 0.99949384
+          },
+          {
+            "token_id": 88,
+            "relative_l2": 0.03220784,
+            "cosine_similarity": 0.99951416
+          },
+          {
+            "token_id": 2,
+            "relative_l2": 0.03217874,
+            "cosine_similarity": 0.99951971
+          },
+          {
+            "token_id": 126,
+            "relative_l2": 0.03126298,
+            "cosine_similarity": 0.99951166
+          }
+        ]
+      }
+    ],
+    "normalization_layers": [
+      {
+        "tensor_name": "model.layers.0.input_layernorm.weight",
+        "layer_index": 0,
+        "dimension": 32,
+        "mean_a": 1.0,
+        "mean_b": 1.0,
+        "mean_scale_shift": 0.0,
+        "max_abs_diff": 0.0,
+        "relative_l2": 0.0,
+        "cosine_similarity": 1.0
+      },
+      {
+        "tensor_name": "model.layers.0.post_attention_layernorm.weight",
+        "layer_index": 0,
+        "dimension": 32,
+        "mean_a": 1.0,
+        "mean_b": 0.99312042,
+        "mean_scale_shift": -0.00687958,
+        "max_abs_diff": 0.04778832,
+        "relative_l2": 0.01947567,
+        "cosine_similarity": 0.99983175
+      },
+      {
+        "tensor_name": "model.layers.1.input_layernorm.weight",
+        "layer_index": 1,
+        "dimension": 32,
+        "mean_a": 1.0,
+        "mean_b": 0.97892877,
+        "mean_scale_shift": -0.02107123,
+        "max_abs_diff": 0.18572861,
+        "relative_l2": 0.07325695,
+        "cosine_similarity": 0.99744146
+      },
+      {
+        "tensor_name": "model.layers.1.post_attention_layernorm.weight",
+        "layer_index": 1,
+        "dimension": 32,
+        "mean_a": 1.0,
+        "mean_b": 0.97862851,
+        "mean_scale_shift": -0.02137149,
+        "max_abs_diff": 0.16620588,
+        "relative_l2": 0.06472599,
+        "cosine_similarity": 0.99805692
+      },
+      {
+        "tensor_name": "model.norm.weight",
+        "layer_index": null,
+        "dimension": 32,
+        "mean_a": 1.0,
+        "mean_b": 0.99702625,
+        "mean_scale_shift": -0.00297375,
+        "max_abs_diff": 0.05183065,
+        "relative_l2": 0.02290814,
+        "cosine_similarity": 0.99974059
+      }
+    ],
+    "skipped_notes": []
+  },
+  "activation": null,
+  "behavioral": null,
+  "regression": {
+    "epistemic_status": "OBSERVED",
+    "verdict": "PASSED",
+    "highest_severity": "INFO",
+    "thresholds": {
+      "policy_name": "production-default-v1",
+      "forbid_nan_or_inf": true,
+      "forbid_missing_tensors": true,
+      "forbid_shape_mismatches": true,
+      "max_overall_pass_rate_drop": 0.05,
+      "critical_overall_pass_rate_drop": 0.15,
+      "max_overall_score_drop": 0.05,
+      "max_category_score_drop": 0.1,
+      "critical_category_score_drop": 0.25,
+      "zero_tolerance_refusal_regression": true,
+      "min_final_hidden_cka": 0.6
+    },
+    "finding_counts": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFO": 0
+    },
+    "findings": [],
+    "failure_reproductions": [],
+    "baseline_comparison": null,
+    "historical_trend": []
+  },
+  "execution_telemetry": {
+    "before": {
+      "timestamp_monotonic": 4918.44433,
+      "process_rss_mb": 1064.71,
+      "system_available_ram_mb": 3298.42,
+      "system_total_ram_mb": 16088.54,
+      "cuda_available": true,
+      "cuda_allocated_mb": 0.0,
+      "cuda_reserved_mb": 0.0,
+      "cuda_total_vram_mb": 8150.56,
+      "selected_device": "cpu"
+    },
+    "after_pre_cleanup": {
+      "timestamp_monotonic": 4918.6413361,
+      "process_rss_mb": 1066.42,
+      "system_available_ram_mb": 3291.24,
+      "system_total_ram_mb": 16088.54,
+      "cuda_available": true,
+      "cuda_allocated_mb": 0.0,
+      "cuda_reserved_mb": 0.0,
+      "cuda_total_vram_mb": 8150.56,
+      "selected_device": "cpu"
+    },
+    "after_post_cleanup": {
+      "timestamp_monotonic": 4918.7074431,
+      "process_rss_mb": 1066.42,
+      "system_available_ram_mb": 3287.64,
+      "system_total_ram_mb": 16088.54,
+      "cuda_available": true,
+      "cuda_allocated_mb": 0.0,
+      "cuda_reserved_mb": 0.0,
+      "cuda_total_vram_mb": 8150.56,
+      "selected_device": "cpu"
+    },
+    "duration_seconds": 0.196497,
+    "rss_delta_mb": 1.71,
+    "cuda_allocated_peak_delta_mb": 0.0
+  },
+  "reproducibility": {
+    "captured_at_utc": "2026-11-26T19:28:15.525529+00:00",
+    "python_version": "3.12.16",
+    "platform": "Windows-11-10.0.26320-SP0",
+    "torch_version": "2.10.0+cu128",
+    "transformers_version": "5.24.1",
+    "safetensors_version": "0.8.0",
+    "neural_diff_version": "0.1.0",
+    "seed": 42,
+    "device_selected": "cpu",
+    "device_reason": "Explicitly configured for CPU execution.",
+    "tolerances": {
+      "atol": 1e-06,
+      "rtol": 1e-05,
+      "zero_threshold": 0.0,
+      "eps": 1e-12
+    },
+    "thresholds": {
+      "policy_name": "production-default-v1",
+      "forbid_nan_or_inf": true,
+      "forbid_missing_tensors": true,
+      "forbid_shape_mismatches": true,
+      "max_overall_pass_rate_drop": 0.05,
+      "critical_overall_pass_rate_drop": 0.15,
+      "max_overall_score_drop": 0.05,
+      "max_category_score_drop": 0.1,
+      "critical_category_score_drop": 0.25,
+      "zero_tolerance_refusal_regression": true,
+      "min_final_hidden_cka": 0.6
+    }
+  }
+}

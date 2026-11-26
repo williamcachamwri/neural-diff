@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NEURAL DIFF Report — ndiff-real-cross-arch</title>
+<style>
+  :root {
+    --bg: #0b1020; --panel: #131a2e; --border: #253152; --text: #e5ecff;
+    --muted: #93a3c7; --accent: #4fd1c5; --warn: #f6ad55; --danger: #fc8181; --ok: #68d391;
+  }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 28px; line-height: 1.5; }
+  .container { max-width: 1240px; margin: 0 auto; }
+  header { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  h1 { margin: 0 0 6px 0; font-size: 24px; }
+  h2 { font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 26px; }
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12.5px; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 13px; }
+  th, td { padding: 9px 11px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { background: #192340; color: var(--muted); font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; background: #233258; }
+  .ep-observed { background: #1c4532; color: #9ae6b4; }
+  .ep-inferred { background: #44337a; color: #d6bcfa; }
+  .ep-correlated { background: #744210; color: #fbd38d; }
+  .ep-not-verified { background: #2d3748; color: #cbd5e0; }
+  .out-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; font-size: 12px; color: var(--muted); }
+  pre { background: var(--panel); border: 1px solid var(--border); padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="badge">REAL MODEL EXPERIMENT</div>
+    <h1>NEURAL DIFF — ndiff-real-cross-arch</h1>
+    <div style="color:var(--muted)">Git for AI Brains • Generated 2026-11-26T19:35:27.181216+00:00 • Regression Verdict: <strong>FAILED_REGRESSION</strong></div>
+    <div class="meta-grid">
+      <div class="card"><strong>Model A (Baseline)</strong><div class="mono">Qwen/Qwen2.5-0.5B-Instruct</div><div>494,032,768 params • huggingface_hub_cached</div></div>
+      <div class="card"><strong>Model B (Candidate)</strong><div class="mono">HuggingFaceTB/SmolLM2-135M-Instruct</div><div>134,515,008 params • huggingface_hub_cached</div></div>
+      <div class="card"><strong>Modules Executed</strong><div class="mono">structural, activation, regression</div></div>
+    </div>
+  </header>
+
+  <h2>1. Epistemic Status Ledger</h2>
+  <table><thead><tr><th>Epistemic Label</th><th>Finding</th><th>Evidence Source</th></tr></thead><tbody><tr><td><span class='badge ep-observed'>OBSERVED</span></td><td>Model A (494,032,768 params) vs Model B (134,515,008 params) share 218 tensor keys.</td><td>Module C — StructuralDiffEngine</td></tr><tr><td><span class='badge ep-not-verified'>NOT VERIFIED</span></td><td>Causal mediation of individual neurons or circuits via counterfactual activation patching was not executed in this observational diff run.</td><td>Epistemic boundary declaration (Causal Patching Gate)</td></tr></tbody></table>
+
+  <h2>2. Layer-by-Component Weight Diff Heatmap (OBSERVED)</h2>
+  <div class="card"><div style='color:#93a3c7'>No layered tensor diff measurements available for heatmap.</div></div>
+
+  <h2>3. Tensor Diff Explorer Summary (OBSERVED)</h2>
+  <table><thead><tr><th>Tensor</th><th>Role</th><th>Shape</th><th>Status</th><th>Cosine</th><th>Rel L2</th><th>Max Abs</th><th>Changed</th></tr></thead><tbody><tr><td colspan='8'>Tensor diff module not selected.</td></tr></tbody></table>
+
+  <h2>4. Behavioral Intelligence Comparison (OBSERVED)</h2>
+  <div class="card"><div style='color:#93a3c7'>Behavioral diff module not executed.</div></div>
+  <table style="margin-top:12px"><thead><tr><th>Case</th><th>Category</th><th>Change</th><th>Score A → B</th><th>Prompt &amp; Paired Outputs</th></tr></thead><tbody><tr><td colspan='5'>Behavioral module not selected.</td></tr></tbody></table>
+
+  <h2>5. Execution &amp; Reproducibility Manifest</h2>
+  <pre class="mono">{
+  &quot;reproducibility&quot;: {
+    &quot;captured_at_utc&quot;: &quot;2026-11-26T19:35:32.069740+00:00&quot;,
+    &quot;python_version&quot;: &quot;3.12.16&quot;,
+    &quot;platform&quot;: &quot;Windows-11-10.0.26320-SP0&quot;,
+    &quot;torch_version&quot;: &quot;2.10.0+cu128&quot;,
+    &quot;transformers_version&quot;: &quot;5.24.1&quot;,
+    &quot;safetensors_version&quot;: &quot;0.8.0&quot;,
+    &quot;neural_diff_version&quot;: &quot;0.1.0&quot;,
+    &quot;seed&quot;: 42,
+    &quot;device_selected&quot;: &quot;cuda:0&quot;,
+    &quot;device_reason&quot;: &quot;Verified CUDA kernel execution on NVIDIA GeForce RTX 5050 Laptop GPU (7014 MB free VRAM).&quot;,
+    &quot;tolerances&quot;: {
+      &quot;atol&quot;: 1e-06,
+      &quot;rtol&quot;: 1e-05,
+      &quot;zero_threshold&quot;: 0.0,
+      &quot;eps&quot;: 1e-12
+    },
+    &quot;thresholds&quot;: {
+      &quot;policy_name&quot;: &quot;production-default-v1&quot;,
+      &quot;forbid_nan_or_inf&quot;: true,
+      &quot;forbid_missing_tensors&quot;: true,
+      &quot;forbid_shape_mismatches&quot;: true,
+      &quot;max_overall_pass_rate_drop&quot;: 0.05,
+      &quot;critical_overall_pass_rate_drop&quot;: 0.15,
+      &quot;max_overall_score_drop&quot;: 0.05,
+      &quot;max_category_score_drop&quot;: 0.1,
+      &quot;critical_category_score_drop&quot;: 0.25,
+      &quot;zero_tolerance_refusal_regression&quot;: true,
+      &quot;min_final_hidden_cka&quot;: 0.6
+    }
+  },
+  &quot;telemetry&quot;: {
+    &quot;before&quot;: {
+      &quot;timestamp_monotonic&quot;: 5350.3629891,
+      &quot;process_rss_mb&quot;: 1958.38,
+      &quot;system_available_ram_mb&quot;: 2735.4,
+      &quot;system_total_ram_mb&quot;: 16088.54,
+      &quot;cuda_available&quot;: true,
+      &quot;cuda_allocated_mb&quot;: 9.12,
+      &quot;cuda_reserved_mb&quot;: 22.0,
+      &quot;cuda_total_vram_mb&quot;: 8150.56,
+      &quot;selected_device&quot;: &quot;cuda:0&quot;
+    },
+    &quot;after_pre_cleanup&quot;: {
+      &quot;timestamp_monotonic&quot;: 5355.1561256,
+      &quot;process_rss_mb&quot;: 2545.77,
+      &quot;system_available_ram_mb&quot;: 2105.57,
+      &quot;system_total_ram_mb&quot;: 16088.54,
+      &quot;cuda_available&quot;: true,
+      &quot;cuda_allocated_mb&quot;: 9.12,
+      &quot;cuda_reserved_mb&quot;: 22.0,
+      &quot;cuda_total_vram_mb&quot;: 8150.56,
+      &quot;selected_device&quot;: &quot;cuda:0&quot;
+    },
+    &quot;after_post_cleanup&quot;: {
+      &quot;timestamp_monotonic&quot;: 5355.2514679,
+      &quot;process_rss_mb&quot;: 2545.77,
+      &quot;system_available_ram_mb&quot;: 2105.53,
+      &quot;system_total_ram_mb&quot;: 16088.54,
+      &quot;cuda_available&quot;: true,
+      &quot;cuda_allocated_mb&quot;: 9.12,
+      &quot;cuda_reserved_mb&quot;: 22.0,
+      &quot;cuda_total_vram_mb&quot;: 8150.56,
+      &quot;selected_device&quot;: &quot;cuda:0&quot;
+    },
+    &quot;duration_seconds&quot;: 4.792252,
+    &quot;rss_delta_mb&quot;: 587.39,
+    &quot;cuda_allocated_peak_delta_mb&quot;: 0.0
+  }
+}</pre>
+</div>
+</body>
+</html>

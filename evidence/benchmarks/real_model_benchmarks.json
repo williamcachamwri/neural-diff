@@ -1,0 +1,212 @@
+{
+  "captured_at_utc": "2026-11-26T19:37:29.409376+00:00",
+  "device": "cuda:0",
+  "experiments": [
+    {
+      "comparison_id": "ndiff-real-smollm2-135m",
+      "experiment_type": "REAL MODEL EXPERIMENT",
+      "model_a": "HuggingFaceTB/SmolLM2-135M",
+      "revision_a": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+      "model_b": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "revision_b": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "parameters_a": 134515008,
+      "parameters_b": 134515008,
+      "tensor_count": 272,
+      "global_changed_pct": 97.672795,
+      "global_mean_cosine": 0.99695139,
+      "pooled_final_cka": 0.9517821,
+      "pass_rate_a": 0.208333,
+      "pass_rate_b": 0.333333,
+      "mean_score_delta": 0.181895,
+      "verdict": "FAILED_REGRESSION",
+      "telemetry": {
+        "before": {
+          "timestamp_monotonic": 4920.0769556,
+          "process_rss_mb": 1078.36,
+          "system_available_ram_mb": 3142.67,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 0.0,
+          "cuda_reserved_mb": 0.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_pre_cleanup": {
+          "timestamp_monotonic": 5111.2067861,
+          "process_rss_mb": 2064.07,
+          "system_available_ram_mb": 2473.12,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 8.12,
+          "cuda_reserved_mb": 20.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_post_cleanup": {
+          "timestamp_monotonic": 5111.2995091,
+          "process_rss_mb": 2064.07,
+          "system_available_ram_mb": 2473.15,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 8.12,
+          "cuda_reserved_mb": 20.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "duration_seconds": 191.128353,
+        "rss_delta_mb": 985.71,
+        "cuda_allocated_peak_delta_mb": 8.12
+      }
+    },
+    {
+      "comparison_id": "ndiff-real-qwen25-05b",
+      "experiment_type": "REAL MODEL EXPERIMENT",
+      "model_a": "Qwen/Qwen2.5-0.5B",
+      "revision_a": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+      "model_b": "Qwen/Qwen2.5-0.5B-Instruct",
+      "revision_b": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "parameters_a": 494032768,
+      "parameters_b": 494032768,
+      "tensor_count": 290,
+      "global_changed_pct": 97.931754,
+      "global_mean_cosine": 0.99849455,
+      "pooled_final_cka": 0.99107627,
+      "pass_rate_a": 0.458333,
+      "pass_rate_b": 0.708333,
+      "mean_score_delta": 0.126533,
+      "verdict": "FAILED_REGRESSION",
+      "telemetry": {
+        "before": {
+          "timestamp_monotonic": 5111.5020436,
+          "process_rss_mb": 2067.25,
+          "system_available_ram_mb": 2449.3,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 8.12,
+          "cuda_reserved_mb": 20.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_pre_cleanup": {
+          "timestamp_monotonic": 5350.0182479,
+          "process_rss_mb": 1957.25,
+          "system_available_ram_mb": 2731.62,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_post_cleanup": {
+          "timestamp_monotonic": 5350.1075761,
+          "process_rss_mb": 1957.25,
+          "system_available_ram_mb": 2733.23,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "duration_seconds": 238.514921,
+        "rss_delta_mb": -110.0,
+        "cuda_allocated_peak_delta_mb": 1.0
+      }
+    },
+    {
+      "comparison_id": "ndiff-real-cross-arch",
+      "experiment_type": "REAL MODEL EXPERIMENT",
+      "model_a": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_b": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "pooled_final_cka": 0.96675814,
+      "verdict": "FAILED_REGRESSION",
+      "telemetry": {
+        "before": {
+          "timestamp_monotonic": 5350.3629891,
+          "process_rss_mb": 1958.38,
+          "system_available_ram_mb": 2735.4,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_pre_cleanup": {
+          "timestamp_monotonic": 5355.1561256,
+          "process_rss_mb": 2545.77,
+          "system_available_ram_mb": 2105.57,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_post_cleanup": {
+          "timestamp_monotonic": 5355.2514679,
+          "process_rss_mb": 2545.77,
+          "system_available_ram_mb": 2105.53,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "duration_seconds": 4.792252,
+        "rss_delta_mb": 587.39,
+        "cuda_allocated_peak_delta_mb": 0.0
+      }
+    },
+    {
+      "comparison_id": "ndiff-real-regression-detected",
+      "experiment_type": "REAL MODEL EXPERIMENT",
+      "model_a": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_b": "Qwen/Qwen2.5-0.5B",
+      "pass_rate_a": 0.625,
+      "pass_rate_b": 0.375,
+      "verdict": "FAILED_REGRESSION",
+      "findings_count": 5,
+      "telemetry": {
+        "before": {
+          "timestamp_monotonic": 5355.3340426,
+          "process_rss_mb": 2548.05,
+          "system_available_ram_mb": 2105.09,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_pre_cleanup": {
+          "timestamp_monotonic": 5472.4205666,
+          "process_rss_mb": 2532.07,
+          "system_available_ram_mb": 2027.98,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "after_post_cleanup": {
+          "timestamp_monotonic": 5472.5175051,
+          "process_rss_mb": 2532.07,
+          "system_available_ram_mb": 2027.96,
+          "system_total_ram_mb": 16088.54,
+          "cuda_available": true,
+          "cuda_allocated_mb": 9.12,
+          "cuda_reserved_mb": 22.0,
+          "cuda_total_vram_mb": 8150.56,
+          "selected_device": "cuda:0"
+        },
+        "duration_seconds": 117.085701,
+        "rss_delta_mb": -15.98,
+        "cuda_allocated_peak_delta_mb": 0.0
+      }
+    }
+  ]
+}

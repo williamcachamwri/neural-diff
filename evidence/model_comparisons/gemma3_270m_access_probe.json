@@ -1,0 +1,10 @@
+{
+  "model_id": "google/gemma-3-270m",
+  "status": "BLOCKED",
+  "reason": "Model 'google/gemma-3-270m' is gated on Hugging Face Hub and requires an accepted license + HF_TOKEN.",
+  "details": {
+    "repo_id": "google/gemma-3-270m",
+    "upstream_error": "401 Client Error. (Request ID: Root=1-6b088852-399c7037045cac042932d479;c5beb437-9874-4b34-8d40-a8c8fc3d1521)\n\nCannot access gated repo for url https://huggingface.co/google/gemma-3-270m/resolve/9b0cfec892e2bc2afd938c98eabe4e4a7b1e0ca1/generation_config.json.\nAccess to model google/gemma-3-270m is restricted. You must have access to it and be authenticated to access it. Please log in."
+  },
+  "reproduction_when_authorized": "Set $env:HF_TOKEN=\"<token_with_accepted_gemma_license>\" and run: uv run neural-diff inspect google/gemma-3-270m"
+}
