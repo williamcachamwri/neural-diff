@@ -1,7 +1,7 @@
 === Suite: mypy_typecheck ===
 Command: D:\LLM\.venv\Scripts\python.exe -m mypy core adapters benchmarks api
-Started (UTC): 2026-11-26T19:24:44.045290+00:00
-Completed (UTC): 2026-11-26T19:24:46.104347+00:00
+Started (UTC): 2026-11-26T19:38:29.893881+00:00
+Completed (UTC): 2026-11-26T19:38:32.447981+00:00
 Exit Code: 0
 
 --- STDOUT ---

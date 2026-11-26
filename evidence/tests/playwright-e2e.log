@@ -1,0 +1,16 @@
+=== Suite: playwright_e2e ===
+Command: npx playwright test
+Started (UTC): 2026-11-26T19:43:21.492796+00:00
+Completed (UTC): 2026-11-26T19:43:25.197419+00:00
+Exit Code: 0
+
+--- STDOUT ---
+
+Running 1 test using 1 worker
+
+  ok 1 [chromium] › tests\e2e.spec.ts:4:3 › NEURAL DIFF Full-Stack Live E2E Workflow › verifies live backend health, compatibility validation, error handling, and all 12 views (1.7s)
+
+  1 passed (2.2s)
+
+--- STDERR ---
+

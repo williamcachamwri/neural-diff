@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/><title>NEURAL DIFF — Verified Test Execution Summary</title>
+<style>
+  body { background:#070b14; color:#e8eefc; font-family:system-ui,sans-serif; padding:26px; }
+  .box { background:#121a2d; border:1px solid #243354; border-radius:10px; padding:18px; margin-bottom:16px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:8px 10px; border-bottom:1px solid #243354; text-align:left; }
+  th { background:#162038; color:#93a4c8; }
+  pre { background:#0a1020; border:1px solid #243354; border-radius:8px; padding:12px; font-size:12px; overflow:auto; }
+</style></head><body>
+<div class="box">
+  <h1 style="margin:0 0 6px 0;font-size:21px">NEURAL DIFF — Automated Test &amp; Static Analysis Summary</h1>
+  <div style="color:#93a4c8;font-size:13px">Source: <code>evidence/tests/test_execution_summary.json</code> • Executed 2026-11-26T19:39:49.496472+00:00</div>
+</div>
+<div class="box">
+  <table><thead><tr><th>Suite</th><th>Result</th><th>Exact Command</th><th>Evidence Log</th></tr></thead><tbody><tr><td style='font-family:monospace'>ruff_lint</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m ruff check core adapters benchmarks api tests scripts</td><td style='font-family:monospace'>evidence/tests/ruff-lint.log</td></tr><tr><td style='font-family:monospace'>mypy_typecheck</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m mypy core adapters benchmarks api</td><td style='font-family:monospace'>evidence/tests/mypy-typecheck.log</td></tr><tr><td style='font-family:monospace'>unit_tests</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m pytest -m unit -v</td><td style='font-family:monospace'>evidence/tests/unit-tests.log</td></tr><tr><td style='font-family:monospace'>property_tests</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m pytest -m property -v</td><td style='font-family:monospace'>evidence/tests/property-tests.log</td></tr><tr><td style='font-family:monospace'>integration_tests</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m pytest -m integration -v</td><td style='font-family:monospace'>evidence/tests/integration-tests.log</td></tr><tr><td style='font-family:monospace'>regression_tests</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m pytest -m regression -v</td><td style='font-family:monospace'>evidence/tests/regression-tests.log</td></tr><tr><td style='font-family:monospace'>security_tests</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m pytest -m security -v</td><td style='font-family:monospace'>evidence/tests/security-tests.log</td></tr><tr><td style='font-family:monospace'>full_coverage</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>D:\LLM\.venv\Scripts\python.exe -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api --cov-report=term-missing -v</td><td style='font-family:monospace'>evidence/tests/coverage.log</td></tr><tr><td style='font-family:monospace'>frontend_typecheck</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>C:\Program Files\nodejs\npm.CMD --prefix frontend run typecheck</td><td style='font-family:monospace'>evidence/tests/frontend-typecheck.log</td></tr><tr><td style='font-family:monospace'>frontend_unit_tests</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>C:\Program Files\nodejs\npm.CMD --prefix frontend run test</td><td style='font-family:monospace'>evidence/tests/frontend-vitest.log</td></tr><tr><td style='font-family:monospace'>frontend_production_build</td><td><span style='color:#34d399;font-weight:700'>PASS (rc=0)</span></td><td style='font-family:monospace;font-size:12px'>C:\Program Files\nodejs\npm.CMD --prefix frontend run build</td><td style='font-family:monospace'>evidence/tests/frontend-build.log</td></tr></tbody></table>
+</div>
+<div class="box"><h3 style="margin-top:0">Coverage Tail (from <code>evidence/tests/coverage.log</code>)</h3><pre>core\cli.py                                         82     16    80%   120, 123-147, 151
+core\exceptions.py                                  39      2    95%   25, 27
+core\loaders\__init__.py                             4      0   100%
+core\loaders\base.py                                43      3    93%   30-31, 57
+core\loaders\model_loader.py                        62      9    85%   44, 57-70
+core\orchestrator.py                               110      1    99%   90
+core\regression_engine\__init__.py                   4      0   100%
+core\regression_engine\engine.py                   153     14    91%   38, 57-60, 210, 225, 240, 259, 278, 327, 408, 426, 451
+core\regression_engine\thresholds.py                29      5    83%   42-46
+core\report_engine\__init__.py                       3      0   100%
+core\report_engine\exporter.py                     187      6    97%   51, 71, 285, 330, 476-477
+core\resource_manager.py                           141     18    87%   31, 111-129, 134, 159-160, 185, 196-197
+core\security.py                                   219     46    79%   74, 109-111, 125, 163-164, 171, 184-186, 192-194, 205, 215-216, 227-228, 231, 239-240, 246, 261-262, 285, 294-295, 301, 314, 321, 331, 336, 343, 354, 396, 402-409, 412, 431, 444-446, 451, 457-458
+core\statistics\__init__.py                          0      0   100%
+core\statistics\distributions.py                   146     19    87%   16, 92, 108, 112, 118, 134-146, 151, 216
+core\statistics\significance.py                     58      2    97%   48, 52
+core\structural_analysis\__init__.py                 5      0   100%
+core\structural_analysis\compatibility.py           83     10    88%   25-28, 98, 122, 143, 156, 197, 228
+core\structural_analysis\diff.py                   164     10    94%   30-33, 49, 71, 264, 270, 276, 306
+core\structural_analysis\neuron_attention.py       206      7    97%   223, 231-232, 269-270, 273-276
+core\tensor_engine\__init__.py                       4      0   100%
+core\tensor_engine\comparator.py                   175     15    91%   188, 215-224, 243-252, 273, 276-288, 329, 337
+core\tensor_engine\metrics.py                      197     12    94%   32, 88-89, 100-101, 109, 197, 228-229, 235, 263, 346
+core\types.py                                      103      0   100%
+------------------------------------------------------------------------------
+TOTAL                                             4219    430    90%
+============================= 40 passed in 23.40s =============================
+
+--- STDERR ---
+</pre></div>
+</body></html>
