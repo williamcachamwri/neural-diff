@@ -1,0 +1,334 @@
+=== Suite: integration_tests ===
+Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m integration -v
+Started (UTC): 2026-11-26T19:18:40.041706+00:00
+Completed (UTC): 2026-11-26T19:18:59.994006+00:00
+Exit Code: 1
+
+--- STDOUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\LLM\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: D:\LLM
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 33 items / 30 deselected / 3 selected
+
+tests/integration/test_end_to_end_and_api.py::test_sharded_safetensors_vs_safe_pytorch_checkpoint_equivalence PASSED [ 33%]
+tests/integration/test_end_to_end_and_api.py::test_full_fastapi_workflow_comparisons_filtering_exports_and_settings PASSED [ 66%]
+tests/integration/test_end_to_end_and_api.py::test_local_pretrained_qwen2_activation_behavioral_and_baseline_api FAILED [100%]
+
+================================== FAILURES ===================================
+_____ test_local_pretrained_qwen2_activation_behavioral_and_baseline_api ______
+
+tmp_path = WindowsPath('C:/Users/MSl/AppData/Local/Temp/pytest-of-MSl/pytest-6/test_local_pretrained_qwen2_ac0')
+
+    @pytest.mark.integration
+    def test_local_pretrained_qwen2_activation_behavioral_and_baseline_api(tmp_path: Path) -> None:
+        """Build two real tiny Qwen2ForCausalLM + PreTrainedTokenizerFast checkpoints and run full 6-module API."""
+        from tokenizers import Tokenizer
+        from tokenizers.models import WordLevel
+        from tokenizers.pre_tokenizers import Whitespace
+        from transformers import PreTrainedTokenizerFast, Qwen2Config, Qwen2ForCausalLM
+    
+        vocab = {
+            "<pad>": 0,
+            "<eos>": 1,
+            "<unk>": 2,
+            "Question": 3,
+            "Answer": 4,
+            "149": 5,
+            "Au": 6,
+            "TCP": 7,
+            "404": 8,
+        }
+        for i in range(9, 96):
+            vocab[f"w{i}"] = i
+    
+        tok_backend = Tokenizer(WordLevel(vocab=vocab, unk_token="<unk>"))
+        tok_backend.pre_tokenizer = Whitespace()
+        fast_tok = PreTrainedTokenizerFast(
+            tokenizer_object=tok_backend,
+            eos_token="<eos>",
+            pad_token="<pad>",
+            unk_token="<unk>",
+        )
+    
+        cfg = Qwen2Config(
+            vocab_size=96,
+            hidden_size=32,
+            intermediate_size=64,
+            num_hidden_layers=2,
+            num_attention_heads=4,
+            num_key_value_heads=2,
+            max_position_embeddings=128,
+            pad_token_id=0,
+            eos_token_id=1,
+            bos_token_id=1,
+        )
+    
+        torch.manual_seed(303)
+        m_a = Qwen2ForCausalLM(cfg)
+        torch.manual_seed(404)
+        m_b = Qwen2ForCausalLM(cfg)
+    
+        dir_a = tmp_path / "tiny_qwen_a"
+        dir_b = tmp_path / "tiny_qwen_b"
+        m_a.save_pretrained(str(dir_a), safe_serialization=True)
+        fast_tok.save_pretrained(str(dir_a))
+        m_b.save_pretrained(str(dir_b), safe_serialization=True)
+        fast_tok.save_pretrained(str(dir_b))
+    
+        policy = SecurityPolicy(allowed_roots=[tmp_path])
+        app = create_app(db_path=tmp_path / "full6.db", policy=policy)
+        client = TestClient(app)
+    
+>       run_resp = client.post(
+            "/api/comparisons/run",
+            json={
+                "model_a": str(dir_a),
+                "model_b": str(dir_b),
+                "modules": ["structural", "tensor", "neuron", "activation", "behavioral", "regression"],
+                "experiment_type": "SYNTHETIC FIXTURE EXPERIMENT",
+                "preferred_device": "cpu",
+                "activation_prompts": ["Question Answer", "Question 149"],
+                "behavioral_categories": ["conciseness", "math_reasoning"],
+                "behavioral_max_cases": 4,
+                "max_new_tokens": 8,
+                "local_files_only": True,
+                "async_job": False,
+            },
+        )
+
+tests\integration\test_end_to_end_and_api.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\httpx2\_client.py:1198: in post
+    return self.request(
+.venv\Lib\site-packages\starlette\testclient.py:518: in request
+    return super().request(
+.venv\Lib\site-packages\httpx2\_client.py:791: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\httpx2\_client.py:988: in send
+    raise exc
+.venv\Lib\site-packages\httpx2\_client.py:982: in send
+    response.read()
+.venv\Lib\site-packages\httpx2\_models.py:890: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\httpx2\_models.py:906: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\httpx2\_models.py:961: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+.venv\Lib\site-packages\httpx2\_client.py:138: in __iter__
+    yield from self._stream
+.venv\Lib\site-packages\starlette\testclient.py:384: in iter_body
+    exit_stack.close()
+.cache\uv-python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:618: in close
+    self.__exit__(None, None, None)
+.cache\uv-python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:610: in __exit__
+    raise exc_details[1]
+.cache\uv-python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:399: in close_app
+    raise exception
+.venv\Lib\site-packages\anyio\from_thread.py:272: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\fastapi\applications.py:1224: in __call__
+    await super().__call__(scope, receive, send)
+.venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+.venv\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.venv\Lib\site-packages\fastapi\telemetry\_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\fastapi\_body_limit.py:80: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\base.py:203: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+api\security_middleware.py:56: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\middleware\base.py:179: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+.venv\Lib\site-packages\starlette\middleware\base.py:149: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+.venv\Lib\site-packages\starlette\middleware\cors.py:91: in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+.venv\Lib\site-packages\starlette\middleware\cors.py:149: in simple_response
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv\Lib\site-packages\fastapi\routing.py:2929: in app
+    await route.handle(scope, receive, send)
+.venv\Lib\site-packages\fastapi\routing.py:1375: in handle
+    await super().handle(scope, receive, send)
+.venv\Lib\site-packages\starlette\routing.py:289: in handle
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\fastapi\routing.py:175: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv\Lib\site-packages\fastapi\routing.py:161: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\fastapi\routing.py:762: in app
+    raw_response = await run_endpoint_function(
+.venv\Lib\site-packages\fastapi\routing.py:383: in run_endpoint_function
+    return await run_in_threadpool(
+.venv\Lib\site-packages\starlette\concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:2779: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1124: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\fastapi\telemetry\_api.py:244: in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+api\app.py:368: in run_comparison
+    return _execute_comparison_job(comp_id, req, token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+api\app.py:302: in _execute_comparison_job
+    bundle = orch.run(
+core\orchestrator.py:162: in run
+    activation_res = act_engine.compare_pretrained(
+core\activation_analysis\comparator.py:401: in compare_pretrained
+    traces_a, tok_info_a, vocab_map_a = self._run_single_pretrained(
+core\activation_analysis\comparator.py:473: in _run_single_pretrained
+    traces = capture_module_traces(
+core\activation_analysis\comparator.py:228: in capture_module_traces
+    out = module(
+.venv\Lib\site-packages\torch\nn\modules\module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\torch\nn\modules\module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\deprecation.py:178: in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\generic.py:1040: in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\models\qwen2\modeling_qwen2.py:447: in forward
+    outputs: BaseModelOutputWithPast = self.model(
+.venv\Lib\site-packages\torch\nn\modules\module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\torch\nn\modules\module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\generic.py:1186: in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\output_capturing.py:361: in wrapper
+    outputs = func(self, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\deprecation.py:178: in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\models\qwen2\modeling_qwen2.py:382: in forward
+    hidden_states = decoder_layer(
+.venv\Lib\site-packages\torch\nn\modules\module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\torch\nn\modules\module.py:1882: in _call_impl
+    return inner()
+           ^^^^^^^
+.venv\Lib\site-packages\torch\nn\modules\module.py:1830: in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\modeling_layers.py:124: in forward_with_checkpointing
+    return forward(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\deprecation.py:178: in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\models\qwen2\modeling_qwen2.py:276: in forward
+    hidden_states, _ = self.self_attn(
+.venv\Lib\site-packages\torch\nn\modules\module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\torch\nn\modules\module.py:1882: in _call_impl
+    return inner()
+           ^^^^^^^
+.venv\Lib\site-packages\torch\nn\modules\module.py:1830: in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\transformers\utils\deprecation.py:178: in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Qwen2Attention(
+  (q_proj): Linear(in_features=32, out_features=32, bias=True)
+  (k_proj): Linear(in_features=32, out_...): Linear(in_features=32, out_features=16, bias=True)
+  (o_proj): Linear(in_features=32, out_features=32, bias=False)
+)
+hidden_states = tensor([], size=(1, 0, 32))
+position_embeddings = (tensor([], size=(1, 0, 8)), tensor([], size=(1, 0, 8)))
+attention_mask = None, cache = None
+kwargs = {'position_ids': tensor([], size=(1, 0), dtype=torch.int64), 'use_cache': False, 'output_hidden_states': True}
+
+    @deprecate_kwarg("past_key_values", "5.40.0", new_name="cache")
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        position_embeddings: tuple[torch.Tensor, torch.Tensor],
+        attention_mask: torch.Tensor | None,
+        cache: Cache | None = None,
+        **kwargs: Unpack[FlashAttentionKwargs],
+    ) -> tuple[torch.Tensor, torch.Tensor | None]:
+        input_shape = hidden_states.shape[:-1]
+        hidden_shape = (*input_shape, -1, self.head_dim)
+    
+>       query_states = self.q_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       RuntimeError: cannot reshape tensor of 0 elements into shape [1, 0, -1, 8] because the unspecified dimension size -1 can be any value and is ambiguous
+
+.venv\Lib\site-packages\transformers\models\qwen2\modeling_qwen2.py:199: RuntimeError
+---------------------------- Captured stderr call -----------------------------
+W1127 02:18:57.656000 28228 .venv\Lib\site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]
+Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 499.44it/s]
+
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]
+Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 984.35it/s]
+
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 27/27 [00:00<00:00, 10085.16it/s]
+------------------------------ Captured log call ------------------------------
+WARNING  torch.distributed.elastic.multiprocessing.redirects:redirects.py:29 NOTE: Redirects are currently not supported in Windows or MacOs.
+=========================== short test summary info ===========================
+FAILED tests/integration/test_end_to_end_and_api.py::test_local_pretrained_qwen2_activation_behavioral_and_baseline_api
+================= 1 failed, 2 passed, 30 deselected in 18.46s =================
+
+--- STDERR ---
+

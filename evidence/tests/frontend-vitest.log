@@ -1,0 +1,24 @@
+=== Suite: frontend_unit_tests ===
+Command: C:\Program Files\nodejs\npm.CMD --prefix frontend run test
+Started (UTC): 2026-11-26T19:25:47.374688+00:00
+Completed (UTC): 2026-11-26T19:25:50.771649+00:00
+Exit Code: 0
+
+--- STDOUT ---
+
+> neural-diff-frontend@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.2 [39m[90mD:/LLM/frontend[39m
+
+ [32m✓[39m src/__tests__/App.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 101[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 02:25:48
+[2m   Duration [22m 2.57s[2m (import 67%, environment 26%, tests 4%, transform 2%)[22m
+
+
+--- STDERR ---
+

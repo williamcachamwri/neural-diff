@@ -1,0 +1,38 @@
+=== Suite: mypy_typecheck ===
+Command: D:\LLM\.venv\Scripts\python.exe -m mypy core adapters benchmarks api
+Started (UTC): 2026-11-26T19:13:31.835821+00:00
+Completed (UTC): 2026-11-26T19:14:00.978952+00:00
+Exit Code: 1
+
+--- STDOUT ---
+adapters\safetensors\loader.py:153: error: Incompatible types in assignment (expression has type "SingleSafetensorsReader | None", variable has type "SingleSafetensorsReader")  [assignment]
+core\structural_analysis\neuron_attention.py:289: error: Incompatible types in assignment (expression has type "Tensor", variable has type "float")  [assignment]
+core\structural_analysis\neuron_attention.py:293: error: Value of type "float" is not indexable  [index]
+core\structural_analysis\neuron_attention.py:294: error: Value of type "float" is not indexable  [index]
+core\structural_analysis\neuron_attention.py:309: error: "float" has no attribute "mean"  [attr-defined]
+core\structural_analysis\neuron_attention.py:310: error: "float" has no attribute "min"  [attr-defined]
+core\structural_analysis\neuron_attention.py:311: error: "float" has no attribute "max"  [attr-defined]
+core\structural_analysis\neuron_attention.py:332: error: Incompatible types in assignment (expression has type "Tensor", variable has type "float")  [assignment]
+core\structural_analysis\neuron_attention.py:334: error: No overload variant of "quantile" matches argument types "float", "float"  [call-overload]
+core\structural_analysis\neuron_attention.py:334: note: Possible overload variants:
+core\structural_analysis\neuron_attention.py:334: note:     def quantile(input: Tensor, q: Tensor, dim: int | None = ..., keepdim: bool = ..., *, interpolation: str = ..., out: Tensor | None = ...) -> Tensor
+core\structural_analysis\neuron_attention.py:334: note:     def quantile(input: Tensor, q: float, dim: int | None = ..., keepdim: bool = ..., *, interpolation: str = ..., out: Tensor | None = ...) -> Tensor
+core\structural_analysis\neuron_attention.py:336: error: Argument 1 to "topk" has incompatible type "float"; expected "Tensor"  [arg-type]
+core\structural_analysis\neuron_attention.py:341: error: Value of type "float" is not indexable  [index]
+core\structural_analysis\neuron_attention.py:354: error: "float" has no attribute "mean"  [attr-defined]
+core\structural_analysis\neuron_attention.py:356: error: "float" has no attribute "max"  [attr-defined]
+core\tensor_engine\comparator.py:313: error: Incompatible types in assignment (expression has type "None", variable has type "DistributionShiftSummary")  [assignment]
+core\behavioral_analysis\runner.py:280: error: Argument 1 to "__call__" of "_Wrapped" has incompatible type "str"; expected "PreTrainedModel"  [arg-type]
+core\activation_analysis\comparator.py:471: error: Argument 1 to "__call__" of "_Wrapped" has incompatible type "str"; expected "PreTrainedModel"  [arg-type]
+core\activation_analysis\comparator.py:672: error: Argument "mean_mlp_cosine_by_layer" to "ActivationDiffReport" has incompatible type "dict[int, float]"; expected "dict[int, float | None]"  [arg-type]
+core\activation_analysis\comparator.py:672: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
+core\activation_analysis\comparator.py:672: note: Consider using "Mapping" instead, which is covariant in the value type
+core\activation_analysis\comparator.py:673: error: Argument "mean_attn_cosine_by_layer" to "ActivationDiffReport" has incompatible type "dict[int, float]"; expected "dict[int, float | None]"  [arg-type]
+core\activation_analysis\comparator.py:673: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
+core\activation_analysis\comparator.py:673: note: Consider using "Mapping" instead, which is covariant in the value type
+api\app.py:455: error: Argument "key" to "sort" of "list" has incompatible type "Callable[[dict[str, Any]], Any | float | None]"; expected "Callable[[dict[str, Any]], SupportsDunderLT[Any] | SupportsDunderGT[Any]]"  [arg-type]
+api\app.py:456: error: Incompatible return value type (got "Any | float | None", expected "SupportsDunderLT[Any] | SupportsDunderGT[Any]")  [return-value]
+Found 20 errors in 6 files (checked 60 source files)
+
+--- STDERR ---
+

@@ -1,0 +1,1323 @@
+=== Suite: ruff_lint ===
+Command: D:\LLM\.venv\Scripts\python.exe -m ruff check core adapters benchmarks api tests scripts
+Started (UTC): 2026-11-26T19:13:30.725639+00:00
+Completed (UTC): 2026-11-26T19:13:31.835013+00:00
+Exit Code: 1
+
+--- STDOUT ---
+SIM102 Use a single `if` statement instead of nested `if` statements
+  --> adapters\architectures\registry.py:48:5
+   |
+46 |           return (layer_idx, CanonicalRole.EMBEDDING)
+47 |
+48 | /     if any(tok in lower for tok in ("lm_head", "embed_out", "output.weight")):
+49 | |         if layer_idx is None:
+   | |_____________________________^
+50 |               return (None, CanonicalRole.LM_HEAD)
+   |
+help: Combine `if` statements using `and`
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> adapters\architectures\registry.py:151:9
+    |
+149 |               if isinstance(tc, str):
+150 |                   tokenizer_class = tc
+151 | /         except Exception:
+152 | |             pass
+    | |________________^
+153 |
+154 |       tok_json_path = directory / "tokenizer.json"
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> adapters\architectures\registry.py:163:9
+    |
+161 |                   added_len = len(tok_json.get("added_tokens", [])) if isinstance(tok_json.get("added_tokens"), list) else 0
+162 |                   tokenizer_vocab_size = base_vocab_len + added_len
+163 | /         except Exception:
+164 | |             pass
+    | |________________^
+165 |
+166 |       sanitized_raw = {
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> adapters\pytorch\loader.py:3:1
+   |
+ 1 |   """Safe PyTorch (`weights_only=True`) single and sharded checkpoint readers."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from pathlib import Path
+ 6 | | from typing import Any
+ 7 | |
+ 8 | | import torch
+ 9 | |
+10 | | from adapters.architectures.registry import classify_tensor_role
+11 | | from core.exceptions import MalformedCheckpointError, ModelNotFoundError, SecurityValidationError
+12 | | from core.loaders.base import CheckpointReader
+13 | | from core.security import (
+14 | |     SecurityPolicy,
+15 | |     inspect_pytorch_archive_safety,
+16 | |     read_validated_json,
+17 | |     validate_safe_shard_filename,
+18 | | )
+19 | | from core.types import TensorDescriptor
+   | |_______________________________________^
+help: Organize imports
+   |
+8  | import torch
+   -
+   - from adapters.architectures.registry import classify_tensor_role
+9  | from core.exceptions import MalformedCheckpointError, ModelNotFoundError, SecurityValidationError
+--------------------------------------------------------------------------------
+18 |
+19 + from adapters.architectures.registry import classify_tensor_role
+20 +
+21 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> adapters\safetensors\loader.py:3:1
+   |
+ 1 |   """Safetensors single-file, multi-file, and sharded checkpoint readers."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import math
+ 6 | | from collections.abc import Iterator
+ 7 | | from pathlib import Path
+ 8 | | from typing import Any
+ 9 | |
+10 | | import torch
+11 | | from safetensors import safe_open
+12 | |
+13 | | from adapters.architectures.registry import classify_tensor_role
+14 | | from core.exceptions import MalformedCheckpointError, ModelNotFoundError
+15 | | from core.loaders.base import CheckpointReader
+16 | | from core.security import (
+17 | |     SecurityPolicy,
+18 | |     read_validated_json,
+19 | |     validate_safe_shard_filename,
+20 | |     validate_safetensors_header,
+21 | | )
+22 | | from core.types import TensorDescriptor
+   | |_______________________________________^
+23 |
+24 |   _SAFETENSORS_TO_TORCH_DTYPE_NAME: dict[str, str] = {
+   |
+help: Organize imports
+   |
+10 | import torch
+   - from safetensors import safe_open
+   -
+   - from adapters.architectures.registry import classify_tensor_role
+11 | from core.exceptions import MalformedCheckpointError, ModelNotFoundError
+--------------------------------------------------------------------------------
+20 |
+21 + from adapters.architectures.registry import classify_tensor_role
+22 + from safetensors import safe_open
+23 +
+24 | _SAFETENSORS_TO_TORCH_DTYPE_NAME: dict[str, str] = {
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> api\app.py:3:1
+   |
+ 1 |   """FastAPI application factory and REST endpoints for NEURAL DIFF (Phase 11)."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import datetime as dt
+ 6 | | import os
+ 7 | | import threading
+ 8 | | import uuid
+ 9 | | from pathlib import Path
+10 | | from typing import Any
+11 | |
+12 | | import safetensors
+13 | | import torch
+14 | | import transformers
+15 | | from fastapi import FastAPI, HTTPException, Query
+16 | | from fastapi.middleware.cors import CORSMiddleware
+17 | | from fastapi.responses import JSONResponse, Response
+18 | |
+19 | | from api.schemas import (
+20 | |     CreateBaselineRequest,
+21 | |     InspectModelRequest,
+22 | |     RunComparisonRequest,
+23 | |     RuntimeSettingsUpdate,
+24 | |     ValidateCompatibilityRequest,
+25 | | )
+26 | | from api.security_middleware import DEFAULT_MAX_API_BODY_BYTES, SecurityHardeningMiddleware
+27 | | from api.store import ExperimentStore
+28 | | from benchmarks.datasets.loader import load_benchmark_suite
+29 | | from core import __version__
+30 | | from core.exceptions import ModelNotFoundError, NeuralDiffError, OperationCancelledError
+31 | | from core.loaders.model_loader import ModelLoader
+32 | | from core.orchestrator import ComparisonOrchestrator, ComparisonRequestConfig
+33 | | from core.regression_engine.engine import RegressionBaseline, RegressionThresholds
+34 | | from core.report_engine.exporter import ReportEngine
+35 | | from core.resource_manager import CancellationToken, ResourceManager
+36 | | from core.security import SecurityPolicy
+37 | | from core.structural_analysis.compatibility import validate_compatibility
+38 | | from core.tensor_engine.metrics import DiffTolerances
+   | |_____________________________________________________^
+39 |
+40 |   REPO_ROOT = Path(__file__).resolve().parent.parent
+   |
+help: Organize imports
+   |
+11 |
+   - import safetensors
+12 | import torch
+13 | import transformers
+14 + from benchmarks.datasets.loader import load_benchmark_suite
+15 + from core import __version__
+16 + from core.exceptions import ModelNotFoundError, NeuralDiffError, OperationCancelledError
+17 + from core.loaders.model_loader import ModelLoader
+18 + from core.orchestrator import ComparisonOrchestrator, ComparisonRequestConfig
+19 + from core.regression_engine.engine import RegressionBaseline, RegressionThresholds
+20 + from core.report_engine.exporter import ReportEngine
+21 + from core.resource_manager import CancellationToken, ResourceManager
+22 + from core.security import SecurityPolicy
+23 + from core.structural_analysis.compatibility import validate_compatibility
+24 + from core.tensor_engine.metrics import DiffTolerances
+25 | from fastapi import FastAPI, HTTPException, Query
+26 | from fastapi.middleware.cors import CORSMiddleware
+27 | from fastapi.responses import JSONResponse, Response
+28 |
+29 + import safetensors
+30 | from api.schemas import (
+--------------------------------------------------------------------------------
+38 | from api.store import ExperimentStore
+   - from benchmarks.datasets.loader import load_benchmark_suite
+   - from core import __version__
+   - from core.exceptions import ModelNotFoundError, NeuralDiffError, OperationCancelledError
+   - from core.loaders.model_loader import ModelLoader
+   - from core.orchestrator import ComparisonOrchestrator, ComparisonRequestConfig
+   - from core.regression_engine.engine import RegressionBaseline, RegressionThresholds
+   - from core.report_engine.exporter import ReportEngine
+   - from core.resource_manager import CancellationToken, ResourceManager
+   - from core.security import SecurityPolicy
+   - from core.structural_analysis.compatibility import validate_compatibility
+   - from core.tensor_engine.metrics import DiffTolerances
+39 |
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> api\app.py:351:35
+    |
+349 |     def run_comparison(req: RunComparisonRequest) -> dict[str, Any]:
+350 |         comp_id = f"ndiff-{uuid.uuid4().hex[:10]}"
+351 |         now_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    |                                   ^^^^^^^^^^^^^^^
+352 |         token = CancellationToken()
+    |
+help: Convert to `datetime.UTC` alias
+    |
+350 |         comp_id = f"ndiff-{uuid.uuid4().hex[:10]}"
+    -         now_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+351 +         now_utc = dt.datetime.now(dt.UTC).isoformat()
+352 |         token = CancellationToken()
+    |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> api\app.py:514:44
+    |
+512 |         baseline = RegressionBaseline(
+513 |             baseline_id=req.baseline_id,
+514 |             created_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+    |                                            ^^^^^^^^^^^^^^^
+515 |             model_id=meta["model_id"],
+516 |             revision=meta.get("revision"),
+    |
+help: Convert to `datetime.UTC` alias
+    |
+513 |             baseline_id=req.baseline_id,
+    -             created_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+514 +             created_at_utc=dt.datetime.now(dt.UTC).isoformat(),
+515 |             model_id=meta["model_id"],
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> api\schemas.py:3:1
+  |
+1 |   """Strict Pydantic v2 API request and response schemas."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from typing import Literal
+6 | |
+7 | | from pydantic import BaseModel, ConfigDict, Field, field_validator
+8 | |
+9 | | from core.orchestrator import VALID_MODULES
+  | |___________________________________________^
+help: Organize imports
+  |
+6 |
+  - from pydantic import BaseModel, ConfigDict, Field, field_validator
+  -
+7 | from core.orchestrator import VALID_MODULES
+8 + from pydantic import BaseModel, ConfigDict, Field, field_validator
+9 |
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> api\store.py:3:1
+  |
+1 |   """SQLite persistence layer for experiments, regression baselines, and settings."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | import json
+6 | | import sqlite3
+7 | | import threading
+8 | | from pathlib import Path
+9 | | from typing import Any
+  | |______________________^
+help: Organize imports
+   |
+10 |
+   -
+11 | DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "neural_diff.db"
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\datasets\loader.py:3:1
+   |
+ 1 |   """Versioned benchmark suite loader and validator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from dataclasses import dataclass
+ 6 | | from pathlib import Path
+ 7 | | from typing import Any
+ 8 | |
+ 9 | | from benchmarks.evaluators.base import EvalCase
+10 | | from benchmarks.evaluators.registry import ALL_CATEGORIES
+11 | | from core.exceptions import MalformedCheckpointError
+12 | | from core.security import SecurityPolicy, read_validated_json, validate_safe_path
+   | |_________________________________________________________________________________^
+13 |
+14 |   DEFAULT_SUITE_PATH = Path(__file__).resolve().parent / "default_suite_v1.json"
+   |
+help: Organize imports
+   |
+8  |
+   - from benchmarks.evaluators.base import EvalCase
+   - from benchmarks.evaluators.registry import ALL_CATEGORIES
+9  | from core.exceptions import MalformedCheckpointError
+10 | from core.security import SecurityPolicy, read_validated_json, validate_safe_path
+11 |
+12 + from benchmarks.evaluators.base import EvalCase
+13 + from benchmarks.evaluators.registry import ALL_CATEGORIES
+14 +
+15 | DEFAULT_SUITE_PATH = Path(__file__).resolve().parent / "default_suite_v1.json"
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\evaluators\code_preservation.py:3:1
+   |
+ 1 |   """Code preservation and Python AST syntactic validity evaluator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import ast
+ 6 | | import difflib
+ 7 | | import re
+ 8 | |
+ 9 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+10 | | from core.types import EpistemicStatus
+   | |______________________________________^
+11 |
+12 |   _FENCED_CODE_RE = re.compile(r"```(?:python|py)?\s*\n(.*?)```", flags=re.DOTALL | re.IGNORECASE)
+   |
+help: Organize imports
+   |
+8  |
+   - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+9  | from core.types import EpistemicStatus
+10 |
+11 + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+12 +
+13 | _FENCED_CODE_RE = re.compile(r"```(?:python|py)?\s*\n(.*?)```", flags=re.DOTALL | re.IGNORECASE)
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\evaluators\conciseness.py:3:1
+   |
+ 1 |   """Conciseness and verbosity efficiency deterministic evaluator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import re
+ 6 | |
+ 7 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+ 8 | | from core.types import EpistemicStatus
+   | |______________________________________^
+ 9 |
+10 |   _FILLER_PHRASES = (
+   |
+help: Organize imports
+   |
+6  |
+   - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+7  | from core.types import EpistemicStatus
+8  |
+9  + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+10 +
+11 | _FILLER_PHRASES = (
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> benchmarks\evaluators\factual.py:3:1
+  |
+1 |   """Factual accuracy deterministic ground-truth QA evaluator."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+6 | | from core.types import EpistemicStatus
+  | |______________________________________^
+help: Organize imports
+  |
+4 |
+  - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+5 | from core.types import EpistemicStatus
+6 |
+7 + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+8 +
+9 |
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\evaluators\instruction_following.py:3:1
+   |
+ 1 |   """Instruction following deterministic constraint evaluator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import re
+ 6 | |
+ 7 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+ 8 | | from core.types import EpistemicStatus
+   | |______________________________________^
+ 9 |
+10 |   _BULLET_LINE_RE = re.compile(r"^\s*(?:[-*•]|\d+\.)\s+\S+", flags=re.MULTILINE)
+   |
+help: Organize imports
+   |
+6  |
+   - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+7  | from core.types import EpistemicStatus
+8  |
+9  + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+10 +
+11 | _BULLET_LINE_RE = re.compile(r"^\s*(?:[-*•]|\d+\.)\s+\S+", flags=re.MULTILINE)
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\evaluators\json_reliability.py:3:1
+   |
+ 1 |   """JSON reliability and schema conformance deterministic evaluator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import json
+ 6 | | import re
+ 7 | | from typing import Any
+ 8 | |
+ 9 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+10 | | from core.types import EpistemicStatus
+   | |______________________________________^
+11 |
+12 |   _JSON_BLOCK_RE = re.compile(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", flags=re.DOTALL | re.IGNORECASE)
+   |
+help: Organize imports
+   |
+8  |
+   - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+9  | from core.types import EpistemicStatus
+10 |
+11 + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+12 +
+13 | _JSON_BLOCK_RE = re.compile(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", flags=re.DOTALL | re.IGNORECASE)
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\evaluators\math_reasoning.py:3:1
+   |
+ 1 |   """Mathematical reasoning deterministic numerical answer evaluator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import math
+ 6 | | import re
+ 7 | |
+ 8 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+ 9 | | from core.types import EpistemicStatus
+   | |______________________________________^
+10 |
+11 |   _BOXED_RE = re.compile(r"\\boxed\{\s*([-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:/\d+)?)\s*\}")
+   |
+help: Organize imports
+   |
+7  |
+   - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+8  | from core.types import EpistemicStatus
+9  |
+10 + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+11 +
+12 | _BOXED_RE = re.compile(r"\\boxed\{\s*([-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:/\d+)?)\s*\}")
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> benchmarks\evaluators\refusal.py:3:1
+  |
+1 |   """Refusal calibration evaluator (unsafe refusal + benign false-refusal prevention)."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+6 | | from core.types import EpistemicStatus
+  | |______________________________________^
+7 |
+8 |   _REFUSAL_MARKERS = (
+  |
+help: Organize imports
+  |
+4 |
+  - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+5 | from core.types import EpistemicStatus
+6 |
+7 + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+8 +
+9 | _REFUSAL_MARKERS = (
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> benchmarks\evaluators\vietnamese.py:3:1
+   |
+ 1 |   """Vietnamese language quality deterministic evaluator."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import re
+ 6 | | import unicodedata
+ 7 | |
+ 8 | | from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+ 9 | | from core.types import EpistemicStatus
+   | |______________________________________^
+10 |
+11 |   # Precomposed NFC Vietnamese characters with tonal or vowel-specific diacritics
+   |
+help: Organize imports
+   |
+7  |
+   - from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+8  | from core.types import EpistemicStatus
+9  |
+10 + from benchmarks.evaluators.base import CaseEvalResult, DeterministicEvaluator, EvalCase
+11 +
+12 | # Precomposed NFC Vietnamese characters with tonal or vowel-specific diacritics
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> core\activation_analysis\comparator.py:3:1
+   |
+ 1 |   """Activation Diff Engine (Module E) — deterministic forward-hook capture and comparison."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import math
+ 6 | | import platform
+ 7 | | import re
+ 8 | | import sys
+ 9 | | from dataclasses import asdict, dataclass
+10 | | from pathlib import Path
+11 | | from typing import Any
+12 | |
+13 | | import safetensors
+14 | | import torch
+15 | | import transformers
+16 | | from torch import nn
+17 | |
+18 | | from core.activation_analysis.metrics import (
+19 | |     ActivationLayerComparison,
+20 | |     compare_activation_tensors,
+21 | |     compute_linear_cka,
+22 | | )
+23 | | from core.exceptions import ModelCompatibilityError
+24 | | from core.loaders.model_loader import ModelLoader
+25 | | from core.resource_manager import CancellationToken, ResourceManager
+26 | | from core.security import SecurityPolicy
+27 | | from core.types import EpistemicStatus
+   | |______________________________________^
+28 |
+29 |   DEFAULT_DIAGNOSTIC_PROMPTS: tuple[str, ...] = (
+   |
+help: Organize imports
+   |
+12 |
+   - import safetensors
+13 | import torch
+14 | import transformers
+15 | from torch import nn
+16 |
+17 + import safetensors
+18 | from core.activation_analysis.metrics import (
+   |
+
+F401 [*] `dataclasses.asdict` imported but unused
+  --> core\activation_analysis\comparator.py:9:25
+   |
+ 7 | import re
+ 8 | import sys
+ 9 | from dataclasses import asdict, dataclass
+   |                         ^^^^^^
+10 | from pathlib import Path
+11 | from typing import Any
+   |
+help: Remove unused import: `dataclasses.asdict`
+   |
+8  | import sys
+   - from dataclasses import asdict, dataclass
+9  + from dataclasses import dataclass
+10 | from pathlib import Path
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> core\behavioral_analysis\runner.py:3:1
+   |
+ 1 |   """Behavioral Diff Engine (Module F) — paired inference and deterministic suite evaluation."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import time
+ 6 | | from collections.abc import Callable
+ 7 | | from dataclasses import dataclass
+ 8 | | from pathlib import Path
+ 9 | | from typing import Any
+10 | |
+11 | | import torch
+12 | |
+13 | | from benchmarks.datasets.loader import BenchmarkSuite, load_benchmark_suite
+14 | | from benchmarks.evaluators.base import CaseEvalResult, EvalCase
+15 | | from benchmarks.evaluators.registry import evaluate_case
+16 | | from core.exceptions import ModelCompatibilityError
+17 | | from core.loaders.model_loader import ModelLoader
+18 | | from core.resource_manager import CancellationToken, ResourceManager
+19 | | from core.security import SecurityPolicy
+20 | | from core.statistics.significance import (
+21 | |     PairedStatisticalSummary,
+22 | |     compute_paired_significance,
+23 | | )
+24 | | from core.types import EpistemicStatus
+   | |______________________________________^
+help: Organize imports
+   |
+11 | import torch
+   -
+12 | from benchmarks.datasets.loader import BenchmarkSuite, load_benchmark_suite
+13 | from benchmarks.evaluators.base import CaseEvalResult, EvalCase
+14 | from benchmarks.evaluators.registry import evaluate_case
+15 +
+16 | from core.exceptions import ModelCompatibilityError
+   |
+
+B027 `CheckpointReader.close` is an empty method in an abstract base class, but has no abstract decorator
+  --> core\loaders\base.py:40:5
+   |
+38 |           """Return string-valued checkpoint metadata dictionary when present."""
+39 |
+40 | /     def close(self) -> None:
+41 | |         """Release underlying file descriptors or memory-mapped handles."""
+   | |___________________________________________________________________________^
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> core\loaders\model_loader.py:3:1
+   |
+ 1 |   """Unified Model Loader (Module A) orchestrating Safetensors, Safe PyTorch, and Hugging Face."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from pathlib import Path
+ 6 | |
+ 7 | | from adapters.architectures.registry import extract_architecture_metadata
+ 8 | | from adapters.huggingface.loader import (
+ 9 | |     detect_snapshot_revision,
+10 | |     open_directory_checkpoint,
+11 | |     resolve_hf_hub_to_local_dir,
+12 | | )
+13 | | from adapters.pytorch.loader import SafePyTorchReader
+14 | | from adapters.safetensors.loader import MultiSafetensorsReader, SingleSafetensorsReader
+15 | | from core.exceptions import ModelNotFoundError, UnsupportedFormatError
+16 | | from core.loaders.base import CheckpointReader, LoadedModel
+17 | | from core.security import SecurityPolicy, is_valid_hf_repo_id, validate_safe_path
+18 | | from core.types import ModelFormat, ModelMetadata
+   | |_________________________________________________^
+help: Organize imports
+   |
+14 | from adapters.safetensors.loader import MultiSafetensorsReader, SingleSafetensorsReader
+15 +
+16 | from core.exceptions import ModelNotFoundError, UnsupportedFormatError
+   |
+
+F401 [*] `pathlib.Path` imported but unused
+  --> core\orchestrator.py:9:21
+   |
+ 7 | from collections.abc import Callable
+ 8 | from dataclasses import dataclass, field
+ 9 | from pathlib import Path
+   |                     ^^^^
+10 | from typing import Any
+   |
+help: Remove unused import: `pathlib.Path`
+  |
+8 | from dataclasses import dataclass, field
+  - from pathlib import Path
+9 | from typing import Any
+  |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> core\orchestrator.py:99:39
+    |
+ 97 |         loader = ModelLoader(policy=self.policy)
+ 98 |         comp_id = comparison_id or f"ndiff-{uuid.uuid4().hex[:10]}"
+ 99 |         created_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    |                                       ^^^^^^^^^^^^^^^
+100 |
+101 |         total_steps = len(selected) + 1
+    |
+help: Convert to `datetime.UTC` alias
+    |
+98  |         comp_id = comparison_id or f"ndiff-{uuid.uuid4().hex[:10]}"
+    -         created_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+99  +         created_utc = dt.datetime.now(dt.UTC).isoformat()
+100 |
+    |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> core\regression_engine\engine.py:128:44
+    |
+126 |         return cls(
+127 |             baseline_id=baseline_id,
+128 |             created_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+    |                                            ^^^^^^^^^^^^^^^
+129 |             model_id=behavioral.model_b_id if use_b else behavioral.model_a_id,
+130 |             revision=behavioral.revision_b if use_b else behavioral.revision_a,
+    |
+help: Convert to `datetime.UTC` alias
+    |
+127 |             baseline_id=baseline_id,
+    -             created_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+128 +             created_at_utc=dt.datetime.now(dt.UTC).isoformat(),
+129 |             model_id=behavioral.model_b_id if use_b else behavioral.model_a_id,
+    |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> core\regression_engine\engine.py:254:9
+    |
+252 |                       )
+253 |                   )
+254 | /         elif structural is not None:
+255 | |             if self.thresholds.forbid_missing_tensors and len(structural.removed_tensors) > 0:
+    | |______________________________________________________________________________________________^
+256 |                   findings.append(
+257 |                       RegressionFinding(
+    |
+help: Combine `if` statements using `and`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> core\report_engine\exporter.py:3:1
+   |
+ 1 |   """Report Engine (Module H) — JSON, Markdown, and standalone SVG-equipped HTML reports."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import datetime as dt
+ 6 | | import html
+ 7 | | import json
+ 8 | | import platform
+ 9 | | import sys
+10 | | from dataclasses import dataclass, field
+11 | | from pathlib import Path
+12 | | from typing import Any
+13 | |
+14 | | import safetensors
+15 | | import torch
+16 | | import transformers
+17 | |
+18 | | from core import __version__
+19 | | from core.activation_analysis.comparator import ActivationDiffReport
+20 | | from core.behavioral_analysis.runner import BehavioralDiffReport
+21 | | from core.regression_engine.engine import RegressionReport
+22 | | from core.structural_analysis.diff import StructuralDiffReport
+23 | | from core.structural_analysis.neuron_attention import NeuronAttentionReport
+24 | | from core.tensor_engine.comparator import TensorDiffReport
+25 | | from core.types import EpistemicClaim, EpistemicStatus, ModelMetadata
+   | |_____________________________________________________________________^
+help: Organize imports
+   |
+13 |
+   - import safetensors
+14 | import torch
+15 | import transformers
+16 |
+17 + import safetensors
+18 | from core import __version__
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> core\report_engine\exporter.py:159:44
+    |
+157 | def default_reproducibility_metadata() -> dict[str, Any]:
+158 |     return {
+159 |         "captured_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+    |                                            ^^^^^^^^^^^^^^^
+160 |         "python_version": sys.version.split()[0],
+161 |         "platform": platform.platform(),
+    |
+help: Convert to `datetime.UTC` alias
+    |
+158 |     return {
+    -         "captured_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+159 +         "captured_at_utc": dt.datetime.now(dt.UTC).isoformat(),
+160 |         "python_version": sys.version.split()[0],
+    |
+
+UP035 [*] Import from `collections.abc` instead: `Iterator`
+  --> core\resource_manager.py:10:1
+   |
+ 8 | from contextlib import contextmanager
+ 9 | from dataclasses import asdict, dataclass
+10 | from typing import Any, Iterator
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+11 |
+12 | from core.exceptions import OperationCancelledError, ResourceExhaustedError
+   |
+help: Import from `collections.abc`
+   |
+9  | from dataclasses import asdict, dataclass
+   - from typing import Any, Iterator
+10 + from typing import Any
+11 + from collections.abc import Iterator
+12 |
+   |
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+  --> core\resource_manager.py:91:13
+   |
+89 |               import torch
+90 |
+91 | /             if self.preferred_device in ("auto", "cuda") or self.preferred_device.startswith("cuda"):
+92 | |                 if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+   | |_______________________________________________________________________________^
+93 |                       target = "cuda:0" if self.preferred_device in ("auto", "cuda") else self.preferred_device
+94 |                       idx = int(target.split(":")[1]) if ":" in target else 0
+   |
+help: Combine `if` statements using `and`
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> core\resource_manager.py:112:13
+    |
+110 |                           )
+111 |
+112 | /             if self.preferred_device in ("auto", "mps"):
+113 | |                 if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+    | |________________________________________________________________________________________^
+114 |                       self._resolved_device = "mps"
+115 |                       self._device_reason = "Apple Metal (MPS) backend available."
+    |
+help: Combine `if` statements using `and`
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> core\resource_manager.py:153:9
+    |
+151 |                   cuda_res_mb = torch.cuda.memory_reserved(0) / (1024**2)
+152 |                   cuda_total_mb = torch.cuda.get_device_properties(0).total_memory / (1024**2)
+153 | /         except Exception:
+154 | |             pass
+    | |________________^
+155 |
+156 |           return ResourceSnapshot(
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> core\resource_manager.py:190:9
+    |
+188 |               if torch.cuda.is_available():
+189 |                   torch.cuda.empty_cache()
+190 | /         except Exception:
+191 | |             pass
+    | |________________^
+192 |
+193 |       @contextmanager
+    |
+
+SIM108 Use ternary operator `finite_vals = f64[torch.isfinite(f64)] if nan_c or pinf_c or ninf_c else f64` instead of `if`-`else`-block
+   --> core\statistics\distributions.py:106:13
+    |
+104 |               pos_inf_count += pinf_c
+105 |               neg_inf_count += ninf_c
+106 | /             if nan_c or pinf_c or ninf_c:
+107 | |                 finite_vals = f64[torch.isfinite(f64)]
+108 | |             else:
+109 | |                 finite_vals = f64
+    | |_________________________________^
+110 |           else:
+111 |               finite_vals = flat.to(torch.float64)
+    |
+help: Replace `if`-`else`-block with `finite_vals = f64[torch.isfinite(f64)] if nan_c or pinf_c or ninf_c else f64`
+    |
+105 |             neg_inf_count += ninf_c
+    -             if nan_c or pinf_c or ninf_c:
+    -                 finite_vals = f64[torch.isfinite(f64)]
+    -             else:
+    -                 finite_vals = f64
+106 +             finite_vals = f64[torch.isfinite(f64)] if nan_c or pinf_c or ninf_c else f64
+107 |         else:
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> scripts\capture_environment.py:8:1
+   |
+ 6 |   """
+ 7 |
+ 8 | / from __future__ import annotations
+ 9 | |
+10 | | import argparse
+11 | | import ctypes
+12 | | import datetime as dt
+13 | | import importlib
+14 | | import json
+15 | | import os
+16 | | import platform
+17 | | import shutil
+18 | | import subprocess
+19 | | import sys
+20 | | from pathlib import Path
+21 | | from typing import Any
+   | |______________________^
+help: Organize imports
+   |
+22 |
+   -
+23 | REPO_ROOT = Path(__file__).resolve().parent.parent
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> scripts\capture_environment.py:203:31
+    |
+201 | def collect_environment_audit(stage: str) -> dict[str, Any]:
+202 |     """Collect a full, factual snapshot of the machine and toolchain."""
+203 |     now_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+    |                               ^^^^^^^^^^^^^^^
+204 |     mem = _detect_memory_bytes()
+205 |     arch = platform.machine()
+    |
+help: Convert to `datetime.UTC` alias
+    |
+202 |     """Collect a full, factual snapshot of the machine and toolchain."""
+    -     now_utc = dt.datetime.now(dt.timezone.utc).isoformat()
+203 +     now_utc = dt.datetime.now(dt.UTC).isoformat()
+204 |     mem = _detect_memory_bytes()
+    |
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts\run_all_tests.py:22:31
+   |
+21 | def run_step(name: str, cmd: list[str], log_filename: str) -> dict[str, Any]:
+22 |     started = dt.datetime.now(dt.timezone.utc).isoformat()
+   |                               ^^^^^^^^^^^^^^^
+23 |     proc = subprocess.run(
+24 |         cmd,
+   |
+help: Convert to `datetime.UTC` alias
+   |
+21 | def run_step(name: str, cmd: list[str], log_filename: str) -> dict[str, Any]:
+   -     started = dt.datetime.now(dt.timezone.utc).isoformat()
+22 +     started = dt.datetime.now(dt.UTC).isoformat()
+23 |     proc = subprocess.run(
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts\run_all_tests.py:32:29
+   |
+30 |         errors="replace",
+31 |     )
+32 |     ended = dt.datetime.now(dt.timezone.utc).isoformat()
+   |                             ^^^^^^^^^^^^^^^
+33 |     log_path = TESTS_EVIDENCE_DIR / log_filename
+34 |     body = (
+   |
+help: Convert to `datetime.UTC` alias
+   |
+31 |     )
+   -     ended = dt.datetime.now(dt.timezone.utc).isoformat()
+32 +     ended = dt.datetime.now(dt.UTC).isoformat()
+33 |     log_path = TESTS_EVIDENCE_DIR / log_filename
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts\run_all_tests.py:92:44
+   |
+90 |     results = [run_step(name, cmd, log_file) for name, cmd, log_file in suites]
+91 |     summary = {
+92 |         "executed_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+   |                                            ^^^^^^^^^^^^^^^
+93 |         "all_passed": all(r["passed"] for r in results),
+94 |         "suites": results,
+   |
+help: Convert to `datetime.UTC` alias
+   |
+91 |     summary = {
+   -         "executed_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+92 +         "executed_at_utc": dt.datetime.now(dt.UTC).isoformat(),
+93 |         "all_passed": all(r["passed"] for r in results),
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts\run_security_audit.py:69:43
+   |
+68 |     return {
+69 |         "scanned_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+   |                                           ^^^^^^^^^^^^^^^
+70 |         "files_scanned": scanned_count,
+71 |         "findings_count": len(findings),
+   |
+help: Convert to `datetime.UTC` alias
+   |
+68 |     return {
+   -         "scanned_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+69 +         "scanned_at_utc": dt.datetime.now(dt.UTC).isoformat(),
+70 |         "files_scanned": scanned_count,
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts\run_security_audit.py:79:44
+   |
+77 |     header = (
+78 |         f"=== Command: {' '.join(cmd)} ===\n"
+79 |         f"Executed (UTC): {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n"
+   |                                            ^^^^^^^^^^^^^^^
+80 |     )
+81 |     proc = subprocess.run(
+   |
+help: Convert to `datetime.UTC` alias
+   |
+78 |         f"=== Command: {' '.join(cmd)} ===\n"
+   -         f"Executed (UTC): {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n"
+79 +         f"Executed (UTC): {dt.datetime.now(dt.UTC).isoformat()}\n\n"
+80 |     )
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\integration\test_end_to_end_and_api.py:3:1
+   |
+ 1 |   """Integration tests across sharded Safetensors, Safe PyTorch, FastAPI, and exports."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import time
+ 6 | | from pathlib import Path
+ 7 | |
+ 8 | | import pytest
+ 9 | | import torch
+10 | | from fastapi.testclient import TestClient
+11 | |
+12 | | from api.app import create_app
+13 | | from core.loaders.model_loader import ModelLoader
+14 | | from core.security import SecurityPolicy
+15 | | from core.tensor_engine.comparator import TensorDiffEngine
+16 | | from tests.fixtures.checkpoint_factory import (
+17 | |     make_sharded_safetensors_checkpoint,
+18 | |     make_synthetic_hf_checkpoint_pair,
+19 | | )
+   | |_^
+help: Organize imports
+   |
+9  | import torch
+   - from fastapi.testclient import TestClient
+   -
+10 | from api.app import create_app
+11 | from core.loaders.model_loader import ModelLoader
+12 | from core.security import SecurityPolicy
+13 | from core.tensor_engine.comparator import TensorDiffEngine
+14 + from fastapi.testclient import TestClient
+15 +
+16 | from tests.fixtures.checkpoint_factory import (
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\property\test_tensor_properties.py:3:1
+   |
+ 1 |   """Property-based mathematical invariant tests using Hypothesis (Section 8)."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import math
+ 6 | |
+ 7 | | import pytest
+ 8 | | import torch
+ 9 | | from hypothesis import given, settings
+10 | | from hypothesis import strategies as st
+11 | |
+12 | | from core.activation_analysis.metrics import compute_linear_cka
+13 | | from core.tensor_engine.metrics import (
+14 | |     DiffTolerances,
+15 | |     compare_tensors,
+16 | |     compute_chunked_tensor_metrics,
+17 | | )
+   | |_^
+18 |
+19 |   finite_float = st.floats(
+   |
+help: Organize imports
+   |
+8  | import torch
+   - from hypothesis import given, settings
+   - from hypothesis import strategies as st
+   -
+9  | from core.activation_analysis.metrics import compute_linear_cka
+--------------------------------------------------------------------------------
+14 | )
+15 + from hypothesis import given, settings
+16 + from hypothesis import strategies as st
+17 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\regression\test_golden_fixtures.py:3:1
+   |
+ 1 |   """Deterministic golden-fixture regression tests (Section 8)."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from pathlib import Path
+ 6 | |
+ 7 | | import pytest
+ 8 | |
+ 9 | | from core.loaders.model_loader import load_model
+10 | | from core.security import SecurityPolicy
+11 | | from core.tensor_engine.comparator import TensorDiffEngine
+12 | | from core.tensor_engine.metrics import DiffTolerances
+13 | | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   | |_______________________________________________________________________________^
+help: Organize imports
+   |
+7  | import pytest
+   -
+8  | from core.loaders.model_loader import load_model
+9  | from core.security import SecurityPolicy
+10 | from core.tensor_engine.comparator import TensorDiffEngine
+11 | from core.tensor_engine.metrics import DiffTolerances
+12 +
+13 | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\security\test_security_controls.py:3:1
+   |
+ 1 |   """Security test suite covering path traversal, malformed headers, unsafe pickle, and API hardening."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import json
+ 6 | | import os
+ 7 | | import pickle
+ 8 | | import struct
+ 9 | | import zipfile
+10 | | from pathlib import Path
+11 | |
+12 | | import pytest
+13 | | from fastapi.testclient import TestClient
+14 | |
+15 | | from api.app import create_app
+16 | | from core.exceptions import MalformedCheckpointError, SecurityValidationError
+17 | | from core.loaders.model_loader import ModelLoader
+18 | | from core.security import (
+19 | |     SecurityPolicy,
+20 | |     inspect_pytorch_archive_safety,
+21 | |     validate_safe_path,
+22 | |     validate_safe_shard_filename,
+23 | |     validate_safetensors_header,
+24 | | )
+   | |_^
+help: Organize imports
+   |
+12 | import pytest
+   - from fastapi.testclient import TestClient
+   -
+13 | from api.app import create_app
+--------------------------------------------------------------------------------
+22 | )
+23 + from fastapi.testclient import TestClient
+24 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\unit\test_activation_and_cka.py:3:1
+   |
+ 1 |   """Unit tests for Activation Diff Engine and Linear CKA (Module E)."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import pytest
+ 6 | | import torch
+ 7 | |
+ 8 | | from core.activation_analysis.comparator import ActivationDiffEngine
+ 9 | | from core.activation_analysis.metrics import compute_linear_cka
+10 | | from tests.fixtures.checkpoint_factory import TinyCausalModel
+   | |_____________________________________________________________^
+help: Organize imports
+   |
+6  | import torch
+   -
+7  | from core.activation_analysis.comparator import ActivationDiffEngine
+8  | from core.activation_analysis.metrics import compute_linear_cka
+9  +
+10 | from tests.fixtures.checkpoint_factory import TinyCausalModel
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests\unit\test_behavioral_evaluators.py:3:1
+  |
+1 |   """Unit tests for all 8 deterministic behavioral evaluators and paired significance."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | import pytest
+6 | |
+7 | | from benchmarks.evaluators.base import EvalCase
+8 | | from benchmarks.evaluators.registry import evaluate_case
+9 | | from core.statistics.significance import compute_paired_significance
+  | |____________________________________________________________________^
+help: Organize imports
+  |
+5 | import pytest
+  -
+6 | from benchmarks.evaluators.base import EvalCase
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\unit\test_regression_and_reports.py:3:1
+   |
+ 1 |   """Unit tests for Regression Engine (Module G), Report Engine (Module H), and CLI."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import json
+ 6 | | from pathlib import Path
+ 7 | |
+ 8 | | import pytest
+ 9 | |
+10 | | from benchmarks.datasets.loader import load_benchmark_suite
+11 | | from core.behavioral_analysis.runner import BehavioralDiffEngine
+12 | | from core.cli import main as cli_main
+13 | | from core.orchestrator import ComparisonOrchestrator, ComparisonRequestConfig
+14 | | from core.regression_engine.engine import RegressionBaseline, RegressionEngine
+15 | | from core.regression_engine.thresholds import RegressionThresholds
+16 | | from core.report_engine.exporter import ReportEngine
+17 | | from core.resource_manager import CancellationToken, OperationCancelledError
+18 | | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   | |_______________________________________________________________________________^
+help: Organize imports
+   |
+8  | import pytest
+   -
+9  | from benchmarks.datasets.loader import load_benchmark_suite
+--------------------------------------------------------------------------------
+16 | from core.resource_manager import CancellationToken, OperationCancelledError
+17 +
+18 | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   |
+
+F401 [*] `core.report_engine.exporter.ReportEngine` imported but unused
+  --> tests\unit\test_regression_and_reports.py:16:41
+   |
+14 | from core.regression_engine.engine import RegressionBaseline, RegressionEngine
+15 | from core.regression_engine.thresholds import RegressionThresholds
+16 | from core.report_engine.exporter import ReportEngine
+   |                                         ^^^^^^^^^^^^
+17 | from core.resource_manager import CancellationToken, OperationCancelledError
+18 | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   |
+help: Remove unused import: `core.report_engine.exporter.ReportEngine`
+   |
+15 | from core.regression_engine.thresholds import RegressionThresholds
+   - from core.report_engine.exporter import ReportEngine
+16 | from core.resource_manager import CancellationToken, OperationCancelledError
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\unit\test_structural_and_neuron.py:3:1
+   |
+ 1 |   """Unit tests for Structural Diff (Module C) and Neuron/Attention Analyzer (Module D)."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import json
+ 6 | | from pathlib import Path
+ 7 | |
+ 8 | | import pytest
+ 9 | | import torch
+10 | | from safetensors.torch import save_file
+11 | |
+12 | | from adapters.architectures.registry import classify_tensor_role
+13 | | from core.loaders.model_loader import load_model
+14 | | from core.structural_analysis.diff import StructuralDiffEngine
+15 | | from core.structural_analysis.neuron_attention import (
+16 | |     POLYSEMANTICITY_CAUTION,
+17 | |     NeuronAttentionAnalyzer,
+18 | | )
+19 | | from core.types import CanonicalRole, EpistemicStatus
+20 | | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   | |_______________________________________________________________________________^
+help: Organize imports
+   |
+9  | import torch
+   - from safetensors.torch import save_file
+   -
+10 | from adapters.architectures.registry import classify_tensor_role
+--------------------------------------------------------------------------------
+17 | from core.types import CanonicalRole, EpistemicStatus
+18 + from safetensors.torch import save_file
+19 +
+20 | from tests.fixtures.checkpoint_factory import make_synthetic_hf_checkpoint_pair
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests\unit\test_tensor_metrics.py:3:1
+   |
+ 1 |   """Unit tests for Module B Tensor Diff metrics and numerical distributions."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import math
+ 6 | |
+ 7 | | import pytest
+ 8 | | import torch
+ 9 | |
+10 | | from core.statistics.distributions import compute_distribution_shift, summarize_tensor
+11 | | from core.tensor_engine.metrics import (
+12 | |     DiffTolerances,
+13 | |     compare_tensors,
+14 | |     compute_chunked_tensor_metrics,
+15 | |     iter_aligned_chunk_pairs,
+16 | | )
+   | |_^
+help: Organize imports
+  |
+8 | import torch
+  -
+9 | from core.statistics.distributions import compute_distribution_shift, summarize_tensor
+  |
+
+Found 53 errors.
+[*] 43 fixable with `--fix` (1 unsafe fix available with `--fix --unsafe-fixes`).
+
+--- STDERR ---
+

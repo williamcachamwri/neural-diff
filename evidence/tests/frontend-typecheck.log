@@ -1,0 +1,14 @@
+=== Suite: frontend_typecheck ===
+Command: C:\Program Files\nodejs\npm.CMD --prefix frontend run typecheck
+Started (UTC): 2026-11-26T19:25:45.329560+00:00
+Completed (UTC): 2026-11-26T19:25:47.374030+00:00
+Exit Code: 0
+
+--- STDOUT ---
+
+> neural-diff-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+--- STDERR ---
+

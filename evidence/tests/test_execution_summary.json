@@ -1,0 +1,187 @@
+{
+  "executed_at_utc": "2026-11-26T19:25:53.309440+00:00",
+  "all_passed": true,
+  "suites": [
+    {
+      "name": "ruff_lint",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "core",
+        "adapters",
+        "benchmarks",
+        "api",
+        "tests",
+        "scripts"
+      ],
+      "started_at_utc": "2026-11-26T19:24:43.935663+00:00",
+      "completed_at_utc": "2026-11-26T19:24:44.044909+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/ruff-lint.log"
+    },
+    {
+      "name": "mypy_typecheck",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "core",
+        "adapters",
+        "benchmarks",
+        "api"
+      ],
+      "started_at_utc": "2026-11-26T19:24:44.045290+00:00",
+      "completed_at_utc": "2026-11-26T19:24:46.104347+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/mypy-typecheck.log"
+    },
+    {
+      "name": "unit_tests",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-m",
+        "unit",
+        "-v"
+      ],
+      "started_at_utc": "2026-11-26T19:24:46.105225+00:00",
+      "completed_at_utc": "2026-11-26T19:24:52.877656+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/unit-tests.log"
+    },
+    {
+      "name": "property_tests",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-m",
+        "property",
+        "-v"
+      ],
+      "started_at_utc": "2026-11-26T19:24:52.878697+00:00",
+      "completed_at_utc": "2026-11-26T19:24:59.181690+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/property-tests.log"
+    },
+    {
+      "name": "integration_tests",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-m",
+        "integration",
+        "-v"
+      ],
+      "started_at_utc": "2026-11-26T19:24:59.182688+00:00",
+      "completed_at_utc": "2026-11-26T19:25:10.965614+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/integration-tests.log"
+    },
+    {
+      "name": "regression_tests",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-m",
+        "regression",
+        "-v"
+      ],
+      "started_at_utc": "2026-11-26T19:25:10.966624+00:00",
+      "completed_at_utc": "2026-11-26T19:25:17.163912+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/regression-tests.log"
+    },
+    {
+      "name": "security_tests",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-m",
+        "security",
+        "-v"
+      ],
+      "started_at_utc": "2026-11-26T19:25:17.164920+00:00",
+      "completed_at_utc": "2026-11-26T19:25:23.666328+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/security-tests.log"
+    },
+    {
+      "name": "full_coverage",
+      "command": [
+        "D:\\LLM\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "--cov=core",
+        "--cov=adapters",
+        "--cov=benchmarks",
+        "--cov=api",
+        "--cov-report=term-missing",
+        "-v"
+      ],
+      "started_at_utc": "2026-11-26T19:25:23.666837+00:00",
+      "completed_at_utc": "2026-11-26T19:25:45.328559+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/coverage.log"
+    },
+    {
+      "name": "frontend_typecheck",
+      "command": [
+        "C:\\Program Files\\nodejs\\npm.CMD",
+        "--prefix",
+        "frontend",
+        "run",
+        "typecheck"
+      ],
+      "started_at_utc": "2026-11-26T19:25:45.329560+00:00",
+      "completed_at_utc": "2026-11-26T19:25:47.374030+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/frontend-typecheck.log"
+    },
+    {
+      "name": "frontend_unit_tests",
+      "command": [
+        "C:\\Program Files\\nodejs\\npm.CMD",
+        "--prefix",
+        "frontend",
+        "run",
+        "test"
+      ],
+      "started_at_utc": "2026-11-26T19:25:47.374688+00:00",
+      "completed_at_utc": "2026-11-26T19:25:50.771649+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/frontend-vitest.log"
+    },
+    {
+      "name": "frontend_production_build",
+      "command": [
+        "C:\\Program Files\\nodejs\\npm.CMD",
+        "--prefix",
+        "frontend",
+        "run",
+        "build"
+      ],
+      "started_at_utc": "2026-11-26T19:25:50.771649+00:00",
+      "completed_at_utc": "2026-11-26T19:25:53.309440+00:00",
+      "exit_code": 0,
+      "passed": true,
+      "log_file": "evidence/tests/frontend-build.log"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+=== Suite: ruff_lint ===
+Command: D:\LLM\.venv\Scripts\python.exe -m ruff check core adapters benchmarks api tests scripts
+Started (UTC): 2026-11-26T19:24:43.935663+00:00
+Completed (UTC): 2026-11-26T19:24:44.044909+00:00
+Exit Code: 0
+
+--- STDOUT ---
+All checks passed!
+
+--- STDERR ---
+

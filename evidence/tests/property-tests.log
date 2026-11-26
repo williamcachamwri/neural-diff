@@ -1,0 +1,29 @@
+=== Suite: property_tests ===
+Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m property -v
+Started (UTC): 2026-11-26T19:24:52.878697+00:00
+Completed (UTC): 2026-11-26T19:24:59.181690+00:00
+Exit Code: 0
+
+--- STDOUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\LLM\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: D:\LLM
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 33 items / 27 deselected / 6 selected
+
+tests/property/test_tensor_properties.py::test_tensor_reflexivity_identity PASSED [ 16%]
+tests/property/test_tensor_properties.py::test_tensor_symmetry_invariants PASSED [ 33%]
+tests/property/test_tensor_properties.py::test_cosine_positive_scale_and_negation_invariance PASSED [ 50%]
+tests/property/test_tensor_properties.py::test_l2_triangle_inequality PASSED [ 66%]
+tests/property/test_tensor_properties.py::test_chunk_partition_invariance PASSED [ 83%]
+tests/property/test_tensor_properties.py::test_linear_cka_planar_rotation_invariance PASSED [100%]
+
+====================== 6 passed, 27 deselected in 5.08s =======================
+
+--- STDERR ---
+
