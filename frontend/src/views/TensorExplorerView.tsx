@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiClient } from "../api/client";
 import type { ComparisonBundle, TensorRecord } from "../types/api";
+import { formatMetricNumber, formatRole, formatStatus } from "../utils/format";
 
 interface Props {
   activeBundle: ComparisonBundle | null;
@@ -36,7 +37,9 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
         if (!cancelled) {
           setRecords(res.records);
           setTotal(res.total);
-          setSelected((prev) => res.records.find((r) => r.name === prev?.name) ?? res.records[0] ?? null);
+          setSelected(
+            (prev) => res.records.find((r) => r.name === prev?.name) ?? res.records[0] ?? null
+          );
         }
       })
       .catch((err) => {
@@ -50,9 +53,9 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
   if (!activeBundle || !activeBundle.tensor_diff) {
     return (
       <div className="panel" data-testid="view-tensors">
-        <h2 className="panel-title">Tensor Diff Explorer</h2>
-        <p style={{ color: "var(--text-muted)" }}>
-          Load or run a comparison with the <code>tensor</code> module enabled to inspect parameter-level math metrics.
+        <h2 className="panel-title">Tensor Explorer</h2>
+        <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
+          Select a comparison with tensor diffing enabled to inspect parameter metrics.
         </p>
       </div>
     );
@@ -67,12 +70,12 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
           <div className="kpi-label">Compared Tensors</div>
           <div className="kpi-value">{sum.compared_tensors}</div>
           <div className="kpi-sub">
-            Modified: {sum.modified_tensors} • Identical: {sum.identical_tensors}
+            {sum.modified_tensors} modified · {sum.identical_tensors} identical
           </div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Global Changed Elements</div>
-          <div className="kpi-value">{sum.global_changed_pct.toFixed(3)}%</div>
+          <div className="kpi-label">Modified Parameters</div>
+          <div className="kpi-value">{sum.global_changed_pct.toFixed(2)}%</div>
           <div className="kpi-sub">
             {sum.total_changed_parameters.toLocaleString()} /{" "}
             {sum.total_compared_parameters.toLocaleString()}
@@ -83,132 +86,126 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
           <div className="kpi-value">
             {sum.global_mean_cosine != null ? sum.global_mean_cosine.toFixed(6) : "—"}
           </div>
-          <div className="kpi-sub">Mean Rel L2: {sum.global_mean_relative_l2?.toFixed(6) ?? "—"}</div>
+          <div className="kpi-sub">
+            Mean rel L2 · {sum.global_mean_relative_l2?.toFixed(5) ?? "—"}
+          </div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-label">Max Absolute Diff</div>
+          <div className="kpi-label">Peak |Δ|</div>
           <div className="kpi-value">
-            {sum.global_max_abs_diff != null ? sum.global_max_abs_diff.toExponential(3) : "—"}
+            {sum.global_max_abs_diff != null ? sum.global_max_abs_diff.toFixed(4) : "—"}
           </div>
           <div className="kpi-sub">
-            NaN/Inf Detected: {sum.has_any_nan_or_inf ? "YES" : "NO"}
+            {sum.has_any_nan_or_inf ? "NaN / Inf present" : "Zero NaN or Inf"}
           </div>
         </div>
       </div>
 
       <div className="panel">
         <div className="panel-header">
-          <h2 className="panel-title">Tensor Explorer ({total} matching tensors)</h2>
-          <span className="badge badge-ok">OBSERVED • Float64 Accumulated</span>
+          <h2 className="panel-title">Parameters ({total})</h2>
+          <span className="panel-subtitle">Float64 chunked accumulation</span>
         </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(175px, 1fr))",
             gap: 10,
             marginBottom: 14,
           }}
         >
           <input
             type="text"
-            placeholder="Filter by tensor name..."
+            placeholder="Filter parameter name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="">All Canonical Roles</option>
-            <option value="embedding">embedding</option>
-            <option value="attn_q">attn_q</option>
-            <option value="attn_k">attn_k</option>
-            <option value="attn_v">attn_v</option>
-            <option value="attn_o">attn_o</option>
-            <option value="mlp_gate">mlp_gate</option>
-            <option value="mlp_up">mlp_up</option>
-            <option value="mlp_down">mlp_down</option>
-            <option value="norm">norm</option>
-            <option value="lm_head">lm_head</option>
+            <option value="">All roles</option>
+            <option value="embedding">Embedding</option>
+            <option value="attn_q">Query (Q)</option>
+            <option value="attn_k">Key (K)</option>
+            <option value="attn_v">Value (V)</option>
+            <option value="attn_o">Attn Out (O)</option>
+            <option value="mlp_gate">MLP Gate</option>
+            <option value="mlp_up">MLP Up</option>
+            <option value="mlp_down">MLP Down</option>
+            <option value="norm">Norm</option>
+            <option value="lm_head">LM Head</option>
           </select>
           <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">All Statuses</option>
-            <option value="modified">modified</option>
-            <option value="identical">identical</option>
-            <option value="within_tolerance">within_tolerance</option>
-            <option value="shape_mismatch">shape_mismatch</option>
-            <option value="missing_in_b">missing_in_b</option>
-            <option value="added_in_b">added_in_b</option>
+            <option value="">All states</option>
+            <option value="modified">Modified</option>
+            <option value="identical">Identical</option>
+            <option value="within_tolerance">Within tolerance</option>
+            <option value="shape_mismatch">Shape mismatch</option>
           </select>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="relative_l2">Sort by Relative L2 (Desc)</option>
-            <option value="max_abs_diff">Sort by Max Abs Diff (Desc)</option>
-            <option value="cosine_similarity">Sort by Cosine Sim (Asc)</option>
-            <option value="changed_pct">Sort by Changed % (Desc)</option>
-            <option value="name">Sort by Name (A-Z)</option>
+            <option value="relative_l2">Sort · Relative L2</option>
+            <option value="max_abs_diff">Sort · Max |Δ|</option>
+            <option value="cosine_similarity">Sort · Cosine</option>
+            <option value="changed_pct">Sort · Changed %</option>
+            <option value="name">Sort · Name</option>
           </select>
         </div>
 
-        <div className="data-table-wrap" style={{ maxHeight: 420, overflowY: "auto" }}>
+        <div className="data-table-wrap" style={{ maxHeight: 380, overflowY: "auto" }}>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Tensor Name</th>
+                <th>Parameter</th>
                 <th>Role</th>
                 <th>Shape</th>
-                <th>Status</th>
-                <th>Cosine</th>
-                <th>Rel L2</th>
-                <th>RMSE</th>
-                <th>Max Abs</th>
-                <th>Changed %</th>
+                <th>State</th>
+                <th className="num">Cosine</th>
+                <th className="num">Rel L2</th>
+                <th className="num">RMSE</th>
+                <th className="num">Max |Δ|</th>
               </tr>
             </thead>
             <tbody>
-              {records.map((rec) => (
-                <tr
-                  key={rec.name}
-                  style={{
-                    cursor: "pointer",
-                    background: selected?.name === rec.name ? "rgba(255, 255, 255, 0.055)" : undefined,
-                  }}
-                  onClick={() => setSelected(rec)}
-                >
-                  <td className="mono">{rec.name}</td>
-                  <td>{rec.canonical_role}</td>
-                  <td className="mono">{JSON.stringify(rec.shape_a ?? rec.shape_b)}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        rec.status === "identical"
-                          ? "badge-ok"
-                          : rec.status === "modified"
-                            ? "badge-warn"
-                            : "badge-danger"
-                      }`}
-                    >
-                      {rec.status}
-                    </span>
-                  </td>
-                  <td className="num">
-                    {rec.metrics?.cosine_similarity != null
-                      ? rec.metrics.cosine_similarity.toFixed(6)
-                      : "—"}
-                  </td>
-                  <td className="num">
-                    {rec.metrics?.relative_l2 != null ? rec.metrics.relative_l2.toFixed(6) : "—"}
-                  </td>
-                  <td className="num">
-                    {rec.metrics?.rmse != null ? rec.metrics.rmse.toExponential(3) : "—"}
-                  </td>
-                  <td className="num">
-                    {rec.metrics?.max_abs_diff != null
-                      ? rec.metrics.max_abs_diff.toExponential(3)
-                      : "—"}
-                  </td>
-                  <td className="num">
-                    {rec.metrics ? `${rec.metrics.changed_pct.toFixed(2)}%` : "—"}
-                  </td>
-                </tr>
-              ))}
+              {records.map((rec) => {
+                const isSel = selected?.name === rec.name;
+                const shapeArr = rec.shape_a ?? rec.shape_b;
+                return (
+                  <tr
+                    key={rec.name}
+                    className={isSel ? "is-active-row" : ""}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelected(rec)}
+                  >
+                    <td className="mono" style={{ color: "var(--text-main)" }}>
+                      {rec.name}
+                    </td>
+                    <td style={{ color: "var(--text-muted)" }}>
+                      {formatRole(rec.canonical_role)}
+                    </td>
+                    <td className="mono" style={{ color: "var(--text-muted)" }}>
+                      {shapeArr ? shapeArr.join(" × ") : "—"}
+                    </td>
+                    <td style={{ color: "var(--text-secondary)" }}>
+                      {formatStatus(rec.status)}
+                    </td>
+                    <td className="num">
+                      {rec.metrics?.cosine_similarity != null
+                        ? rec.metrics.cosine_similarity.toFixed(6)
+                        : "—"}
+                    </td>
+                    <td className="num" style={{ color: "var(--text-main)" }}>
+                      {rec.metrics?.relative_l2 != null ? rec.metrics.relative_l2.toFixed(5) : "—"}
+                    </td>
+                    <td className="num" style={{ color: "var(--text-muted)" }}>
+                      {rec.metrics?.rmse != null ? rec.metrics.rmse.toExponential(2) : "—"}
+                    </td>
+                    <td className="num" style={{ color: "var(--text-muted)" }}>
+                      {rec.metrics?.max_abs_diff != null
+                        ? rec.metrics.max_abs_diff.toFixed(4)
+                        : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -216,32 +213,67 @@ export const TensorExplorerView: React.FC<Props> = ({ activeBundle, onError }) =
 
       {selected && (
         <div className="panel" data-testid="tensor-detail-inspector">
-          <h3 className="panel-title">
-            Parameter Detail Inspector: <span className="mono">{selected.name}</span>
-          </h3>
-          <div className="grid-2" style={{ marginTop: 12 }}>
-            <div className="diff-box">
-              <strong>Numerical Diff Metrics</strong>
-              <div>Dtype: {selected.dtype_a ?? "—"} → {selected.dtype_b ?? "—"}</div>
-              <div>Exact Equal: {String(selected.metrics?.exact_equal ?? false)}</div>
-              <div>Mean Abs Diff: {selected.metrics?.mean_abs_diff ?? "—"}</div>
-              <div>L2 Norm A / B: {selected.metrics?.l2_norm_a?.toFixed(4) ?? "—"} / {selected.metrics?.l2_norm_b?.toFixed(4) ?? "—"}</div>
-              <div>Zero → Nonzero: {selected.metrics?.zero_to_nonzero ?? 0}</div>
-              <div>Nonzero → Zero: {selected.metrics?.nonzero_to_zero ?? 0}</div>
-              <div>NaN (A / B): {selected.metrics?.nan_count_a ?? 0} / {selected.metrics?.nan_count_b ?? 0}</div>
-            </div>
-            <div className="diff-box">
-              <strong>Distribution Shift (A → B)</strong>
-              <div>Mean: {String(selected.distribution_a?.mean ?? "—")} → {String(selected.distribution_b?.mean ?? "—")}</div>
-              <div>Std: {String(selected.distribution_a?.std ?? "—")} → {String(selected.distribution_b?.std ?? "—")}</div>
-              <div>Median (p50): {String(selected.distribution_a?.p50 ?? "—")} → {String(selected.distribution_b?.p50 ?? "—")}</div>
-              <div>p05 / p95 (B): {String(selected.distribution_b?.p05 ?? "—")} / {String(selected.distribution_b?.p95 ?? "—")}</div>
-              <div>Wasserstein-1 Approx: {String(selected.distribution_shift?.wasserstein_1d_approx ?? "—")}</div>
-            </div>
+          <div className="panel-header">
+            <h3 className="panel-title mono" style={{ fontSize: 13 }}>
+              {selected.name}
+            </h3>
+            <span className="mono" style={{ color: "var(--text-muted)", fontSize: 11.5 }}>
+              {selected.dtype_a ?? "—"} → {selected.dtype_b ?? "—"} ·{" "}
+              {selected.metrics ? `${selected.metrics.changed_pct.toFixed(2)}% changed` : "—"}
+            </span>
+          </div>
+
+          <div className="grid-2">
+            <table className="data-table">
+              <tbody>
+                <tr>
+                  <td style={{ color: "var(--text-muted)" }}>L2 Norm (A → B)</td>
+                  <td className="num">
+                    {formatMetricNumber(selected.metrics?.l2_norm_a, 4)} →{" "}
+                    {formatMetricNumber(selected.metrics?.l2_norm_b, 4)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--text-muted)" }}>Mean |Δ|</td>
+                  <td className="num">{formatMetricNumber(selected.metrics?.mean_abs_diff, 6)}</td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--text-muted)" }}>Zero ↔ Nonzero Transitions</td>
+                  <td className="num">
+                    +{selected.metrics?.zero_to_nonzero ?? 0} / -
+                    {selected.metrics?.nonzero_to_zero ?? 0}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table className="data-table">
+              <tbody>
+                <tr>
+                  <td style={{ color: "var(--text-muted)" }}>Mean (A → B)</td>
+                  <td className="num">
+                    {formatMetricNumber(selected.distribution_a?.mean, 5)} →{" "}
+                    {formatMetricNumber(selected.distribution_b?.mean, 5)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--text-muted)" }}>Std Dev (A → B)</td>
+                  <td className="num">
+                    {formatMetricNumber(selected.distribution_a?.std, 5)} →{" "}
+                    {formatMetricNumber(selected.distribution_b?.std, 5)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--text-muted)" }}>Wasserstein-1 Shift</td>
+                  <td className="num">
+                    {formatMetricNumber(selected.distribution_shift?.wasserstein_1d_approx, 5)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       )}
     </div>
   );
 };
-

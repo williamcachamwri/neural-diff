@@ -5,6 +5,7 @@ import type {
   ComparisonBundle,
   ModelMetadata,
 } from "../types/api";
+import { formatSeverity } from "../utils/format";
 
 interface Props {
   modelA: string;
@@ -41,7 +42,7 @@ export const CompatibilityView: React.FC<Props> = ({
   const handleValidate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!modelA.trim() || !modelB.trim()) {
-      onError(new Error("Enter both Model A and Model B identifiers to validate compatibility."));
+      onError(new Error("Enter both Model A and Model B identifiers."));
       return;
     }
     setLoading(true);
@@ -62,9 +63,9 @@ export const CompatibilityView: React.FC<Props> = ({
   return (
     <div data-testid="view-compatibility">
       <div className="panel">
-        <h2 className="panel-title" style={{ marginBottom: 12 }}>
-          Model Compatibility Validation
-        </h2>
+        <div className="panel-header">
+          <h2 className="panel-title">Checkpoint Compatibility</h2>
+        </div>
         <form onSubmit={handleValidate}>
           <div className="grid-2">
             <div className="field-group">
@@ -94,129 +95,144 @@ export const CompatibilityView: React.FC<Props> = ({
             data-testid="btn-validate-compatibility"
             disabled={loading}
           >
-            {loading ? "Validating Checkpoints..." : "Run Compatibility Check"}
+            {loading ? "Validating..." : "Validate Checkpoints"}
           </button>
         </form>
       </div>
 
       {comp && metaA && metaB && (
-        <>
-          <div className="panel" data-testid="compatibility-result">
-            <div className="panel-header">
-              <h3 className="panel-title">{comp.summary}</h3>
-              <span className="badge badge-ok">{comp.epistemic_status}</span>
-            </div>
-            <div className="kpi-grid">
-              <div className="kpi-card">
-                <div className="kpi-label">Direct Tensor Diff</div>
-                <div className="kpi-value">
-                  {comp.compatible_for_direct_tensor_diff ? "SUPPORTED" : "INCOMPATIBLE"}
-                </div>
-                <div className="kpi-sub">
-                  {comp.shape_matched_tensor_count} shape-aligned tensors
-                </div>
+        <div data-testid="compatibility-result">
+          <div className="kpi-grid">
+            <div className="kpi-card">
+              <div className="kpi-label">Tensor Alignment</div>
+              <div className="kpi-value">
+                {comp.shape_matched_tensor_count}/{comp.shared_tensor_count}
               </div>
-              <div className="kpi-card">
-                <div className="kpi-label">Key Jaccard Overlap</div>
-                <div className="kpi-value">{(comp.jaccard_key_overlap * 100).toFixed(1)}%</div>
-                <div className="kpi-sub">{comp.shared_tensor_count} shared keys</div>
-              </div>
-              <div className="kpi-card">
-                <div className="kpi-label">Head / Neuron Slicing</div>
-                <div className="kpi-value">
-                  {comp.compatible_for_head_neuron_analysis ? "SUPPORTED" : "LIMITED"}
-                </div>
-                <div className="kpi-sub">Requires matching architecture family</div>
-              </div>
-              <div className="kpi-card">
-                <div className="kpi-label">Activation &amp; Behavioral</div>
-                <div className="kpi-value">
-                  {comp.compatible_for_behavioral_diff ? "SUPPORTED" : "WEIGHTS ONLY"}
-                </div>
-                <div className="kpi-sub">Requires HF config &amp; tokenizer</div>
+              <div className="kpi-sub">
+                {comp.compatible_for_direct_tensor_diff ? "Direct diff ready" : "Shape mismatch"}
               </div>
             </div>
-
-            <div className="grid-2">
-              <div className="diff-box">
-                <strong>Model A Metadata ({metaA.model_id})</strong>
-                <div>Format: {metaA.format}</div>
-                <div>Parameters: {metaA.total_parameters.toLocaleString()}</div>
-                <div>Tensors: {metaA.tensor_count} ({metaA.shard_count} shard(s))</div>
-                <div>Dtypes: {metaA.dtypes_present.join(", ")}</div>
-                <div>
-                  Architecture: {metaA.architecture.architecture_class ?? "—"} (type:{" "}
-                  {metaA.architecture.model_type ?? "—"}, layers:{" "}
-                  {metaA.architecture.num_hidden_layers ?? "—"}, hidden:{" "}
-                  {metaA.architecture.hidden_size ?? "—"})
-                </div>
+            <div className="kpi-card">
+              <div className="kpi-label">Key Overlap</div>
+              <div className="kpi-value">{(comp.jaccard_key_overlap * 100).toFixed(1)}%</div>
+              <div className="kpi-sub">Jaccard index</div>
+            </div>
+            <div className="kpi-card">
+              <div className="kpi-label">Head Slicing</div>
+              <div className="kpi-value" style={{ fontSize: 18 }}>
+                {comp.compatible_for_head_neuron_analysis ? "Compatible" : "Partial"}
               </div>
-              <div className="diff-box">
-                <strong>Model B Metadata ({metaB.model_id})</strong>
-                <div>Format: {metaB.format}</div>
-                <div>Parameters: {metaB.total_parameters.toLocaleString()}</div>
-                <div>Tensors: {metaB.tensor_count} ({metaB.shard_count} shard(s))</div>
-                <div>Dtypes: {metaB.dtypes_present.join(", ")}</div>
-                <div>
-                  Architecture: {metaB.architecture.architecture_class ?? "—"} (type:{" "}
-                  {metaB.architecture.model_type ?? "—"}, layers:{" "}
-                  {metaB.architecture.num_hidden_layers ?? "—"}, hidden:{" "}
-                  {metaB.architecture.hidden_size ?? "—"})
-                </div>
+              <div className="kpi-sub">Attention &amp; MLP geometry</div>
+            </div>
+            <div className="kpi-card">
+              <div className="kpi-label">Forward Hooks &amp; Eval</div>
+              <div className="kpi-value" style={{ fontSize: 18 }}>
+                {comp.compatible_for_behavioral_diff ? "Compatible" : "Weights only"}
               </div>
+              <div className="kpi-sub">Tokenizer &amp; config check</div>
             </div>
           </div>
 
           <div className="panel">
-            <h3 className="panel-title" style={{ marginBottom: 10 }}>
-              Compatibility Diagnostic Findings ({comp.issues.length})
-            </h3>
-            {comp.issues.length === 0 ? (
-              <div style={{ color: "var(--ok)" }}>
-                Zero structural or architectural mismatches detected.
+            <div className="panel-header">
+              <h3 className="panel-title">Architecture Metadata</h3>
+              <span className="panel-subtitle">{comp.summary}</span>
+            </div>
+            <div className="data-table-wrap">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Property</th>
+                    <th>Model A ({metaA.model_id})</th>
+                    <th>Model B ({metaB.model_id})</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ color: "var(--text-muted)" }}>Format</td>
+                    <td className="mono">{metaA.format}</td>
+                    <td className="mono">{metaB.format}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "var(--text-muted)" }}>Parameters</td>
+                    <td className="mono">{metaA.total_parameters.toLocaleString()}</td>
+                    <td className="mono">{metaB.total_parameters.toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "var(--text-muted)" }}>Tensors · Shards</td>
+                    <td className="mono">
+                      {metaA.tensor_count} · {metaA.shard_count} shard(s)
+                    </td>
+                    <td className="mono">
+                      {metaB.tensor_count} · {metaB.shard_count} shard(s)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "var(--text-muted)" }}>Precision</td>
+                    <td className="mono">{metaA.dtypes_present.join(", ")}</td>
+                    <td className="mono">{metaB.dtypes_present.join(", ")}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "var(--text-muted)" }}>Architecture</td>
+                    <td className="mono">
+                      {metaA.architecture.architecture_class ?? "—"} (
+                      {metaA.architecture.num_hidden_layers ?? "—"}L ×{" "}
+                      {metaA.architecture.hidden_size ?? "—"}d)
+                    </td>
+                    <td className="mono">
+                      {metaB.architecture.architecture_class ?? "—"} (
+                      {metaB.architecture.num_hidden_layers ?? "—"}L ×{" "}
+                      {metaB.architecture.hidden_size ?? "—"}d)
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {comp.issues.length > 0 && (
+            <div className="panel">
+              <div className="panel-header">
+                <h3 className="panel-title">Notices ({comp.issues.length})</h3>
               </div>
-            ) : (
               <div className="data-table-wrap">
                 <table className="data-table">
                   <thead>
                     <tr>
                       <th>Severity</th>
-                      <th>Code</th>
                       <th>Field</th>
                       <th>Model A</th>
                       <th>Model B</th>
-                      <th>Diagnostic Message</th>
+                      <th>Detail</th>
                     </tr>
                   </thead>
                   <tbody>
                     {comp.issues.map((iss, idx) => (
                       <tr key={`${iss.code}-${idx}`}>
                         <td>
-                          <span
-                            className={`badge ${
-                              iss.severity === "CRITICAL" || iss.severity === "HIGH"
-                                ? "badge-danger"
-                                : iss.severity === "MEDIUM"
-                                  ? "badge-warn"
-                                  : "badge-info"
-                            }`}
-                          >
-                            {iss.severity}
+                          <span className="status-inline">
+                            <span
+                              className={`dot ${
+                                iss.severity === "CRITICAL" || iss.severity === "HIGH"
+                                  ? "dot-danger"
+                                  : "dot-warn"
+                              }`}
+                            />
+                            <span>{formatSeverity(iss.severity)}</span>
                           </span>
                         </td>
-                        <td className="mono">{iss.code}</td>
                         <td className="mono">{iss.field}</td>
-                        <td className="mono">{JSON.stringify(iss.value_a)}</td>
-                        <td className="mono">{JSON.stringify(iss.value_b)}</td>
-                        <td>{iss.message}</td>
+                        <td className="mono">{String(iss.value_a ?? "—")}</td>
+                        <td className="mono">{String(iss.value_b ?? "—")}</td>
+                        <td style={{ color: "var(--text-secondary)" }}>{iss.message}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
-        </>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

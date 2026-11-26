@@ -9,7 +9,7 @@ interface Props {
 
 export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
   const [settings, setSettings] = useState<RuntimeSettings | null>(null);
-  const [savedBanner, setSavedBanner] = useState(false);
+  const [savedNotice, setSavedNotice] = useState(false);
 
   useEffect(() => {
     apiClient
@@ -24,9 +24,9 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
     try {
       const updated = await apiClient.updateSettings(settings);
       setSettings(updated);
-      setSavedBanner(true);
+      setSavedNotice(true);
       onSettingsSaved();
-      setTimeout(() => setSavedBanner(false), 3000);
+      setTimeout(() => setSavedNotice(false), 2500);
     } catch (err) {
       onError(err instanceof Error ? err : new Error(String(err)));
     }
@@ -35,7 +35,7 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
   if (!settings) {
     return (
       <div className="panel" data-testid="view-settings">
-        Loading persisted runtime settings...
+        <span style={{ color: "var(--text-muted)", fontSize: 13 }}>Loading runtime settings...</span>
       </div>
     );
   }
@@ -43,14 +43,24 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
   return (
     <div className="panel" data-testid="view-settings">
       <div className="panel-header">
-        <h2 className="panel-title">Engine &amp; Security Settings</h2>
-        {savedBanner && <span className="badge badge-ok">Persisted to SQLite</span>}
+        <div>
+          <h2 className="panel-title">Runtime &amp; Serialization Settings</h2>
+          <div className="panel-subtitle" style={{ marginTop: 2 }}>
+            Default compute backend, streaming block size, and checkpoint loading rules
+          </div>
+        </div>
+        {savedNotice && (
+          <span className="status-inline">
+            <span className="dot dot-ok" />
+            <span>Saved</span>
+          </span>
+        )}
       </div>
 
       <form onSubmit={handleSave}>
         <div className="grid-2">
           <div className="field-group">
-            <label htmlFor="set-device">Default Compute Device</label>
+            <label htmlFor="set-device">Compute Backend</label>
             <select
               id="set-device"
               value={settings.preferred_device}
@@ -61,9 +71,9 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
                 })
               }
             >
-              <option value="auto">auto (CUDA if verified, else CPU)</option>
-              <option value="cuda">cuda</option>
-              <option value="cpu">cpu</option>
+              <option value="auto">Auto (CUDA with CPU fallback)</option>
+              <option value="cuda">CUDA</option>
+              <option value="cpu">CPU</option>
             </select>
           </div>
 
@@ -82,7 +92,7 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
           </div>
 
           <div className="field-group">
-            <label htmlFor="set-atol">Default Absolute Tolerance (atol)</label>
+            <label htmlFor="set-atol">Absolute Tolerance (atol)</label>
             <input
               id="set-atol"
               type="number"
@@ -93,7 +103,7 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
           </div>
 
           <div className="field-group">
-            <label htmlFor="set-rtol">Default Relative Tolerance (rtol)</label>
+            <label htmlFor="set-rtol">Relative Tolerance (rtol)</label>
             <input
               id="set-rtol"
               type="number"
@@ -104,7 +114,7 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
           </div>
 
           <div className="field-group">
-            <label htmlFor="set-tokens">Default Behavioral Max New Tokens</label>
+            <label htmlFor="set-tokens">Max Generated Tokens</label>
             <input
               id="set-tokens"
               type="number"
@@ -118,7 +128,7 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
           </div>
 
           <div className="field-group">
-            <label>Checkpoint Serialization Policy</label>
+            <label>PyTorch Archive Policy</label>
             <label className="check-tile">
               <input
                 type="checkbox"
@@ -130,15 +140,13 @@ export const SettingsView: React.FC<Props> = ({ onError, onSettingsSaved }) => {
                   })
                 }
               />
-              <span>
-                Allow safe PyTorch <code>weights_only=True</code> + opcode-scanned archives (Safetensors always preferred)
-              </span>
+              <span>Allow opcode-verified PyTorch weights_only archives</span>
             </label>
           </div>
         </div>
 
         <button type="submit" className="btn btn-primary" data-testid="btn-save-settings">
-          Save Settings
+          Save Changes
         </button>
       </form>
     </div>

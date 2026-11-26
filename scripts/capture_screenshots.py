@@ -52,32 +52,33 @@ def render_test_summary_html(summary_json_path: Path, coverage_log_path: Path, o
     cov_tail = "\n".join(cov_text.splitlines()[-30:])
 
     rows = "".join(
-        f"<tr><td style='font-family:monospace'>{html.escape(s['name'])}</td>"
-        f"<td><span style='color:{'#34d399' if s['passed'] else '#f87171'};font-weight:700'>"
-        f"{'PASS' if s['passed'] else 'FAIL'} (rc={s['exit_code']})</span></td>"
-        f"<td style='font-family:monospace;font-size:12px'>{html.escape(' '.join(s['command']))}</td>"
-        f"<td style='font-family:monospace'>{html.escape(s['log_file'])}</td></tr>"
+        f"<tr><td style='font-family:Consolas,monospace;color:#f4f4f5'>{html.escape(s['name'])}</td>"
+        f"<td><span style='display:inline-flex;align-items:center;gap:6px;color:#e4e4e7'>"
+        f"<span style='width:6px;height:6px;border-radius:99px;background:{'#4ade80' if s['passed'] else '#f87171'};display:inline-block'></span>"
+        f"{'Passed' if s['passed'] else 'Failed'} · exit {s['exit_code']}</span></td>"
+        f"<td style='font-family:Consolas,monospace;font-size:11.5px;color:#a1a1aa'>{html.escape(' '.join(s['command']))}</td>"
+        f"<td style='font-family:Consolas,monospace;color:#71717a'>{html.escape(s['log_file'])}</td></tr>"
         for s in data.get("suites", [])
     )
 
     doc = f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8"/><title>NEURAL DIFF — Verified Test Execution Summary</title>
+<html><head><meta charset="utf-8"/><title>Neural Diff — Verification Summary</title>
 <style>
-  body {{ background:#070b14; color:#e8eefc; font-family:system-ui,sans-serif; padding:26px; }}
-  .box {{ background:#121a2d; border:1px solid #243354; border-radius:10px; padding:18px; margin-bottom:16px; }}
-  table {{ width:100%; border-collapse:collapse; font-size:13px; }}
-  th, td {{ padding:8px 10px; border-bottom:1px solid #243354; text-align:left; }}
-  th {{ background:#162038; color:#93a4c8; }}
-  pre {{ background:#0a1020; border:1px solid #243354; border-radius:8px; padding:12px; font-size:12px; overflow:auto; }}
+  body {{ background:#09090b; color:#f4f4f5; font-family:Inter,system-ui,-apple-system,sans-serif; padding:32px 38px; margin:0; -webkit-font-smoothing:antialiased; }}
+  .box {{ background:#121216; border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:20px 22px; margin-bottom:18px; }}
+  table {{ width:100%; border-collapse:collapse; font-size:12.5px; }}
+  th, td {{ padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.05); text-align:left; }}
+  th {{ color:#71717a; font-size:11px; font-weight:500; }}
+  pre {{ background:#0d0d10; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; font-size:11.5px; color:#a1a1aa; overflow:auto; margin:0; line-height:1.5; }}
 </style></head><body>
-<div class="box">
-  <h1 style="margin:0 0 6px 0;font-size:21px">NEURAL DIFF — Automated Test &amp; Static Analysis Summary</h1>
-  <div style="color:#93a4c8;font-size:13px">Source: <code>evidence/tests/test_execution_summary.json</code> • Executed {html.escape(str(data.get("executed_at_utc", "")))}</div>
+<div class="box" style="display:flex;justify-content:space-between;align-items:baseline">
+  <h1 style="margin:0;font-size:16px;font-weight:600;letter-spacing:-0.015em">Verification &amp; Coverage Ledger</h1>
+  <div style="color:#71717a;font-size:12px;font-family:Consolas,monospace">evidence/tests/test_execution_summary.json · {html.escape(str(data.get("executed_at_utc", "")))}</div>
 </div>
 <div class="box">
-  <table><thead><tr><th>Suite</th><th>Result</th><th>Exact Command</th><th>Evidence Log</th></tr></thead><tbody>{rows}</tbody></table>
+  <table><thead><tr><th>Suite</th><th>Status</th><th>Command</th><th>Log Artifact</th></tr></thead><tbody>{rows}</tbody></table>
 </div>
-<div class="box"><h3 style="margin-top:0">Coverage Tail (from <code>evidence/tests/coverage.log</code>)</h3><pre>{html.escape(cov_tail)}</pre></div>
+<div class="box"><h3 style="margin:0 0 12px 0;font-size:13.5px;font-weight:600">Statement Coverage Summary</h3><pre>{html.escape(cov_tail)}</pre></div>
 </body></html>"""
     out_html.write_text(doc, encoding="utf-8")
 

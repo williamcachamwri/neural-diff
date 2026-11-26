@@ -18,12 +18,12 @@ interface Props {
 }
 
 const ALL_MODULES = [
-  { id: "structural", label: "Structural & Compatibility Diff" },
-  { id: "tensor", label: "Chunked Float64 Tensor Diff" },
-  { id: "neuron", label: "Attention Heads, MLP & Embeddings" },
-  { id: "activation", label: "Forward-Hook Activation Diff & CKA" },
-  { id: "behavioral", label: "8-Suite Deterministic Behavioral Diff" },
-  { id: "regression", label: "Regression Threshold Gate" },
+  { id: "structural", label: "Structural & Topology" },
+  { id: "tensor", label: "Float64 Tensor Math" },
+  { id: "neuron", label: "Attention Heads & MLP" },
+  { id: "activation", label: "Forward-Hook CKA" },
+  { id: "behavioral", label: "Behavioral Suites" },
+  { id: "regression", label: "Regression Gate" },
 ];
 
 export const ModelComparisonView: React.FC<Props> = ({
@@ -67,7 +67,7 @@ export const ModelComparisonView: React.FC<Props> = ({
   const handleRun = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!modelA.trim() || !modelB.trim()) {
-      onError(new Error("Both Model A and Model B must be specified."));
+      onError(new Error("Specify both Model A and Model B."));
       return;
     }
     if (modules.length === 0) {
@@ -99,7 +99,6 @@ export const ModelComparisonView: React.FC<Props> = ({
       });
       setRunningJob(job);
 
-      // Poll genuine server-side step progress until completion/failure/cancellation
       let current = job;
       while (current.status === "running") {
         await new Promise((r) => setTimeout(r, 450));
@@ -139,14 +138,18 @@ export const ModelComparisonView: React.FC<Props> = ({
     <div data-testid="view-compare">
       <div className="panel">
         <div className="panel-header">
-          <h2 className="panel-title">Configure &amp; Execute Model Comparison</h2>
-          <span className="badge badge-info">Real Backend Execution</span>
+          <div>
+            <h2 className="panel-title">Model Comparison</h2>
+            <div className="panel-subtitle" style={{ marginTop: 2 }}>
+              Select checkpoints, numerical tolerances, and analysis stages
+            </div>
+          </div>
         </div>
 
         {discovered && (
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginBottom: 8 }}>
-              Quick-Select Verified Model Pairs:
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginBottom: 8 }}>
+              Presets
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               <button
@@ -156,7 +159,7 @@ export const ModelComparisonView: React.FC<Props> = ({
                   applyPreset("Qwen/Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", true)
                 }
               >
-                Qwen2.5-0.5B Base vs Instruct (Apache-2.0)
+                Qwen2.5-0.5B · Base vs Instruct
               </button>
               <button
                 type="button"
@@ -169,7 +172,7 @@ export const ModelComparisonView: React.FC<Props> = ({
                   )
                 }
               >
-                SmolLM2-135M Base vs Instruct (Apache-2.0)
+                SmolLM2-135M · Base vs Instruct
               </button>
               {discovered.local_models.length >= 2 && (
                 <button
@@ -183,8 +186,8 @@ export const ModelComparisonView: React.FC<Props> = ({
                     )
                   }
                 >
-                  Local Fixture Pair ({discovered.local_models[0].label} vs{" "}
-                  {discovered.local_models[1].label})
+                  Local Fixture · {discovered.local_models[0].label} vs{" "}
+                  {discovered.local_models[1].label}
                 </button>
               )}
             </div>
@@ -194,32 +197,32 @@ export const ModelComparisonView: React.FC<Props> = ({
         <form onSubmit={handleRun}>
           <div className="grid-2">
             <div className="field-group">
-              <label htmlFor="input-model-a">Model A (Baseline Path or Hugging Face ID)</label>
+              <label htmlFor="input-model-a">Model A (Baseline)</label>
               <input
                 id="input-model-a"
                 data-testid="input-model-a"
                 type="text"
                 value={modelA}
                 onChange={(e) => onChangeModelA(e.target.value)}
-                placeholder="e.g. Qwen/Qwen2.5-0.5B or local checkpoint path"
+                placeholder="Qwen/Qwen2.5-0.5B or local path"
               />
             </div>
             <div className="field-group">
-              <label htmlFor="input-model-b">Model B (Candidate Path or Hugging Face ID)</label>
+              <label htmlFor="input-model-b">Model B (Candidate)</label>
               <input
                 id="input-model-b"
                 data-testid="input-model-b"
                 type="text"
                 value={modelB}
                 onChange={(e) => onChangeModelB(e.target.value)}
-                placeholder="e.g. Qwen/Qwen2.5-0.5B-Instruct or local checkpoint path"
+                placeholder="Qwen/Qwen2.5-0.5B-Instruct or local path"
               />
             </div>
           </div>
 
-          <div className="grid-2" style={{ marginTop: 6 }}>
+          <div className="grid-2">
             <div className="field-group">
-              <label htmlFor="select-exp-type">Experiment Provenance Classification</label>
+              <label htmlFor="select-exp-type">Provenance</label>
               <select
                 id="select-exp-type"
                 value={experimentType}
@@ -229,20 +232,20 @@ export const ModelComparisonView: React.FC<Props> = ({
                   )
                 }
               >
-                <option value="REAL MODEL EXPERIMENT">REAL MODEL EXPERIMENT</option>
-                <option value="SYNTHETIC FIXTURE EXPERIMENT">SYNTHETIC FIXTURE EXPERIMENT</option>
+                <option value="REAL MODEL EXPERIMENT">Real model benchmark</option>
+                <option value="SYNTHETIC FIXTURE EXPERIMENT">Synthetic fixture</option>
               </select>
             </div>
             <div className="field-group">
-              <label htmlFor="select-device">Preferred Compute Device</label>
+              <label htmlFor="select-device">Compute Device</label>
               <select
                 id="select-device"
                 value={device}
                 onChange={(e) => setDevice(e.target.value as "auto" | "cpu" | "cuda")}
               >
-                <option value="auto">Auto (Verified CUDA GPU with CPU Fallback)</option>
+                <option value="auto">Auto (CUDA with CPU fallback)</option>
                 <option value="cuda">CUDA GPU</option>
-                <option value="cpu">CPU Only</option>
+                <option value="cpu">CPU</option>
               </select>
             </div>
           </div>
@@ -272,7 +275,7 @@ export const ModelComparisonView: React.FC<Props> = ({
 
           <div className="grid-2">
             <div className="field-group">
-              <label htmlFor="input-max-cases">Behavioral Suite Case Limit (max 24)</label>
+              <label htmlFor="input-max-cases">Behavioral Case Limit (1–24)</label>
               <input
                 id="input-max-cases"
                 type="number"
@@ -283,24 +286,24 @@ export const ModelComparisonView: React.FC<Props> = ({
               />
             </div>
             <div className="field-group">
-              <label htmlFor="select-baseline">Optional Versioned Baseline Gate</label>
+              <label htmlFor="select-baseline">Baseline Gate</label>
               <select
                 id="select-baseline"
                 value={baselineId}
                 onChange={(e) => setBaselineId(e.target.value)}
               >
-                <option value="">None (Compare Model B directly against Model A)</option>
+                <option value="">Direct A → B comparison</option>
                 {baselines.map((b) => (
                   <option key={b.baseline_id} value={b.baseline_id}>
-                    {b.baseline_id} ({b.model_id} — pass {(b.overall_pass_rate * 100).toFixed(0)}%)
+                    {b.baseline_id} ({b.model_id} · {(b.overall_pass_rate * 100).toFixed(0)}%)
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          <div className="field-group" style={{ marginTop: 8 }}>
-            <label>Analysis Modules</label>
+          <div className="field-group" style={{ marginTop: 6 }}>
+            <label>Pipeline Stages</label>
             <div className="checkbox-grid">
               {ALL_MODULES.map((m) => (
                 <label key={m.id} className="check-tile">
@@ -315,18 +318,18 @@ export const ModelComparisonView: React.FC<Props> = ({
             </div>
           </div>
 
-          <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 10 }}>
             <button
               type="submit"
               className="btn btn-primary"
               data-testid="btn-run-comparison"
               disabled={runningJob !== null}
             >
-              {runningJob ? "Executing Comparison..." : "Run Comparison"}
+              {runningJob ? "Running..." : "Run Comparison"}
             </button>
             {runningJob && (
               <button type="button" className="btn btn-danger" onClick={handleCancel}>
-                Cancel Active Job
+                Cancel
               </button>
             )}
           </div>
@@ -335,12 +338,36 @@ export const ModelComparisonView: React.FC<Props> = ({
 
       {runningJob && (
         <div className="panel" data-testid="live-job-status">
-          <h3 className="panel-title">
-            Active Backend Job: <span className="mono">{runningJob.comparison_id}</span>
-          </h3>
-          <div style={{ marginTop: 8, color: "var(--accent)" }}>
-            Stage ({runningJob.completed_steps} / {runningJob.total_steps} completed modules):{" "}
-            <strong>{runningJob.stage_message}</strong>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+            <span className="mono" style={{ color: "var(--text-main)" }}>
+              {runningJob.comparison_id}
+            </span>
+            <span className="mono" style={{ color: "var(--text-muted)" }}>
+              {runningJob.completed_steps} / {runningJob.total_steps}
+            </span>
+          </div>
+          <div
+            style={{
+              height: 4,
+              background: "rgba(255,255,255,0.06)",
+              borderRadius: 99,
+              overflow: "hidden",
+              marginBottom: 8,
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.round(
+                  (runningJob.completed_steps / Math.max(1, runningJob.total_steps)) * 100
+                )}%`,
+                height: "100%",
+                background: "#f4f4f5",
+                transition: "width 0.25s ease",
+              }}
+            />
+          </div>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+            {runningJob.stage_message}
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import React from "react";
 import type { ExperimentSummaryItem } from "../types/api";
+import { formatStatus, formatVerdict } from "../utils/format";
 
 interface Props {
   experiments: ExperimentSummaryItem[];
@@ -17,106 +18,118 @@ export const ExperimentHistoryView: React.FC<Props> = ({
   return (
     <div className="panel" data-testid="view-history">
       <div className="panel-header">
-        <h2 className="panel-title">
-          Persisted Experiment History ({experiments.length} runs)
-        </h2>
-        <button className="btn" onClick={onRefresh}>
-          Refresh List
+        <div>
+          <h2 className="panel-title">Experiment Ledger ({experiments.length})</h2>
+          <div className="panel-subtitle" style={{ marginTop: 2 }}>
+            Persisted model comparisons and runtime telemetry
+          </div>
+        </div>
+        <button type="button" className="btn" onClick={onRefresh}>
+          Refresh
         </button>
       </div>
       <div className="data-table-wrap">
         <table className="data-table">
           <thead>
             <tr>
-              <th>Comparison ID</th>
-              <th>Timestamp (UTC)</th>
-              <th>Provenance</th>
-              <th>Model A → Model B</th>
-              <th>Modules</th>
-              <th>Changed %</th>
-              <th>Behav Δ</th>
-              <th>Verdict / Status</th>
-              <th>Duration</th>
-              <th>Load</th>
+              <th>Run ID</th>
+              <th>Source</th>
+              <th>Checkpoint Pair</th>
+              <th className="num">Modified</th>
+              <th className="num">Score Δ</th>
+              <th>Outcome</th>
+              <th className="num">Runtime</th>
+              <th />
             </tr>
           </thead>
           <tbody>
             {experiments.length === 0 ? (
               <tr>
-                <td colSpan={10} style={{ color: "var(--text-muted)" }}>
-                  No historical runs stored in SQLite yet.
+                <td colSpan={8} style={{ color: "var(--text-muted)" }}>
+                  No historical runs recorded yet.
                 </td>
               </tr>
             ) : (
-              experiments.map((exp) => (
-                <tr
-                  key={exp.comparison_id}
-                  style={{
-                    background:
-                      exp.comparison_id === activeComparisonId
-                        ? "rgba(255, 255, 255, 0.055)"
-                        : undefined,
-                  }}
-                >
-                  <td className="mono">{exp.comparison_id}</td>
-                  <td className="mono">{exp.created_at_utc.slice(0, 19)}Z</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        exp.experiment_type === "REAL MODEL EXPERIMENT"
-                          ? "badge-ok"
-                          : "badge-purple"
-                      }`}
+              experiments.map((exp) => {
+                const isReal = exp.experiment_type === "REAL MODEL EXPERIMENT";
+                const isActive = exp.comparison_id === activeComparisonId;
+                return (
+                  <tr
+                    key={exp.comparison_id}
+                    className={isActive ? "is-active-row" : ""}
+                  >
+                    <td className="mono" style={{ color: "var(--text-main)" }}>
+                      {exp.comparison_id}
+                    </td>
+                    <td>
+                      <span className="status-inline">
+                        <span className={`dot ${isReal ? "dot-ivory" : ""}`} />
+                        <span style={{ color: isReal ? "var(--text-secondary)" : "var(--text-muted)" }}>
+                          {isReal ? "Real model" : "Fixture"}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="mono" style={{ color: "var(--text-secondary)" }}>
+                      {exp.model_a_id} → {exp.model_b_id}
+                    </td>
+                    <td className="num">
+                      {exp.summary?.global_changed_pct != null
+                        ? `${exp.summary.global_changed_pct.toFixed(2)}%`
+                        : "—"}
+                    </td>
+                    <td
+                      className="num"
+                      style={{
+                        color:
+                          exp.summary?.behavioral_score_delta != null &&
+                          exp.summary.behavioral_score_delta > 0.01
+                            ? "var(--ok)"
+                            : exp.summary?.behavioral_score_delta != null &&
+                                exp.summary.behavioral_score_delta < -0.01
+                              ? "var(--danger)"
+                              : "var(--text-muted)",
+                      }}
                     >
-                      {exp.experiment_type === "REAL MODEL EXPERIMENT"
-                        ? "REAL MODEL"
-                        : "SYNTHETIC"}
-                    </span>
-                  </td>
-                  <td className="mono">
-                    {exp.model_a_id} → {exp.model_b_id}
-                  </td>
-                  <td>{exp.selected_modules.join(", ")}</td>
-                  <td className="num">
-                    {exp.summary?.global_changed_pct != null
-                      ? `${exp.summary.global_changed_pct.toFixed(2)}%`
-                      : "—"}
-                  </td>
-                  <td className="num">
-                    {exp.summary?.behavioral_score_delta != null
-                      ? `${exp.summary.behavioral_score_delta >= 0 ? "+" : ""}${exp.summary.behavioral_score_delta.toFixed(3)}`
-                      : "—"}
-                  </td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        exp.verdict === "PASSED"
-                          ? "badge-ok"
-                          : exp.verdict === "FAILED_REGRESSION" || exp.status === "failed"
-                            ? "badge-danger"
-                            : "badge-info"
-                      }`}
-                    >
-                      {exp.verdict ?? exp.status}
-                    </span>
-                  </td>
-                  <td className="num">
-                    {exp.summary?.duration_seconds != null
-                      ? `${exp.summary.duration_seconds.toFixed(2)}s`
-                      : "—"}
-                  </td>
-                  <td>
-                    {exp.status === "completed" && (
-                      <button
-                        className="btn"
-                        onClick={() => onSelectExperiment(exp.comparison_id)}
-                      >
-                        Load
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
+                      {exp.summary?.behavioral_score_delta != null
+                        ? `${exp.summary.behavioral_score_delta >= 0 ? "+" : ""}${exp.summary.behavioral_score_delta.toFixed(3)}`
+                        : "—"}
+                    </td>
+                    <td>
+                      <span className="status-inline">
+                        <span
+                          className={`dot ${
+                            exp.verdict === "PASSED"
+                              ? "dot-ok"
+                              : exp.verdict === "FAILED_REGRESSION" || exp.status === "failed"
+                                ? "dot-danger"
+                                : ""
+                          }`}
+                        />
+                        <span>
+                          {exp.verdict ? formatVerdict(exp.verdict) : formatStatus(exp.status)}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="num" style={{ color: "var(--text-muted)" }}>
+                      {exp.summary?.duration_seconds != null
+                        ? `${exp.summary.duration_seconds.toFixed(2)}s`
+                        : "—"}
+                    </td>
+                    <td className="num">
+                      {exp.status === "completed" && (
+                        <button
+                          type="button"
+                          className="btn"
+                          style={{ padding: "4px 10px", fontSize: 11.5 }}
+                          onClick={() => onSelectExperiment(exp.comparison_id)}
+                        >
+                          Open
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -124,4 +137,3 @@ export const ExperimentHistoryView: React.FC<Props> = ({
     </div>
   );
 };
-
