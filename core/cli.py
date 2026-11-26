@@ -7,13 +7,15 @@ import json
 import sys
 from pathlib import Path
 
-from core.exceptions import NeuralDiffError
+from benchmarks.datasets.loader import load_benchmark_suite
+from core.exceptions import ModelNotFoundError, NeuralDiffError
 from core.loaders.model_loader import load_model
 from core.orchestrator import VALID_MODULES, ComparisonOrchestrator, ComparisonRequestConfig
 from core.regression_engine.thresholds import RegressionThresholds
 from core.report_engine.exporter import ReportEngine
 from core.structural_analysis.compatibility import validate_compatibility
 from core.tensor_engine.metrics import DiffTolerances
+from core.tensor_engine.task_vector import analyze_task_vector_spectrum
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -61,6 +63,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_beh.add_argument("--seed", type=int, default=42)
     p_beh.add_argument("--device", default="auto")
     p_beh.add_argument("--output-dir", default=None)
+
+    # suites
+    sub.add_parser("suites", help="List registered deterministic behavioral benchmark suites.")
+
+    # svd
+    p_svd = sub.add_parser(
+        "svd",
+        help="Analyze SVD singular spectrum and Shannon effective rank of a 2D weight delta.",
+    )
+    p_svd.add_argument("--model-a", required=True)
+    p_svd.add_argument("--model-b", required=True)
+    p_svd.add_argument("--tensor", required=True, help="Exact 2D matrix parameter name.")
+    p_svd.add_argument("--local-only", action="store_true")
 
     return parser
 
@@ -138,6 +153,39 @@ def main(argv: list[str] | None = None) -> int:
                 print(json.dumps({k: str(v) for k, v in paths.items()}, indent=2))
             else:
                 print(exporter.to_json(bundle))
+            return 0
+
+        if args.command == "suites":
+            suite = load_benchmark_suite()
+            counts: dict[str, int] = {}
+            for c in suite.cases:
+                counts[c.category] = counts.get(c.category, 0) + 1
+            print(
+                json.dumps(
+                    {
+                        "suite_id": suite.suite_id,
+                        "version": suite.version,
+                        "total_cases": len(suite.cases),
+                        "categories": counts,
+                    },
+                    indent=2,
+                )
+            )
+            return 0
+
+        if args.command == "svd":
+            with (
+                load_model(args.model_a, local_files_only=args.local_only) as ha,
+                load_model(args.model_b, local_files_only=args.local_only) as hb,
+            ):
+                if args.tensor not in ha.tensors or args.tensor not in hb.tensors:
+                    raise ModelNotFoundError(
+                        f"Tensor '{args.tensor}' not found in both checkpoints."
+                    )
+                spec = analyze_task_vector_spectrum(
+                    ha.get_tensor(args.tensor), hb.get_tensor(args.tensor)
+                )
+                print(json.dumps({"tensor": args.tensor, **spec.to_dict()}, indent=2))
             return 0
 
     except NeuralDiffError as exc:
