@@ -1,0 +1,738 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-11-26T20:20:31.081090+00:00",
+  "integrity_scope_notice": "This manifest records post-capture SHA-256 hashes and byte sizes to detect silent file modification or truncation. It establishes post-capture file integrity, not independent cryptographic proof of the underlying execution event.",
+  "artifact_count": 73,
+  "artifacts": [
+    {
+      "relative_path": "evidence/backend/backend_startup.log",
+      "sha256": "e2f31e8a946d02b774a2f36cfbbfd8fb6f3f36f3439a51b35394e88f47a72223",
+      "size_bytes": 3602,
+      "captured_timestamp_utc": "2026-11-26T20:20:15.396011+00:00",
+      "category": "backend",
+      "related_feature": "FastAPI Backend & Engine Verification",
+      "related_test_or_experiment": "API / Backend Integration",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/benchmarks/model-comparison.log",
+      "sha256": "355a56cae6a247962ed8e73f6cd946bdae3dbb64e61d218d9aa36bcecae0d50f",
+      "size_bytes": 1090,
+      "captured_timestamp_utc": "2026-11-26T19:37:29.411087+00:00",
+      "category": "benchmarks",
+      "related_feature": "Throughput, Memory, & Real Model Benchmarks",
+      "related_test_or_experiment": "scripts/run_benchmarks.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/benchmarks/real_model_benchmarks.json",
+      "sha256": "6fed39f5e896250c4b655678d13c217464a5846bfc040a156c706b6082ce500a",
+      "size_bytes": 7637,
+      "captured_timestamp_utc": "2026-11-26T19:37:29.410564+00:00",
+      "category": "benchmarks",
+      "related_feature": "Throughput, Memory, & Real Model Benchmarks",
+      "related_test_or_experiment": "scripts/run_benchmarks.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/benchmarks/synthetic_throughput_benchmarks.json",
+      "sha256": "c96882a5469ef02eae8a0a61583ef897531bc66e855725cd23bf52c159a9b50a",
+      "size_bytes": 3603,
+      "captured_timestamp_utc": "2026-11-26T19:28:15.257588+00:00",
+      "category": "benchmarks",
+      "related_feature": "Throughput, Memory, & Real Model Benchmarks",
+      "related_test_or_experiment": "scripts/run_benchmarks.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/environment/environment_baseline.json",
+      "sha256": "a2d1e6ce3082fcfe05202d53f651bc33a563df4ce619035b6e2406a992a49f99",
+      "size_bytes": 6466,
+      "captured_timestamp_utc": "2026-11-26T18:16:53.743639+00:00",
+      "category": "environment",
+      "related_feature": "Environment Audit & Hardware Detection",
+      "related_test_or_experiment": "scripts/capture_environment.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/environment/environment_baseline.log",
+      "sha256": "aae1272325420bd76b3b098d7c7ae8fed5168136a1331ccffa58090d9786a0c9",
+      "size_bytes": 2158,
+      "captured_timestamp_utc": "2026-11-26T18:16:53.743639+00:00",
+      "category": "environment",
+      "related_feature": "Environment Audit & Hardware Detection",
+      "related_test_or_experiment": "scripts/capture_environment.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/environment/environment_post_install.json",
+      "sha256": "a5b33632b89f30d31b1c91b22784ddfd4cd035eb5d21cae9553f60ec8dd9343e",
+      "size_bytes": 6121,
+      "captured_timestamp_utc": "2026-11-26T19:11:20.114311+00:00",
+      "category": "environment",
+      "related_feature": "Environment Audit & Hardware Detection",
+      "related_test_or_experiment": "scripts/capture_environment.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/environment/environment_post_install.log",
+      "sha256": "14adb2cc0c870048cbbe63e3dbf575f9a87cb5fa9a577f2756598e1f9f706193",
+      "size_bytes": 2410,
+      "captured_timestamp_utc": "2026-11-26T19:11:20.114311+00:00",
+      "category": "environment",
+      "related_feature": "Environment Audit & Hardware Detection",
+      "related_test_or_experiment": "scripts/capture_environment.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/FINAL_ENGINEERING_REPORT.md",
+      "sha256": "799428c634c2c9457db23a292939b20644c4a7d3b61a38b211db76da971277c0",
+      "size_bytes": 6164,
+      "captured_timestamp_utc": "2026-11-26T20:20:22.809132+00:00",
+      "category": "summary_document",
+      "related_feature": "Project Evidence Index & Engineering Report",
+      "related_test_or_experiment": "Phase 17-20 Verification",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/01-dashboard.png",
+      "sha256": "24af1cabe2343978fda4838dde8571b5a268f59b23bf510c34000d1aa6408c86",
+      "size_bytes": 339852,
+      "captured_timestamp_utc": "2026-11-26T20:19:59.648622+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/02-model-selection.png",
+      "sha256": "06e18a0d9eaf386e91e12d5342bd4a6aad627c6b1045c0b1a82c5b2a4337a0d3",
+      "size_bytes": 271882,
+      "captured_timestamp_utc": "2026-11-26T20:20:00.596611+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/03-compatibility-validation.png",
+      "sha256": "8b566bca47f8ef6f6ea0fe8634c1e1a370de8088e2702f40b8334c4a1e945017",
+      "size_bytes": 259540,
+      "captured_timestamp_utc": "2026-11-26T20:20:01.848625+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/04-tensor-diff.png",
+      "sha256": "2b0e2e4d35dd8e5ea9c8d4bc963ebd6922fae9557b940a18efb0c0855524a22f",
+      "size_bytes": 347127,
+      "captured_timestamp_utc": "2026-11-26T20:20:02.905533+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/05-structural-diff.png",
+      "sha256": "781cd7c35cb0e49cd868f15b2181d77035ec102420ac295547b3f89df0f4a6ff",
+      "size_bytes": 314645,
+      "captured_timestamp_utc": "2026-11-26T20:20:04.286322+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/06-layer-analysis.png",
+      "sha256": "9dfd93aa97011709a6abdeef789bb1d41808634f3fd8594d415f01f5682a8af5",
+      "size_bytes": 452053,
+      "captured_timestamp_utc": "2026-11-26T20:20:05.572180+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/07-activation-comparison.png",
+      "sha256": "4aa26c89e8987baad12d46bb399308175dd15561277b766af3fa4a96e5a8317b",
+      "size_bytes": 313862,
+      "captured_timestamp_utc": "2026-11-26T20:20:06.446196+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/08-behavioral-diff.png",
+      "sha256": "d766fd95e3af79ce1cb263c6489cff94af66e5b4d8c082bbd4432227a0551b98",
+      "size_bytes": 322370,
+      "captured_timestamp_utc": "2026-11-26T20:20:07.335798+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/09-regression-report.png",
+      "sha256": "a6d09a70ba7448452c8141155a5a2866f72fec4546584ff824b6843cefce069b",
+      "size_bytes": 329605,
+      "captured_timestamp_utc": "2026-11-26T20:20:08.559437+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/10-benchmark-results.png",
+      "sha256": "7adce823dce6dce1b00f98ea5a6e7dcb33d7b8819937d0f8c7406b0bb5ab7a17",
+      "size_bytes": 363538,
+      "captured_timestamp_utc": "2026-11-26T20:20:09.726806+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/11-report-export.png",
+      "sha256": "405df4944918fa17e64a55c7c44b1b36f981fa85fe5a21b2efbb5915183d3b05",
+      "size_bytes": 312815,
+      "captured_timestamp_utc": "2026-11-26T20:20:11.538886+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/12-test-execution-summary.png",
+      "sha256": "05a77c15454cf13b6199f737d02e45d7817a410e13a49b187eee45962f197e32",
+      "size_bytes": 264843,
+      "captured_timestamp_utc": "2026-11-26T20:20:12.199584+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/13-error-handling.png",
+      "sha256": "f30bd1bcc8943ebc12e548886dabcde4ff8e8c3a3486cbe5facd6f4be76902d3",
+      "size_bytes": 268659,
+      "captured_timestamp_utc": "2026-11-26T20:20:14.429861+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/14-settings.png",
+      "sha256": "05273b23d2311dd170aa01e500c82ac40c8ec97c846b96cd774ee69f690aa0ff",
+      "size_bytes": 219437,
+      "captured_timestamp_utc": "2026-11-26T20:20:15.363250+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/15-final-application-state.png",
+      "sha256": "2a327439644bc9c8285aed41eb188283e579f0b3aecefa9523334a289a06456d",
+      "size_bytes": 326831,
+      "captured_timestamp_utc": "2026-11-26T20:20:16.759182+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/frontend_startup.log",
+      "sha256": "ce2bbea88ccbb136fbb778ad0154fc14af7d4b13351040a0feb8f14f346ca2bf",
+      "size_bytes": 172,
+      "captured_timestamp_utc": "2026-11-26T20:19:49.152888+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/frontend/screenshots_metadata.json",
+      "sha256": "d46d9d183115e55276578c5ecc80ef60d74381a747ae06a361cc190dcf0596f4",
+      "size_bytes": 9963,
+      "captured_timestamp_utc": "2026-11-26T20:20:16.802917+00:00",
+      "category": "frontend",
+      "related_feature": "React TypeScript Application Live Screenshots",
+      "related_test_or_experiment": "scripts/capture_screenshots.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/git/git-history.log",
+      "sha256": "db9d98db6e4af6ac854052078e749f71e6a0ea3a7e69eca9f0b4e83ebaacc3fa",
+      "size_bytes": 8242,
+      "captured_timestamp_utc": "2026-11-26T20:20:30.572767+00:00",
+      "category": "git",
+      "related_feature": "Repository Commit History & Working Tree Verification",
+      "related_test_or_experiment": "git log / git rev-list",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/git/git_verification.json",
+      "sha256": "0210a23065ab3cb0dda20e11feaf13ccca4a6ca493490b231e33e098e900ed4e",
+      "size_bytes": 2725,
+      "captured_timestamp_utc": "2026-11-26T20:20:30.573284+00:00",
+      "category": "git",
+      "related_feature": "Repository Commit History & Working Tree Verification",
+      "related_test_or_experiment": "git log / git rev-list",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/installation/frontend_npm_install.log",
+      "sha256": "7d62297cb6a2d264a935104ccf67841cfe069f18baeaf82d0b2f9f7380ab5008",
+      "size_bytes": 2700,
+      "captured_timestamp_utc": "2026-11-26T18:28:47.188628+00:00",
+      "category": "installation",
+      "related_feature": "Reproducible Dependency & Toolchain Provisioning",
+      "related_test_or_experiment": "uv sync / npm install",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/installation/playwright_install.log",
+      "sha256": "03348ed4551b0bd3d810471e40f20512e1fb675d4e071fa23c947ac45520147a",
+      "size_bytes": 10625,
+      "captured_timestamp_utc": "2026-11-26T19:28:07.774138+00:00",
+      "category": "installation",
+      "related_feature": "Reproducible Dependency & Toolchain Provisioning",
+      "related_test_or_experiment": "uv sync / npm install",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/installation/python_uv_sync.log",
+      "sha256": "1ce2fed9001ffc84475708d2da24fc1adbf783bf09d7107f5af3c06fe9957eca",
+      "size_bytes": 6952,
+      "captured_timestamp_utc": "2026-11-26T18:28:29.660088+00:00",
+      "category": "installation",
+      "related_feature": "Reproducible Dependency & Toolchain Provisioning",
+      "related_test_or_experiment": "uv sync / npm install",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/installation/uv_install.log",
+      "sha256": "c2346128617d9497840050734530127d12f1f18d6a550dc275f8e39000ded5a3",
+      "size_bytes": 818,
+      "captured_timestamp_utc": "2026-11-26T18:17:21.760223+00:00",
+      "category": "installation",
+      "related_feature": "Reproducible Dependency & Toolchain Provisioning",
+      "related_test_or_experiment": "uv sync / npm install",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/gemma3_270m_access_probe.json",
+      "sha256": "f9811ef70b70bbc223970103d33d068b2564a8d09ead28cb8e6fad99cd5a86ef",
+      "size_bytes": 812,
+      "captured_timestamp_utc": "2026-11-26T19:28:16.893910+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_cross_architecture/ndiff-real-cross-arch.html",
+      "sha256": "aa91f300cfb521288924da09dc25c99707f520034526baf0e82829b63c5da4d0",
+      "size_bytes": 7894,
+      "captured_timestamp_utc": "2026-11-26T19:35:32.152073+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_cross_architecture/ndiff-real-cross-arch.json",
+      "sha256": "41e1c0aaa3dda1290941ade3b80ce0ffb5afd744e8295634f2f09c4ea7d46f4e",
+      "size_bytes": 896185,
+      "captured_timestamp_utc": "2026-11-26T19:35:32.151069+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_cross_architecture/ndiff-real-cross-arch.md",
+      "sha256": "d311ec169bfe5ea1875340c2b424345fa32f0cc27779b10038b42f09e0150dcf",
+      "size_bytes": 4305,
+      "captured_timestamp_utc": "2026-11-26T19:35:32.151069+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_qwen25_05b/ndiff-real-qwen25-05b.html",
+      "sha256": "4aa676f24f36e5127dd2901036233efbe806eba062be80300c84906a46f722b4",
+      "size_bytes": 59849,
+      "captured_timestamp_utc": "2026-11-26T19:35:27.094878+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_qwen25_05b/ndiff-real-qwen25-05b.json",
+      "sha256": "525e9a930caa66c8461a0639c3a19c3382f696d2a6480c7df8cd7a2e5fbe8ce1",
+      "size_bytes": 2581491,
+      "captured_timestamp_utc": "2026-11-26T19:35:27.091879+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_qwen25_05b/ndiff-real-qwen25-05b.md",
+      "sha256": "c16a64eb01b5ae1fa0972c7fb648704c221e097f71d57190a32ec309dc298bc1",
+      "size_bytes": 7687,
+      "captured_timestamp_utc": "2026-11-26T19:35:27.092877+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_regression_detection/ndiff-real-regression-detected.html",
+      "sha256": "50245eaababd8f7cce95c5b212d69188be551ea1f8a8f32860e9ff01d06d2cf0",
+      "size_bytes": 52510,
+      "captured_timestamp_utc": "2026-11-26T19:37:29.409377+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_regression_detection/ndiff-real-regression-detected.json",
+      "sha256": "de507ce6ceb1fe438197254321c742ba544151df8c37bf346abaeded2be1578d",
+      "size_bytes": 1030105,
+      "captured_timestamp_utc": "2026-11-26T19:37:29.408357+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_regression_detection/ndiff-real-regression-detected.md",
+      "sha256": "d18ab1e3b568f7a10f54d71693c4305ab33e1fac76b118bd504338079a540c45",
+      "size_bytes": 7708,
+      "captured_timestamp_utc": "2026-11-26T19:37:29.408357+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_smollm2_135m/ndiff-real-smollm2-135m.html",
+      "sha256": "d01aac1e658e5e75a10305d159cd19992f1e5ed7a2f6bb505981000862416a1d",
+      "size_bytes": 62112,
+      "captured_timestamp_utc": "2026-11-26T19:31:28.318991+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_smollm2_135m/ndiff-real-smollm2-135m.json",
+      "sha256": "4659f0eb7214e7536f9c2f01bb75319291ad7e7e1d58fdea30a84998a0041cf0",
+      "size_bytes": 2897522,
+      "captured_timestamp_utc": "2026-11-26T19:31:28.317478+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/real_smollm2_135m/ndiff-real-smollm2-135m.md",
+      "sha256": "656928b942fef5b05ebc5497d3de5ea89444e84cba6a9c7dceff1d9f8ac0220d",
+      "size_bytes": 7690,
+      "captured_timestamp_utc": "2026-11-26T19:31:28.317984+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/model_comparisons/synthetic_fixture_comparison.json",
+      "sha256": "8515a61546fa226db67dbee3d5367fcf7108a5fed2756ee3e87303f88267069e",
+      "size_bytes": 116868,
+      "captured_timestamp_utc": "2026-11-26T19:28:15.595937+00:00",
+      "category": "model_comparisons",
+      "related_feature": "Real & Synthetic Model Comparison Artifacts",
+      "related_test_or_experiment": "ComparisonOrchestrator",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/releases/ndiff-real-qwen25-05b.html",
+      "sha256": "4aa676f24f36e5127dd2901036233efbe806eba062be80300c84906a46f722b4",
+      "size_bytes": 59849,
+      "captured_timestamp_utc": "2026-11-26T19:35:27.175777+00:00",
+      "category": "releases",
+      "related_feature": "Release Readiness & Exported Sample Reports",
+      "related_test_or_experiment": "ReportEngine",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/releases/ndiff-real-qwen25-05b.json",
+      "sha256": "525e9a930caa66c8461a0639c3a19c3382f696d2a6480c7df8cd7a2e5fbe8ce1",
+      "size_bytes": 2581491,
+      "captured_timestamp_utc": "2026-11-26T19:35:27.173221+00:00",
+      "category": "releases",
+      "related_feature": "Release Readiness & Exported Sample Reports",
+      "related_test_or_experiment": "ReportEngine",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/releases/ndiff-real-qwen25-05b.md",
+      "sha256": "c16a64eb01b5ae1fa0972c7fb648704c221e097f71d57190a32ec309dc298bc1",
+      "size_bytes": 7687,
+      "captured_timestamp_utc": "2026-11-26T19:35:27.174262+00:00",
+      "category": "releases",
+      "related_feature": "Release Readiness & Exported Sample Reports",
+      "related_test_or_experiment": "ReportEngine",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/research/hub_and_ecosystem_verification.json",
+      "sha256": "b0a86dce79fdeabbf31bc8be198661d180bcc981e0a84d6a35ca9451b9f80797",
+      "size_bytes": 4477,
+      "captured_timestamp_utc": "2026-11-26T18:20:20.339605+00:00",
+      "category": "research",
+      "related_feature": "Ecosystem & Hugging Face Hub Live Verification",
+      "related_test_or_experiment": "Phase 1 & 2 Research Probes",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/SCREENSHOT_INDEX.md",
+      "sha256": "8958dedf83b4f07b47ab341c449bfddf8a88ebf65f54d45c80e1ddd36ffef381",
+      "size_bytes": 7637,
+      "captured_timestamp_utc": "2026-11-26T20:20:16.802917+00:00",
+      "category": "summary_document",
+      "related_feature": "Project Evidence Index & Engineering Report",
+      "related_test_or_experiment": "Phase 17-20 Verification",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/security/npm_audit.log",
+      "sha256": "827032da21e69efd3ca724bbe0b1ec0b09b3e433e8f97af500ab4f57bd60e682",
+      "size_bytes": 201,
+      "captured_timestamp_utc": "2026-11-26T20:19:37.273459+00:00",
+      "category": "security",
+      "related_feature": "Secret Scanning & Dependency Vulnerability Audits",
+      "related_test_or_experiment": "scripts/run_security_audit.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/security/pip_audit.log",
+      "sha256": "087fd13035a266d439186dc92b51839080b5732305553056bce3b81acf5885ef",
+      "size_bytes": 468,
+      "captured_timestamp_utc": "2026-11-26T20:19:34.923143+00:00",
+      "category": "security",
+      "related_feature": "Secret Scanning & Dependency Vulnerability Audits",
+      "related_test_or_experiment": "scripts/run_security_audit.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/security/pip_audit_initial_failure.log",
+      "sha256": "effca3dadf35e81241c29b7ca2679e6da4859686963254980c8b66e6cc278605",
+      "size_bytes": 10590,
+      "captured_timestamp_utc": "2026-11-26T19:06:11.453858+00:00",
+      "category": "security",
+      "related_feature": "Secret Scanning & Dependency Vulnerability Audits",
+      "related_test_or_experiment": "scripts/run_security_audit.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/security/secret_scan.json",
+      "sha256": "e93038bd03e93a54744b0e4db794a3ab9066f1475018924d414b7575c57b85a3",
+      "size_bytes": 128,
+      "captured_timestamp_utc": "2026-11-26T20:19:30.239686+00:00",
+      "category": "security",
+      "related_feature": "Secret Scanning & Dependency Vulnerability Audits",
+      "related_test_or_experiment": "scripts/run_security_audit.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/security/secret_scan.log",
+      "sha256": "cab5e526cea984ca87a3c8ea9af39d34d2b6f988e6d329ff6b594eb7bc932a49",
+      "size_bytes": 90,
+      "captured_timestamp_utc": "2026-11-26T20:19:30.239686+00:00",
+      "category": "security",
+      "related_feature": "Secret Scanning & Dependency Vulnerability Audits",
+      "related_test_or_experiment": "scripts/run_security_audit.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/coverage.log",
+      "sha256": "e8a3aef07c13855dffec792825521075d4600e7b5e11ed8752c22d6603789b78",
+      "size_bytes": 12084,
+      "captured_timestamp_utc": "2026-11-26T20:19:15.589088+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/frontend-build.log",
+      "sha256": "30d3893f6ed683ed4821d3d205d27a66bd9797abdd4f81f5cfe12df7d3493f82",
+      "size_bytes": 1600,
+      "captured_timestamp_utc": "2026-11-26T20:19:22.944009+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/frontend-typecheck.log",
+      "sha256": "815775fbcf8c37bfa71da0eff16080b15481dff7b6ccf98190cf5ab8cb09b43e",
+      "size_bytes": 321,
+      "captured_timestamp_utc": "2026-11-26T20:19:17.444984+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/frontend-vitest.log",
+      "sha256": "6ff87a808d9fca437735966a0327af8508d8b69ac2205a02e604d45d6f6effdc",
+      "size_bytes": 755,
+      "captured_timestamp_utc": "2026-11-26T20:19:20.512058+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/integration-tests-initial-failure.log",
+      "sha256": "c6c37c1e54d6d756e54540790bcb39990cf6c8f909662ca0a81940a72857c99e",
+      "size_bytes": 16742,
+      "captured_timestamp_utc": "2026-11-26T19:18:59.994562+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/integration-tests.log",
+      "sha256": "c2bd8ae7dcd6d5e8ccef4b89bc27682cdfa98b0764184f651a9c3c99941a5ca2",
+      "size_bytes": 1303,
+      "captured_timestamp_utc": "2026-11-26T20:18:43.184231+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/mypy-typecheck-initial-failure.log",
+      "sha256": "2e7c30728f143f811630fcc4c4b47b4ee01cc9d4d7945bde84a6e16fd7a2f177",
+      "size_bytes": 4274,
+      "captured_timestamp_utc": "2026-11-26T19:14:00.978953+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/mypy-typecheck.log",
+      "sha256": "87e7adeb27867d3f71537fe8fa242394b45a20c4c8dea117bc641eb47bfd9c65",
+      "size_bytes": 307,
+      "captured_timestamp_utc": "2026-11-26T20:18:17.649705+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/playwright-e2e.log",
+      "sha256": "bdebdee1ddccde8d684daf298468bfb4e9f654ae0a404087c3fd68ba483fd3f1",
+      "size_bytes": 459,
+      "captured_timestamp_utc": "2026-11-26T20:19:57.267886+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/property-tests.log",
+      "sha256": "b49f53ecc68d63547ddec11e3abd8e30551b89b60514676e732942ce3369f88d",
+      "size_bytes": 1474,
+      "captured_timestamp_utc": "2026-11-26T20:18:32.308165+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/regression-tests.log",
+      "sha256": "a6797aa40a04ad4cae305178984516a70754b05c96fc3edc7d78c8456b10d0a4",
+      "size_bytes": 1023,
+      "captured_timestamp_utc": "2026-11-26T20:18:48.417756+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/ruff-lint-initial-failure.log",
+      "sha256": "6fba9e62ebdcb7f436b51c3ecc5daadb5ee07e54c64259c2f378e5ce73311182",
+      "size_bytes": 48385,
+      "captured_timestamp_utc": "2026-11-26T19:13:31.835013+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/ruff-lint.log",
+      "sha256": "1633ade97fc61d4bf9df0e267a28abc4cb6ca143ab98c5e559eccc09afb6af84",
+      "size_bytes": 297,
+      "captured_timestamp_utc": "2026-11-26T20:18:15.253901+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/security-tests.log",
+      "sha256": "624123a9560fea5fe7e72ff469251ffec1651400144c455afac4e63f5d66a39d",
+      "size_bytes": 1452,
+      "captured_timestamp_utc": "2026-11-26T20:18:53.867829+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/test_execution_summary.json",
+      "sha256": "b3f3c0873a4604c5b36f6c58dfc923a363a51045c9bebd2f668d64b61dc069a1",
+      "size_bytes": 5080,
+      "captured_timestamp_utc": "2026-11-26T20:19:22.945175+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/unit-tests.log",
+      "sha256": "fe76bb0d6dde8142691d1f31dabae20709da623ae6d5c1be3b983096267ad32e",
+      "size_bytes": 3966,
+      "captured_timestamp_utc": "2026-11-26T20:18:26.344293+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    },
+    {
+      "relative_path": "evidence/tests/verified_test_summary.html",
+      "sha256": "dedc8cfda16c4daf4c72f0f99541ba6f32c57095474bcd5deb7968a393ed3744",
+      "size_bytes": 7475,
+      "captured_timestamp_utc": "2026-11-26T20:20:11.539392+00:00",
+      "category": "tests",
+      "related_feature": "Automated Unit, Property, Integration, Regression, Security & E2E Logs",
+      "related_test_or_experiment": "scripts/run_all_tests.py",
+      "verification_status": "VERIFIED"
+    }
+  ]
+}
