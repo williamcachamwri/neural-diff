@@ -1,9 +1,12 @@
 {
-  "captured_at_utc": "2026-11-26T20:49:03.415498+00:00",
-  "commit_count": 105,
+  "captured_at_utc": "2026-11-26T21:02:05.481026+00:00",
+  "commit_count": 108,
   "clean_working_tree": true,
   "status_short": [],
   "recent_commits": [
+    "add3f2f docs(readme): expand 7-layer architecture specification, sequence diagrams, and API reference across all 5 languages",
+    "d2938bf chore(evidence): update SHA-256 evidence manifest for final artifacts",
+    "b4e4546 docs(evidence): capture verified 105-commit git history log",
     "a619282 docs(report): finalize engineering acceptance report across all 20 phases",
     "064f446 docs(readme): publish comprehensive 5-language documentation with 15 screenshots and full benchmarks",
     "1e5645a test(evidence): capture final anti-slop studio screenshots and 55-test coverage logs",
@@ -25,9 +28,6 @@
     "94e6abf test(evidence): refresh test summary logs and screenshots from final full verification run",
     "7662876 test(e2e): recapture 15 live screenshots after anti-slop redesign",
     "e3cc863 style(frontend): replace caution boxes with editorial footnotes and remove residual blue accents",
-    "e28a833 refactor(frontend): simplify canvas nodes, signal cables and status strip to restrained monochrome",
-    "af54969 style(frontend): unify header navigation and replace pill badges with quiet monochrome typography",
-    "b604971 feat(structural): add structured pruning and 2:4 semi-structured sparsity analyzer",
-    "b14bdf0 feat(diff): add SVD task-vector spectrum and Shannon effective-rank LoRA detector"
+    "e28a833 refactor(frontend): simplify canvas nodes, signal cables and status strip to restrained monochrome"
   ]
 }
