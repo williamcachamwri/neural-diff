@@ -1,0 +1,13 @@
+=== Command: D:\LLM\.venv\Scripts\python.exe -m pip_audit --skip-editable --desc ===
+Executed (UTC): 2026-11-26T19:09:55.256281+00:00
+
+--- STDOUT ---
+Name        Skip Reason
+----------- ---------------------------------------------------------------------------
+neural-diff distribution marked as editable
+torch       Dependency not found on PyPI and could not be audited: torch (2.10.0+cu128)
+
+--- STDERR ---
+No known vulnerabilities found
+
+Exit Code: 0

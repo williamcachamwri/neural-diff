@@ -1,5 +1,5 @@
 {
-  "captured_at_utc": "2026-11-26T18:29:02.683878+00:00",
+  "captured_at_utc": "2026-11-26T19:11:01.984328+00:00",
   "stage": "post_install",
   "os": {
     "system": "Windows",
@@ -16,22 +16,22 @@
   },
   "memory": {
     "total_gb": 15.71,
-    "available_gb": 3.86,
+    "available_gb": 4.75,
     "total_bytes": 16870060032,
-    "available_bytes": 4142325760
+    "available_bytes": 5098799104
   },
   "storage": {
     "workspace_drive": {
       "path": "D:\\LLM",
       "total_gb": 200.05,
-      "used_gb": 107.04,
-      "free_gb": 93.0
+      "used_gb": 111.37,
+      "free_gb": 88.68
     },
     "home_drive": {
       "path": "C:\\Users\\MSl",
       "total_gb": 247.94,
-      "used_gb": 205.14,
-      "free_gb": 42.79
+      "used_gb": 204.98,
+      "free_gb": 42.96
     }
   },
   "python_runtime": {
@@ -146,14 +146,14 @@
       "available": true,
       "executable": "C:\\WINDOWS\\system32\\nvidia-smi.EXE",
       "returncode": 0,
-      "stdout": "NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 6474 MiB, 12.0",
+      "stdout": "NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 5913 MiB, 12.0",
       "stderr": ""
     }
   },
   "python_packages": {
     "torch": {
       "installed": true,
-      "version": "2.11.0+cu128",
+      "version": "2.10.0+cu128",
       "cuda_available": true,
       "cuda_compiled_version": "12.8",
       "mps_available": false,
@@ -243,11 +243,11 @@
       "@testing-library/react": "^16.2.0",
       "@types/react": "^18.3.18",
       "@types/react-dom": "^18.3.5",
-      "@vitejs/plugin-react": "^4.3.4",
+      "@vitejs/plugin-react": "^6.3.0",
       "jsdom": "^26.0.0",
       "typescript": "^5.7.3",
-      "vite": "^6.1.0",
-      "vitest": "^3.0.5"
+      "vite": "^8.4.0",
+      "vitest": "^5.1.2"
     }
   }
 }

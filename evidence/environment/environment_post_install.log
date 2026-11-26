@@ -1,6 +1,6 @@
 ============================================================================
 NEURAL DIFF ENVIRONMENT AUDIT — STAGE: post_install
-Captured (UTC): 2026-11-26T18:29:02.683878+00:00
+Captured (UTC): 2026-11-26T19:11:01.984328+00:00
 ============================================================================
 
 [OS & CPU]
@@ -12,9 +12,9 @@ Captured (UTC): 2026-11-26T18:29:02.683878+00:00
 
 [MEMORY & STORAGE]
   Total RAM (GB) : 15.71
-  Avail RAM (GB) : 3.86
-  workspace_drive: D:\LLM — 93.0 GB free / 200.05 GB total
-  home_drive     : C:\Users\MSl — 42.79 GB free / 247.94 GB total
+  Avail RAM (GB) : 4.75
+  workspace_drive: D:\LLM — 88.68 GB free / 200.05 GB total
+  home_drive     : C:\Users\MSl — 42.96 GB free / 247.94 GB total
 
 [PYTHON RUNTIME]
   Executable     : D:\LLM\.venv\Scripts\python.exe
@@ -31,10 +31,10 @@ Captured (UTC): 2026-11-26T18:29:02.683878+00:00
   npm         : [AVAILABLE] rc=0 | 11.20.0
   npx         : [AVAILABLE] rc=0 | 11.20.0
   docker      : [MISSING/UNAVAILABLE] rc=None | docker not found on PATH
-  nvidia_smi  : [AVAILABLE] rc=0 | NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 6474 MiB, 12.0
+  nvidia_smi  : [AVAILABLE] rc=0 | NVIDIA GeForce RTX 5050 Laptop GPU, 591.44, 8151 MiB, 5913 MiB, 12.0
 
 [PYTHON PACKAGES]
-  torch           : INSTALLED (2.11.0+cu128) (cuda_available=True, cuda_compiled=12.8, devices=[{'index': 0, 'name': 'NVIDIA GeForce RTX 5050 Laptop GPU', 'total_memory_gb': 7.96, 'compute_capability': '12.0', 'multi_processor_count': 20, 'kernel_execution_verified': True, 'kernel_error': None}])
+  torch           : INSTALLED (2.10.0+cu128) (cuda_available=True, cuda_compiled=12.8, devices=[{'index': 0, 'name': 'NVIDIA GeForce RTX 5050 Laptop GPU', 'total_memory_gb': 7.96, 'compute_capability': '12.0', 'multi_processor_count': 20, 'kernel_execution_verified': True, 'kernel_error': None}])
   transformers    : INSTALLED (5.24.1)
   safetensors     : INSTALLED (0.8.0)
   numpy           : INSTALLED (2.5.5)
