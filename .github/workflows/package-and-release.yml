@@ -69,9 +69,40 @@ jobs:
           path: dist-web/neural-diff-frontend-dist.tar.gz
           retention-days: 7
 
+  build-charm-cli:
+    name: Build Cross-OS Charm v2 CLI Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go (>= 1.26)
+        uses: actions/setup-go@v6
+        with:
+          go-version: ">=1.26.0"
+          cache-dependency-path: cli/go.sum
+
+      - name: Cross-compile stripped `ndiff` binaries (Linux, macOS, Windows)
+        working-directory: cli
+        run: |
+          mkdir -p ../dist-cli
+          COMMIT_SHA="$(git rev-parse --short HEAD)"
+          GOOS=linux   GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.commit=${COMMIT_SHA}" -o ../dist-cli/ndiff-linux-amd64 ./cmd/ndiff
+          GOOS=linux   GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.commit=${COMMIT_SHA}" -o ../dist-cli/ndiff-linux-arm64 ./cmd/ndiff
+          GOOS=darwin  GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.commit=${COMMIT_SHA}" -o ../dist-cli/ndiff-darwin-arm64 ./cmd/ndiff
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.commit=${COMMIT_SHA}" -o ../dist-cli/ndiff-windows-amd64.exe ./cmd/ndiff
+          ls -lh ../dist-cli
+
+      - name: Upload Charm CLI release binaries
+        uses: actions/upload-artifact@v7
+        with:
+          name: charm-cli-binaries
+          path: dist-cli/*
+          retention-days: 7
+
   cleanroom-cli-smoke:
     name: Isolated Clean-Room Wheel & Evolution CLI Smoke
-    needs: [build-wheel-sdist, build-frontend-tarball]
+    needs: [build-wheel-sdist, build-frontend-tarball, build-charm-cli]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository (for fixture seeder only)
@@ -139,6 +170,7 @@ jobs:
           mkdir -p release-dist
           cp incoming/python-dist/* release-dist/
           cp incoming/frontend-tarball/* release-dist/
+          cp incoming/charm-cli-binaries/* release-dist/
           (cd release-dist && sha256sum * > SHA256SUMS.txt)
           cat release-dist/SHA256SUMS.txt
 

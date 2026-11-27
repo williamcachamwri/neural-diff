@@ -8,12 +8,13 @@
 
 [**English**](README.md) · [**Tiếng Việt**](docs/i18n/README.vi.md) · [**简体中文**](docs/i18n/README.zh-CN.md) · [**日本語**](docs/i18n/README.ja.md) · [**Français**](docs/i18n/README.fr.md)
 
-[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](.github/workflows)
+[![CI Pipelines](https://img.shields.io/badge/CI-11%20Multi--Node%20Workflows-18181b?style=flat-square)](.github/workflows)
+[![Go + Charm v2](https://img.shields.io/badge/CLI-Go%201.26%2B%20%C2%B7%20Charm%20v2-18181b?style=flat-square)](cli/go.mod)
 [![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](pyproject.toml)
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(72%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](LICENSE)
 
 ---
@@ -40,7 +41,7 @@
 6. [Verified Real Model & Multi-Generation DAG Benchmarks (`REAL MODEL EXPERIMENT`)](#6-verified-real-model--multi-generation-dag-benchmarks-real-model-experiment)
 7. [Synthetic Streaming Throughput & Memory Benchmarks](#7-synthetic-streaming-throughput--memory-benchmarks)
 8. [Installation & Reproducible Quickstart](#8-installation--reproducible-quickstart)
-9. [CLI Reference (`neural-diff`)](#9-cli-reference-neural-diff)
+9. [CLI Reference (`ndiff` & `neural-diff`)](#9-cli-reference-ndiff--neural-diff)
 10. [REST API Reference (37 Endpoints)](#10-rest-api-reference-37-endpoints)
 11. [Multi-Node CI/CD Architecture, Testing (`89%` Coverage) & Security Hardening](#11-multi-node-cicd-architecture-testing-89-coverage--security-hardening)
 12. [Evidence Integrity & Known Limitations](#12-evidence-integrity--known-limitations)
@@ -389,26 +390,37 @@ cd neural-diff
 python -m uv sync
 npm --prefix frontend ci
 
-# 2. Start FastAPI Backend (http://127.0.0.1:8000) & Studio UI (http://127.0.0.1:5173)
+# 2. (Optional) Build the ~25ms Charmbracelet v2 native Go CLI & TUI (`bin/ndiff`)
+.\.venv\Scripts\python.exe scripts/build_cli.py
+.\bin\ndiff tui
+
+# 3. Start FastAPI Backend (http://127.0.0.1:8000) & Studio UI (http://127.0.0.1:5173)
 .\.venv\Scripts\python.exe -m uvicorn api.app:app --host 127.0.0.1 --port 8000
 npm --prefix frontend run dev
 ```
 
 ---
 
-## 9. CLI Reference (`neural-diff`)
+## 9. CLI Reference (`ndiff` & `neural-diff`)
+
+NEURAL DIFF ships a dual-layer terminal architecture: a **native compiled Go CLI & TUI (`ndiff`, [`cli/`](cli/))** built on the **`charm.land` v2** stack (`fang/v2`, `bubbletea/v2`, `lipgloss/v2`, `bubbles/v2`, `huh/v2`) for ~25 ms zero-PyTorch `.safetensors` header inspection, DAG tree visualization, and interactive studio navigation, paired with the **`neural-diff` Python CLI ([`core/cli.py`](core/cli.py))**. Piped/redirected invocations (`| jq`, `> out.json`, or `--json`) automatically emit pure RFC-8259 JSON, while interactive TTY sessions (or `--pretty`) render clean rounded Lip Gloss v2 tables with strict `NO_COLOR` compliance.
 
 | Subcommand | Example Invocation | Description |
 | :--- | :--- | :--- |
-| `inspect` | `python -m core.cli inspect Qwen/Qwen2.5-0.5B` | Header-only checkpoint metadata, shard count, dtypes, and architecture profile |
-| `validate` | `python -m core.cli validate --model-a A --model-b B` | Structural, GQA head, activation, and behavioral compatibility verification |
-| `compare` | `python -m core.cli compare --model-a A --model-b B --output-dir ./out` | Run selected pipeline stages and export HTML, Markdown, and JSON reports |
-| `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | Deterministic behavioral evaluation & single-category regression reproduction |
-| `suites` | `python -m core.cli suites` | List registered deterministic evaluation suites and case counts |
-| `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | Compute 2D task-vector SVD singular spectrum and Shannon effective rank |
-| `evolution create-project` | `neural-diff evolution create-project --name "SmolLM2 DAG"` | Create an isolated multi-generation evolution tracking project |
-| `evolution register` | `neural-diff evolution register --project-id <id> --source <path> --parents <ids> --transformation SFT` | Fingerprint checkpoint (SHA-256 + PEFT/quant metadata), guard cycles, and register into DAG |
-| `evolution analyze` | `neural-diff evolution analyze --project-id <id> --output-dir ./evo_out` | Run multi-gen tensor, layer, CKA, behavioral & regression origin analysis and export `json`/`csv`/`md`/`html`/`pdf` |
+| `tui` | `ndiff tui` / `neural-diff tui` | Launch full-screen 5-tab Bubble Tea v2 Terminal Studio (`Overview`, `Evolution DAG`, `Checkpoints`, `Regressions`, `Tensor Explorer` with `/` live filter) |
+| `wizard` | `ndiff wizard` / `neural-diff wizard` | Interactive Charm Huh v2 configurator for checkpoint comparison & reproducible CLI generation |
+| `status` | `ndiff status` | Millisecond workspace, SQLite WAL, SHA-256 manifest, and suite readiness check |
+| `dag` | `ndiff dag` | Render the branched & merged Evolution DAG (`lipgloss/v2/tree`), weight drift, and epistemic regression ledger |
+| `quickdiff` | `ndiff quickdiff --model-a A --model-b B` | Zero-PyTorch `.safetensors` binary header diff (aligned/added/removed/shape/dtype mismatches in `< 5 ms`) |
+| `inspect` | `ndiff inspect <path> --filter attn --top 20` | Native `.safetensors` binary header & tensor parameter inspector (with Hub/PyTorch fallback) |
+| `validate` | `ndiff validate --model-a A --model-b B` | Structural, GQA head, activation, and behavioral compatibility verification |
+| `compare` | `ndiff compare --model-a A --model-b B --output-dir ./out` | Run selected pipeline stages with live spinner telemetry and export HTML, Markdown, and JSON reports |
+| `behavior` | `ndiff behavior --model-a A --model-b B --category vietnamese --seed 42` | Deterministic behavioral evaluation & single-category regression reproduction |
+| `suites` | `ndiff suites` | List registered deterministic evaluation suites, case weights, and distribution bars |
+| `svd` | `ndiff svd --model-a A --model-b B --tensor <name>` | Compute 2D task-vector SVD singular spectrum and Shannon effective rank |
+| `evolution create-project` | `ndiff evolution create-project --name "SmolLM2 DAG"` | Create an isolated multi-generation evolution tracking project |
+| `evolution register` | `ndiff evolution register --project-id <id> --source <path> --parents <ids> --transformation SFT` | Fingerprint checkpoint (5-domain SHA-256 + PEFT/quant metadata), guard cycles, and register into DAG |
+| `evolution analyze` | `ndiff evolution analyze --project-id <id> --output-dir ./evo_out` | Run multi-gen tensor, layer, CKA, behavioral & regression origin analysis and export `json`/`csv`/`md`/`html`/`pdf` |
 
 ---
 
@@ -442,10 +454,11 @@ npm --prefix frontend run dev
 
 ## 11. Multi-Node CI/CD Architecture, Testing (`89%` Coverage) & Security Hardening
 
-### 11.1 10 Multi-Node GitHub Actions Pipelines ([`.github/workflows/`](.github/workflows))
+### 11.1 11 Multi-Node GitHub Actions Pipelines ([`.github/workflows/`](.github/workflows))
 
 | Workflow | Multi-Node Job DAG & Runtime Matrices | Engineering Gate |
 | :--- | :--- | :--- |
+| [`charm-cli.yml`](.github/workflows/charm-cli.yml) | `charm-cli-matrix` [`ubuntu-latest`, `windows-latest`, `macos-latest`] (`Go >= 1.26`) | Verifies `go vet`, Go unit tests (Safetensors + Bubble Tea v2 Studio), Lip Gloss v2 rendering, and JSON parity |
 | [`backend-ci.yml`](.github/workflows/backend-ci.yml) | `lint-and-typecheck` $\to$ (`unit-property-matrix` [`Py 3.11`, `3.12`] $\parallel$ `windows-portability` [`windows-latest`]) $\to$ `integration-and-api` | Enforces `ruff`, `mypy` (86 files), `>=85%` coverage, and Windows Safetensors mmap & SQLite WAL safety |
 | [`frontend-ci.yml`](.github/workflows/frontend-ci.yml) | `typecheck-and-vitest` [`Node 20`, `Node 22` LTS] $\to$ `production-bundle` $\to$ `chunk-budget-gate` | Verifies Node 20/22 LTS compatibility, Vitest suites, Vite 8 build, and `<500 KB` JS chunk ceiling |
 | [`evolution-pipeline.yml`](.github/workflows/evolution-pipeline.yml) | `dag-and-migrations` $\to$ (`cumulative-math-and-origin` $\parallel$ `live-evolution-example`) $\to$ `multiformat-export-gate` | Verifies 3-color DFS cycle guard, direct base $L_2$, regression origin pinpointing, and 5-format (`JSON`/`CSV`/`MD`/`HTML`/`PDF`) exports |
@@ -462,7 +475,7 @@ npm --prefix frontend run dev
 Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\python.exe scripts/run_security_audit.py`:
 
 * **Static Analysis:** `ruff check` (`exit 0`) and `mypy` across `86` Python source files (`exit 0`).
-* **Python Test Suites (`71 passed`):** Unit (`49`), Hypothesis property-based invariant (`7`), multi-checkpoint & Evolution REST API integration (`6`), golden regression (`1`), and adversarial security (`8`) suites—achieving **`89%` statement coverage** across `8,168` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
+* **Python & Go Test Suites (`72 passed` + Go CLI suites):** Unit (`50`), Hypothesis property-based invariant (`7`), multi-checkpoint & Evolution REST API integration (`6`), golden regression (`1`), adversarial security (`8`), and Go `safetensors`/`tui` suites—achieving **`89%` statement coverage** across `8,293` Python statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
 * **Frontend & Live E2E:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 production build (`exit 0`), and live Playwright Chromium full-stack E2E (`2 passed`, `exit 0`).
 * **Vulnerability & Secret Audits:** `pip-audit` (`0` vulnerabilities), `npm audit` (`0` vulnerabilities), and secret scanner (`0` findings).
 

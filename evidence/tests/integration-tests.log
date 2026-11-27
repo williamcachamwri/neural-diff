@@ -1,7 +1,7 @@
 === Suite: integration_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m integration -v
-Started (UTC): 2026-11-27T11:43:46.398387+00:00
-Completed (UTC): 2026-11-27T11:44:07.024915+00:00
+Started (UTC): 2026-11-27T12:44:36.232429+00:00
+Completed (UTC): 2026-11-27T12:44:53.650669+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -14,7 +14,7 @@ configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
-collecting ... collected 71 items / 65 deselected / 6 selected
+collecting ... collected 72 items / 66 deselected / 6 selected
 
 tests/integration/test_diagnostics_api.py::test_diagnostics_tensor_probe_weight_tying_and_trends PASSED [ 16%]
 tests/integration/test_end_to_end_and_api.py::test_sharded_safetensors_vs_safe_pytorch_checkpoint_equivalence PASSED [ 33%]
@@ -23,7 +23,7 @@ tests/integration/test_end_to_end_and_api.py::test_local_pretrained_qwen2_activa
 tests/integration/test_evolution_pipeline_and_api.py::test_orchestrator_representation_compat_caching_cancellation_and_exports PASSED [ 83%]
 tests/integration/test_evolution_pipeline_and_api.py::test_evolution_rest_api_and_cli_end_to_end PASSED [100%]
 
-====================== 6 passed, 65 deselected in 18.81s ======================
+====================== 6 passed, 66 deselected in 15.98s ======================
 
 --- STDERR ---
 

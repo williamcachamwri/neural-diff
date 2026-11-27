@@ -1,7 +1,7 @@
 === Suite: security_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m security -v
-Started (UTC): 2026-11-27T11:44:18.076727+00:00
-Completed (UTC): 2026-11-27T11:44:28.634803+00:00
+Started (UTC): 2026-11-27T12:45:02.262659+00:00
+Completed (UTC): 2026-11-27T12:45:11.112139+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -14,7 +14,7 @@ configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
-collecting ... collected 71 items / 63 deselected / 8 selected
+collecting ... collected 72 items / 64 deselected / 8 selected
 
 tests/security/test_evolution_security.py::test_evolution_api_blocks_traversal_pickle_rce_and_schema_injection PASSED [ 12%]
 tests/security/test_evolution_security.py::test_tampered_checkpoint_detected_via_sha256_revalidation PASSED [ 25%]
@@ -25,7 +25,7 @@ tests/security/test_security_controls.py::test_unsafe_pickle_rce_gadget_rejected
 tests/security/test_security_controls.py::test_api_security_headers_payload_limit_and_traversal_blocking PASSED [ 87%]
 tests/security/test_security_controls.py::test_default_allowed_roots_honors_cwd_and_env_override PASSED [100%]
 
-====================== 8 passed, 63 deselected in 8.77s =======================
+====================== 8 passed, 64 deselected in 7.43s =======================
 
 --- STDERR ---
 

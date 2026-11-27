@@ -8,12 +8,13 @@
 
 [**English**](../../README.md) · [**Tiếng Việt**](README.vi.md) · [**简体中文**](README.zh-CN.md) · [**日本語**](README.ja.md) · [**Français**](README.fr.md)
 
-[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](../../.github/workflows)
+[![CI Pipelines](https://img.shields.io/badge/CI-11%20Multi--Node%20Workflows-18181b?style=flat-square)](../../.github/workflows)
+[![Go + Charm v2](https://img.shields.io/badge/CLI-Go%201.26%2B%20%C2%B7%20Charm%20v2-18181b?style=flat-square)](../../cli/go.mod)
 [![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](../../pyproject.toml)
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(72%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
@@ -40,7 +41,7 @@
 6. [Benchmark Mô Hình Thực & Đồ Thị Tiến Hóa DAG (`REAL MODEL EXPERIMENT`)](#6-benchmark-mô-hình-thực--đồ-thị-tiến-hóa-dag-real-model-experiment)
 7. [Benchmark Băng Thông Streaming & Bộ Nhớ (`SYNTHETIC FIXTURE EXPERIMENT`)](#7-benchmark-băng-thông-streaming--bộ-nhớ-synthetic-fixture-experiment)
 8. [Hướng Dẫn Cài Đặt & Khởi Chạy Tái Lập](#8-hướng-dẫn-cài-đặt--khởi-chạy-tái-lập)
-9. [Tham Chiếu Công Cụ Dòng Lệnh (`neural-diff`)](#9-tham-chiếu-công-cụ-dòng-lệnh-neural-diff)
+9. [Tham Chiếu Công Cụ Dòng Lệnh (`ndiff` & `neural-diff`)](#9-tham-chiếu-công-cụ-dòng-lệnh-ndiff--neural-diff)
 10. [Tham Chiếu Hệ Thống REST API (37 Endpoint)](#10-tham-chiếu-hệ-thống-rest-api-37-endpoint)
 11. [Kiến Trúc CI/CD Đa Node, Kiểm Thử (`89%` Độ Phủ) & Kiểm Toán Bảo Mật](#11-kiến-trúc-cicd-đa-node-kiểm-thử-89-độ-phủ--kiểm-toán-bảo-mật)
 12. [Toàn Vẹn Bằng Chứng SHA-256 & Giới Hạn Kỹ Thuật](#12-toàn-vẹn-bằng-chứng-sha-256--giới-hạn-kỹ-thuật)
@@ -372,26 +373,37 @@ cd neural-diff
 python -m uv sync
 npm --prefix frontend ci
 
-# 2. Khởi chạy Backend FastAPI (http://127.0.0.1:8000) & Giao diện Studio (http://127.0.0.1:5173)
+# 2. (Tuỳ chọn) Biên dịch CLI/TUI gốc Charmbracelet v2 tốc độ ~25ms (`bin/ndiff`)
+.\.venv\Scripts\python.exe scripts/build_cli.py
+.\bin\ndiff tui
+
+# 3. Khởi chạy Backend FastAPI (http://127.0.0.1:8000) & Giao diện Studio (http://127.0.0.1:5173)
 .\.venv\Scripts\python.exe -m uvicorn api.app:app --host 127.0.0.1 --port 8000
 npm --prefix frontend run dev
 ```
 
 ---
 
-## 9. Tham Chiếu Công Cụ Dòng Lệnh (`neural-diff`)
+## 9. Tham Chiếu Công Cụ Dòng Lệnh (`ndiff` & `neural-diff`)
+
+NEURAL DIFF cung cấp kiến trúc dòng lệnh hai tầng: thực thi **Go biên dịch gốc (`ndiff`, [`cli/`](../../cli/))** sử dụng hệ sinh thái **`charm.land` v2** (`fang/v2`, `bubbletea/v2`, `lipgloss/v2`, `bubbles/v2`, `huh/v2`) cho phản hồi ~25 ms không cần khởi động PyTorch, kết hợp mượt với **`neural-diff` ([`core/cli.py`](../../core/cli.py))**. Khi truyền qua pipe (`| jq`) hoặc cờ `--json`, CLI xuất JSON chuẩn tất định; khi dùng trên terminal tương tác (hoặc `--pretty`), CLI hiển thị bảng bo góc nhẹ tinh gọn tuân thủ `NO_COLOR`.
 
 | Lệnh Con | Ví Dụ Sử Dụng | Chức Năng |
 | :--- | :--- | :--- |
-| `inspect` | `python -m core.cli inspect Qwen/Qwen2.5-0.5B` | Đọc an toàn header metadata, số mảnh shard, kiểu dữ liệu và kiến trúc |
-| `validate` | `python -m core.cli validate --model-a A --model-b B` | Kiểm tra tương thích cấu trúc, đầu chú ý GQA, kích hoạt và hành vi |
-| `compare` | `python -m core.cli compare --model-a A --model-b B --output-dir ./out` | Chạy các tầng phân tích được chọn và xuất báo cáo HTML, Markdown, JSON |
-| `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | Chạy đánh giá hành vi tất định & tái hiện lỗi theo miền cụ thể |
-| `suites` | `python -m core.cli suites` | Liệt kê danh sách các bộ kiểm thử hành vi tất định đã đăng ký |
-| `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | Phân tích phổ kỳ dị SVD và hạng hiệu dụng Shannon của ma trận trọng số 2D |
-| `evolution create-project` | `neural-diff evolution create-project --name "SmolLM2 DAG"` | Khởi tạo dự án theo dõi tiến hóa đa thế hệ độc lập |
-| `evolution register` | `neural-diff evolution register --project-id <id> --source <path> --parents <ids> --transformation SFT` | Định danh SHA-256, kiểm tra chu trình DAG và đăng ký checkpoint |
-| `evolution analyze` | `neural-diff evolution analyze --project-id <id> --output-dir ./evo_out` | Chạy phân tích tiến hóa toàn diện và xuất 5 định dạng `json`/`csv`/`md`/`html`/`pdf` |
+| `tui` | `ndiff tui` / `neural-diff tui` | Mở giao diện Terminal Studio 5 tab toàn màn hình bằng Bubble Tea v2 (`Overview`, `DAG`, `Checkpoints`, `Regressions`, `Tensor Explorer` lọc nhanh bằng `/`) |
+| `wizard` | `ndiff wizard` / `neural-diff wizard` | Trình cấu hình tương tác bằng Charm Huh v2 giúp chọn mô hình, module và sinh lệnh CLI tái lập |
+| `status` | `ndiff status` | Kiểm tra tức thời trạng thái không gian làm việc, SQLite WAL, manifest SHA-256 và bộ đề |
+| `dag` | `ndiff dag` | Vẽ cây tiến hóa phân nhánh/hợp nhất (`lipgloss/v2/tree`), bảng dịch chuyển $\Delta W$ và sổ cái suy thoái |
+| `quickdiff` | `ndiff quickdiff --model-a A --model-b B` | So sánh cấu trúc header nhị phân `.safetensors` dưới 5 ms không nạp trọng số vào RAM |
+| `inspect` | `ndiff inspect <path> --filter attn --top 20` | Đọc trực tiếp header `.safetensors`, kiểu dữ liệu, kích thước tensor (tự động chuyển về Python cho Hub/PyTorch) |
+| `validate` | `ndiff validate --model-a A --model-b B` | Kiểm tra tương thích cấu trúc, đầu chú ý GQA, kích hoạt và hành vi |
+| `compare` | `ndiff compare --model-a A --model-b B --output-dir ./out` | Chạy các tầng phân tích kèm spinner trực quan và xuất báo cáo HTML, Markdown, JSON |
+| `behavior` | `ndiff behavior --model-a A --model-b B --category vietnamese --seed 42` | Chạy đánh giá hành vi tất định & tái hiện lỗi theo miền cụ thể |
+| `suites` | `ndiff suites` | Liệt kê danh sách các bộ kiểm thử hành vi tất định kèm thanh tỷ trọng |
+| `svd` | `ndiff svd --model-a A --model-b B --tensor <name>` | Phân tích phổ kỳ dị SVD và hạng hiệu dụng Shannon của ma trận trọng số 2D |
+| `evolution create-project` | `ndiff evolution create-project --name "SmolLM2 DAG"` | Khởi tạo dự án theo dõi tiến hóa đa thế hệ độc lập |
+| `evolution register` | `ndiff evolution register --project-id <id> --source <path> --parents <ids> --transformation SFT` | Định danh SHA-256 5 miền, kiểm tra chu trình DAG và đăng ký checkpoint |
+| `evolution analyze` | `ndiff evolution analyze --project-id <id> --output-dir ./evo_out` | Chạy phân tích tiến hóa toàn diện và xuất 5 định dạng `json`/`csv`/`md`/`html`/`pdf` |
 
 ---
 
@@ -425,8 +437,8 @@ npm --prefix frontend run dev
 
 ## 11. Kiến Trúc CI/CD Đa Node, Kiểm Thử (`89%` Độ Phủ) & Kiểm Toán Bảo Mật
 
-* **10 Quy Trình GitHub Actions Đa Node ([`.github/workflows/`](../../.github/workflows)):** Bao gồm ma trận `Python 3.11 / 3.12`, ma trận `Node.js 20 / 22 LTS`, kiểm chứng chéo `ubuntu-latest` + `windows-latest` (kiểm định an toàn mmap Safetensors & khóa SQLite WAL trên Windows), phân mảnh song song Playwright E2E (`e2e.spec.ts` $\parallel$ `evolution.e2e.spec.ts`), quy trình kiểm định đồ thị tiến hóa & 5 định dạng báo cáo (`evolution-pipeline.yml`), cổng kiểm tra hợp đồng 37 REST OpenAPI & đồng thời SQLite (`api-contract-and-db.yml`), CodeQL, quét CVE/bí mật, kiểm chứng toán học Hypothesis và cài đặt sạch `.whl` tại `/tmp`.
-* **Phân tích tĩnh & Kiểm thử Python (`71 passed`):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `8,168` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
+* **11 Quy Trình GitHub Actions Đa Node ([`.github/workflows/`](../../.github/workflows)):** Bao gồm ma trận CLI/TUI Go đa hệ điều hành (`charm-cli.yml` trên `ubuntu-latest`, `windows-latest`, `macos-latest`), ma trận `Python 3.11 / 3.12`, ma trận `Node.js 20 / 22 LTS`, kiểm chứng chéo `ubuntu-latest` + `windows-latest` (kiểm định an toàn mmap Safetensors & khóa SQLite WAL trên Windows), phân mảnh song song Playwright E2E (`e2e.spec.ts` $\parallel$ `evolution.e2e.spec.ts`), quy trình kiểm định đồ thị tiến hóa & 5 định dạng báo cáo (`evolution-pipeline.yml`), cổng kiểm tra hợp đồng 37 REST OpenAPI & đồng thời SQLite (`api-contract-and-db.yml`), CodeQL, quét CVE/bí mật, kiểm chứng toán học Hypothesis và cài đặt sạch `.whl` tại `/tmp`.
+* **Phân tích tĩnh & Kiểm thử Python + Go (`72 passed` + Go CLI suites):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `8,293` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
 * **Frontend & E2E thực tế:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 build (`exit 0`, mọi JS chunk `< 500 KB`) và Playwright Chromium E2E (`2 passed`, `exit 0`).
 * **Kiểm toán lỗ hổng & bí mật:** `pip-audit` (`0` lỗ hổng), `npm audit` (`0` lỗ hổng) và trình quét khóa bí mật (`0` phát hiện).
 
