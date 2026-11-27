@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Columns2, Maximize2, Play, Workflow, X } from "lucide-react";
+import { ArrowRight, Columns2, Maximize2, Play, Search, X } from "lucide-react";
 import { apiClient, ApiClientError } from "./api/client";
 import { WorkflowCanvas } from "./components/canvas/WorkflowCanvas";
 import type {
@@ -25,25 +25,34 @@ import { SettingsView } from "./views/SettingsView";
 import { StructuralDiffView } from "./views/StructuralDiffView";
 import { TensorExplorerView } from "./views/TensorExplorerView";
 
-const NAV_ITEMS: Array<{ id: ViewId; short: string; title: string }> = [
-  { id: "dashboard", short: "Canvas", title: "Workflow Graph" },
-  { id: "evolution", short: "Evolution", title: "Neural Evolution Tracking" },
-  { id: "compare", short: "Compare", title: "Configure Comparison" },
-  { id: "compatibility", short: "Validate", title: "Compatibility Check" },
-  { id: "tensors", short: "Tensors", title: "Tensor Explorer" },
-  { id: "structural", short: "Topology", title: "Structural Topology" },
-  { id: "layers", short: "Layers", title: "Layer & Head Analysis" },
-  { id: "activations", short: "Activations", title: "Activation & Linear CKA" },
-  { id: "behavioral", short: "Behavior", title: "Behavioral Evaluation" },
-  { id: "regression", short: "Regression", title: "Regression Gate" },
-  { id: "history", short: "History", title: "Experiment Ledger" },
-  { id: "reports", short: "Export", title: "Reports & Artifacts" },
-  { id: "settings", short: "Settings", title: "Runtime Settings" },
+const NAV_ITEMS: Array<{ id: ViewId; short: string; title: string; hint: string }> = [
+  { id: "dashboard", short: "Canvas", title: "Workflow Graph", hint: "Interactive node workspace" },
+  { id: "evolution", short: "Evolution", title: "Neural Evolution Tracking", hint: "DAG lineage & CKA matrix" },
+  { id: "compare", short: "Compare", title: "Configure Comparison", hint: "Launch pairwise model diff" },
+  { id: "compatibility", short: "Validate", title: "Compatibility Check", hint: "Tensor alignment & shapes" },
+  { id: "tensors", short: "Tensors", title: "Tensor Explorer", hint: "Float64 metrics & SVD probe" },
+  { id: "structural", short: "Topology", title: "Structural Topology", hint: "Key deltas & block inventory" },
+  { id: "layers", short: "Layers", title: "Layer & Head Analysis", hint: "Attention head & MLP slicing" },
+  { id: "activations", short: "Activations", title: "Activation & Linear CKA", hint: "Hidden-state & logit alignment" },
+  { id: "behavioral", short: "Behavior", title: "Behavioral Evaluation", hint: "Paired rubric & radar suites" },
+  { id: "regression", short: "Regression", title: "Regression Gate", hint: "Thresholds & CLI reproducers" },
+  { id: "history", short: "History", title: "Experiment Ledger", hint: "Persisted comparison runs" },
+  { id: "reports", short: "Export", title: "Reports & Artifacts", hint: "Visual HTML, Markdown & JSON" },
+  { id: "settings", short: "Settings", title: "Runtime Settings", hint: "Device, tolerances & chunking" },
 ];
+
+const SHEET_SPRING = {
+  type: "spring" as const,
+  stiffness: 430,
+  damping: 38,
+  mass: 0.82,
+};
 
 export const App: React.FC = () => {
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
   const [drawerExpanded, setDrawerExpanded] = useState<boolean>(false);
+  const [paletteOpen, setPaletteOpen] = useState<boolean>(false);
+  const [paletteQuery, setPaletteQuery] = useState<string>("");
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [discovered, setDiscovered] = useState<DiscoveredModelsResponse | null>(null);
   const [experiments, setExperiments] = useState<ExperimentSummaryItem[]>([]);
@@ -101,6 +110,24 @@ export const App: React.FC = () => {
     void refreshCoreData();
   }, [refreshCoreData]);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+        setPaletteQuery("");
+      } else if (e.key === "Escape") {
+        if (paletteOpen) {
+          setPaletteOpen(false);
+        } else if (activeView !== "dashboard") {
+          setActiveView("dashboard");
+        }
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [paletteOpen, activeView]);
+
   const handleSelectExperiment = useCallback(
     async (comparisonId: string) => {
       try {
@@ -128,6 +155,31 @@ export const App: React.FC = () => {
 
   const activeNavMeta = NAV_ITEMS.find((n) => n.id === activeView);
 
+  const filteredNavItems = useMemo(() => {
+    const q = paletteQuery.trim().toLowerCase();
+    if (!q) return NAV_ITEMS;
+    return NAV_ITEMS.filter(
+      (n) =>
+        n.short.toLowerCase().includes(q) ||
+        n.title.toLowerCase().includes(q) ||
+        n.hint.toLowerCase().includes(q)
+    );
+  }, [paletteQuery]);
+
+  const filteredRuns = useMemo(() => {
+    const completed = experiments.filter((e) => e.status === "completed");
+    const q = paletteQuery.trim().toLowerCase();
+    if (!q) return completed.slice(0, 6);
+    return completed
+      .filter(
+        (e) =>
+          e.comparison_id.toLowerCase().includes(q) ||
+          e.model_a_id.toLowerCase().includes(q) ||
+          e.model_b_id.toLowerCase().includes(q)
+      )
+      .slice(0, 6);
+  }, [experiments, paletteQuery]);
+
   return (
     <div className="studio-viewport">
       {/* Unified Single-Line Studio Header */}
@@ -139,9 +191,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView("dashboard")}
             title="Return to Node Graph"
           >
-            <span className="studio-mark">
-              <Workflow size={13} strokeWidth={2} />
-            </span>
+            <img src="/logo.png" alt="Neural Diff" className="studio-brand-logo" />
             <span className="studio-brand-name">Neural Diff</span>
           </button>
 
@@ -174,7 +224,7 @@ export const App: React.FC = () => {
                   <motion.span
                     layoutId="studio-nav-pill"
                     className="studio-nav-pill"
-                    transition={{ type: "spring", stiffness: 500, damping: 38, mass: 0.7 }}
+                    transition={{ type: "spring", stiffness: 520, damping: 38, mass: 0.68 }}
                   />
                 )}
                 <span className="studio-nav-label">{item.short}</span>
@@ -184,6 +234,20 @@ export const App: React.FC = () => {
         </nav>
 
         <div className="studio-header-right">
+          <button
+            type="button"
+            className="studio-cmdk-btn"
+            onClick={() => {
+              setPaletteQuery("");
+              setPaletteOpen(true);
+            }}
+            title="Quick Jump (Ctrl+K)"
+            aria-label="Open Command Palette"
+          >
+            <Search size={12} />
+            <span className="studio-kbd">⌘K</span>
+          </button>
+
           <select
             id="active-exp-selector"
             aria-label="Active Experiment Run"
@@ -215,7 +279,7 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main ComfyUI Node Graph + Sliding Editorial Sheet */}
+      {/* Main Optical Node Graph + Floating Rounded Glass Sheet */}
       <div className="studio-body">
         <div className="studio-canvas-layer">
           <WorkflowCanvas
@@ -233,10 +297,10 @@ export const App: React.FC = () => {
         <AnimatePresence>
           {errorBanner && activeView === "dashboard" && (
             <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: -12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               style={{ position: "absolute", top: 16, right: 20, zIndex: 45, maxWidth: 520 }}
             >
               <div className="error-banner" role="alert" data-testid="error-banner">
@@ -259,7 +323,7 @@ export const App: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Either Quiet Canvas Status Strip OR Smooth Sliding Inspector Sheet */}
+        {/* Either Quiet Canvas Status Strip OR Floating Rounded Glass Inspector Sheet */}
         <AnimatePresence>
           {activeView === "dashboard" ? (
             <DashboardView
@@ -280,7 +344,7 @@ export const App: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.22 }}
+                transition={{ duration: 0.2 }}
                 onClick={() => setActiveView("dashboard")}
               />
               <motion.section
@@ -288,17 +352,17 @@ export const App: React.FC = () => {
                 className={`inspector-sheet ${
                   drawerExpanded || activeView === "evolution" ? "is-expanded" : ""
                 }`}
-                initial={{ opacity: 0, x: 48 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 36 }}
-                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, x: 44, scale: 0.992 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 32, scale: 0.994 }}
+                transition={SHEET_SPRING}
               >
                 <div className="inspector-sheet-header">
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     <span className="inspector-sheet-title">
                       {activeNavMeta?.title ?? "Inspector"}
                     </span>
-                    {activeBundle && (
+                    {activeBundle && activeView !== "evolution" && (
                       <span className="inspector-sheet-meta">
                         <span
                           className={`dot ${
@@ -310,7 +374,7 @@ export const App: React.FC = () => {
                         <span>
                           {activeBundle.experiment_type === "REAL MODEL EXPERIMENT"
                             ? "Real model"
-                            : "Synthetic fixture"}
+                            : "Fixture"}
                         </span>
                         <span style={{ color: "var(--text-faint)" }}>·</span>
                         <span className="mono" style={{ fontSize: 11 }}>
@@ -321,20 +385,22 @@ export const App: React.FC = () => {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => setDrawerExpanded((v) => !v)}
-                      title="Toggle full-width view"
-                    >
-                      {drawerExpanded ? <Columns2 size={13} /> : <Maximize2 size={13} />}
-                      <span>{drawerExpanded ? "Split" : "Full width"}</span>
-                    </button>
+                    {activeView !== "evolution" && (
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => setDrawerExpanded((v) => !v)}
+                        title="Toggle full-width view"
+                      >
+                        {drawerExpanded ? <Columns2 size={13} /> : <Maximize2 size={13} />}
+                        <span>{drawerExpanded ? "Split" : "Full width"}</span>
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="btn"
                       onClick={() => setActiveView("dashboard")}
-                      title="Close inspector"
+                      title="Close inspector (Esc)"
                     >
                       <X size={13} />
                       <span>Close</span>
@@ -364,13 +430,14 @@ export const App: React.FC = () => {
 
                   <motion.div
                     key={activeView}
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                   >
                     {activeView === "evolution" && (
                       <EvolutionStudioView discovered={discovered} onError={handleError} />
                     )}
+
                     {activeView === "compare" && (
                       <ModelComparisonView
                         discovered={discovered}
@@ -383,6 +450,7 @@ export const App: React.FC = () => {
                         onError={handleError}
                       />
                     )}
+
                     {activeView === "compatibility" && (
                       <CompatibilityView
                         modelA={modelA}
@@ -393,21 +461,27 @@ export const App: React.FC = () => {
                         onError={handleError}
                       />
                     )}
+
                     {activeView === "tensors" && (
                       <TensorExplorerView activeBundle={activeBundle} onError={handleError} />
                     )}
+
                     {activeView === "structural" && (
                       <StructuralDiffView activeBundle={activeBundle} />
                     )}
+
                     {activeView === "layers" && (
                       <LayerVisualizationView activeBundle={activeBundle} />
                     )}
+
                     {activeView === "activations" && (
                       <ActivationComparisonView activeBundle={activeBundle} />
                     )}
+
                     {activeView === "behavioral" && (
                       <BehavioralDiffView activeBundle={activeBundle} />
                     )}
+
                     {activeView === "regression" && (
                       <RegressionDashboardView
                         activeBundle={activeBundle}
@@ -416,6 +490,7 @@ export const App: React.FC = () => {
                         onError={handleError}
                       />
                     )}
+
                     {activeView === "history" && (
                       <ExperimentHistoryView
                         experiments={experiments}
@@ -427,9 +502,11 @@ export const App: React.FC = () => {
                         onRefresh={() => void refreshCoreData()}
                       />
                     )}
+
                     {activeView === "reports" && (
                       <ReportViewerView activeBundle={activeBundle} onError={handleError} />
                     )}
+
                     {activeView === "settings" && (
                       <SettingsView
                         onError={handleError}
@@ -443,6 +520,100 @@ export const App: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Quick Command Palette (⌘K / Ctrl+K) */}
+      <AnimatePresence>
+        {paletteOpen && (
+          <motion.div
+            className="cmdk-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.16 }}
+            onClick={() => setPaletteOpen(false)}
+          >
+            <motion.div
+              className="cmdk-dialog"
+              role="dialog"
+              aria-label="Quick Navigation"
+              initial={{ opacity: 0, y: -12, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={SHEET_SPRING}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="cmdk-search-bar">
+                <img src="/logo.png" alt="" style={{ width: 18, height: 18 }} />
+                <input
+                  type="text"
+                  autoFocus
+                  className="cmdk-input"
+                  placeholder="Jump to workspace view or comparison run..."
+                  value={paletteQuery}
+                  onChange={(e) => setPaletteQuery(e.target.value)}
+                />
+                <span className="studio-kbd">ESC</span>
+              </div>
+
+              <div className="cmdk-list">
+                {filteredNavItems.length > 0 && (
+                  <>
+                    <div className="cmdk-group-label">Workspaces</div>
+                    {filteredNavItems.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className={`cmdk-item ${activeView === item.id ? "is-active" : ""}`}
+                        onClick={() => {
+                          setActiveView(item.id);
+                          setPaletteOpen(false);
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontWeight: 500, color: "var(--text-main)" }}>
+                            {item.title}
+                          </span>
+                          <span style={{ fontSize: 11.5, color: "var(--text-muted)" }}>
+                            {item.hint}
+                          </span>
+                        </div>
+                        <ArrowRight size={12} style={{ color: "var(--text-faint)" }} />
+                      </button>
+                    ))}
+                  </>
+                )}
+
+                {filteredRuns.length > 0 && (
+                  <>
+                    <div className="cmdk-group-label" style={{ marginTop: 4 }}>
+                      Comparison Runs
+                    </div>
+                    {filteredRuns.map((run) => (
+                      <button
+                        key={run.comparison_id}
+                        type="button"
+                        className="cmdk-item"
+                        onClick={() => {
+                          void handleSelectExperiment(run.comparison_id);
+                          setActiveView("tensors");
+                          setPaletteOpen(false);
+                        }}
+                      >
+                        <span className="mono" style={{ color: "var(--text-main)" }}>
+                          {run.comparison_id}
+                        </span>
+                        <span className="mono" style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                          {run.model_a_id} → {run.model_b_id}
+                        </span>
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

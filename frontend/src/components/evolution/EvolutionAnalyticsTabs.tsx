@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Download } from "lucide-react";
 import { evolutionApi } from "../../api/evolutionClient";
 import type { EvolutionRunBundle, TransitionTensorRecord } from "../../types/evolution";
+import { formatCategoryShort, formatRole } from "../../utils/format";
 import {
   DualTrajectoryChart,
   PixelMatrixHeatmap,
@@ -212,7 +214,9 @@ export const WeightEvolutionSection: React.FC<{
                 {selectedTopSource.top_k_modified_tensors.map((rec) => (
                   <tr key={rec.name}>
                     <td className="mono">{rec.name}</td>
-                    <td className="mono">{rec.canonical_role}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>
+                      {formatRole(rec.canonical_role)}
+                    </td>
                     <td className="num">{fmtFloat(rec.relative_l2, 6)}</td>
                     <td className="num">{fmtFloat(rec.max_abs_diff, 5)}</td>
                     <td className="num">{fmtFloat(rec.cosine_similarity, 6)}</td>
@@ -370,7 +374,7 @@ export const LayerEvolutionSection: React.FC<{ bundle: EvolutionRunBundle }> = (
             <tbody>
               {le.transition_profiles.map((p, idx) => (
                 <tr key={`${p.scope}-${p.source_checkpoint_id}-${p.target_checkpoint_id}-${idx}`}>
-                  <td className="mono">{p.scope}</td>
+                  <td style={{ color: "var(--text-secondary)" }}>{humanizeEnum(p.scope)}</td>
                   <td className="mono">
                     {p.source_label} → {p.target_label}
                   </td>
@@ -493,7 +497,7 @@ export const BehavioralEvolutionSection: React.FC<{ bundle: EvolutionRunBundle }
                 <th className="num">Mean Score</th>
                 {allCategories.map((cat) => (
                   <th key={cat} className="num">
-                    {cat.replace("_", " ")}
+                    {formatCategoryShort(cat)}
                   </th>
                 ))}
               </tr>
@@ -672,11 +676,10 @@ export const RepresentationEvolutionSection: React.FC<{ bundle: EvolutionRunBund
         <div className="panel-header">
           <div>
             <h3 className="panel-title">
-              Step-to-Step Representation Drift & Cross-Checkpoint Causal Patching
+              Step-to-Step Representation Drift &amp; Cross-Checkpoint Causal Patching
             </h3>
             <div className="panel-subtitle">
-              Single-layer residual stream intervention (`CAUSALLY VERIFIED` for tested prompt &
-              site)
+              Single-layer residual stream intervention across aligned checkpoints
             </div>
           </div>
         </div>
@@ -781,7 +784,9 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
                   n={ev.statistical_confidence.sample_size} · p=
                   {ev.statistical_confidence.mcnemar_p_value.toFixed(4)}
                 </div>
-                <div className="kpi-sub">{ev.statistical_confidence.confidence_level}</div>
+                <div className="kpi-sub">
+                  {humanizeEnum(ev.statistical_confidence.confidence_level)}
+                </div>
               </div>
               <div className="kpi-card">
                 <div className="kpi-label">Causal Verification</div>
@@ -820,7 +825,9 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
                             : "—"}
                         </td>
                         <td className="num">{fmtFloat(cl.linear_cka, 5)}</td>
-                        <td className="mono">{cl.evidence_relationship}</td>
+                        <td style={{ color: "var(--text-secondary)" }}>
+                          {humanizeEnum(cl.evidence_relationship)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -993,17 +1000,28 @@ export const ExperimentExportSection: React.FC<{
               { fmt: "csv", label: "CSV" },
               { fmt: "json", label: "JSON" },
             ] as const
-          ).map(({ fmt, label }) => (
-            <button
-              key={fmt}
-              type="button"
-              data-testid={`btn-evo-preview-${fmt}`}
-              className={`segmented-btn ${previewFmt === fmt ? "active" : ""}`}
-              onClick={() => void handleLoadPreview(fmt)}
-            >
-              {label}
-            </button>
-          ))}
+          ).map(({ fmt, label }) => {
+            const active = previewFmt === fmt;
+            return (
+              <button
+                key={fmt}
+                type="button"
+                data-testid={`btn-evo-preview-${fmt}`}
+                className={`segmented-btn ${active ? "active" : ""}`}
+                style={{ background: "transparent", boxShadow: "none" }}
+                onClick={() => void handleLoadPreview(fmt)}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="evo-export-seg-pill"
+                    className="studio-nav-pill"
+                    transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                  />
+                )}
+                <span className="studio-nav-label">{label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {loadingPreview && <div className="panel-subtitle">Loading report preview…</div>}
@@ -1017,7 +1035,7 @@ export const ExperimentExportSection: React.FC<{
               width: "100%",
               height: 540,
               border: "1px solid var(--border-subtle)",
-              borderRadius: 8,
+              borderRadius: 12,
               background: "#09090b",
             }}
           />
@@ -1032,7 +1050,7 @@ export const ExperimentExportSection: React.FC<{
               padding: 14,
               background: "#09090b",
               border: "1px solid var(--border-subtle)",
-              borderRadius: 8,
+              borderRadius: 12,
               color: "var(--text-secondary)",
               fontSize: 11.5,
               margin: 0,

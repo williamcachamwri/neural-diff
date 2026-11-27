@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  BaseEdge,
   type EdgeProps,
   getBezierPath,
   getSmoothStepPath,
@@ -23,7 +22,7 @@ export const SignalEdge: React.FC<EdgeProps> = ({
   data,
 }) => {
   const edgeData = (data ?? {}) as SignalEdgeData;
-  const stroke = edgeData.color ?? "#71717a";
+  const stroke = edgeData.color ?? "#a1a1aa";
   const routing = edgeData.routing ?? "bezier";
   const pulse = edgeData.animatedPulse ?? true;
 
@@ -36,7 +35,7 @@ export const SignalEdge: React.FC<EdgeProps> = ({
           targetX,
           targetY,
           targetPosition,
-          borderRadius: 12,
+          borderRadius: 14,
         })
       : getBezierPath({
           sourceX,
@@ -45,40 +44,51 @@ export const SignalEdge: React.FC<EdgeProps> = ({
           targetX,
           targetY,
           targetPosition,
-          curvature: 0.34,
+          curvature: 0.36,
         });
 
   return (
     <g className="comfy-signal-edge">
-      {/* Subtle architectural wire track */}
-      <BaseEdge
-        id={`${id}-track`}
-        path={edgePath}
-        style={{
-          stroke: "rgba(255, 255, 255, 0.085)",
-          strokeWidth: 1.5,
-        }}
-      />
-      {/* Delicate flowing signal dash */}
+      {/* Layer 1: Insulated dark outer sheath for clean crossing separation */}
       <path
-        id={id}
+        id={`${id}-sheath`}
+        d={edgePath}
+        fill="none"
+        stroke="rgba(9, 9, 11, 0.72)"
+        strokeWidth={4.2}
+        strokeLinecap="round"
+      />
+      {/* Layer 2: Continuous brushed-titanium signal conductor */}
+      <path
+        id={`${id}-core`}
         d={edgePath}
         fill="none"
         stroke={stroke}
-        strokeWidth={1.35}
-        strokeOpacity={pulse ? 0.62 : 0.32}
-        strokeDasharray={pulse ? "5 14" : undefined}
-      >
-        {pulse && (
+        strokeOpacity={0.28}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
+      {/* Layer 3: Smooth gliding optical pulse packet (zero choppy marching ants) */}
+      {pulse && (
+        <path
+          id={id}
+          d={edgePath}
+          fill="none"
+          stroke={stroke}
+          strokeWidth={1.85}
+          strokeOpacity={0.88}
+          strokeLinecap="round"
+          strokeDasharray="28 220"
+        >
           <animate
             attributeName="stroke-dashoffset"
-            from="38"
+            from="248"
             to="0"
-            dur="2.8s"
+            dur="3.1s"
             repeatCount="indefinite"
           />
-        )}
-      </path>
+        </path>
+      )}
     </g>
   );
 };

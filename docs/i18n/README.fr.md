@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="../assets/logo.png" width="68" alt="Neural Diff Logo" />
+</p>
+
 # NEURAL DIFF — Git pour les Cerveaux IA
 
 **Plateforme d'Ingénierie pour la Comparaison Structurelle, Neuronale et Comportementale des Modèles de Fondation et Modèles Affinés**

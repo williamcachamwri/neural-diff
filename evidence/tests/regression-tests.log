@@ -1,7 +1,7 @@
 === Suite: regression_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m regression -v
-Started (UTC): 2026-11-27T06:54:31.606860+00:00
-Completed (UTC): 2026-11-27T06:54:39.476631+00:00
+Started (UTC): 2026-11-27T08:02:12.093418+00:00
+Completed (UTC): 2026-11-27T08:02:20.540570+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -18,7 +18,7 @@ collecting ... collected 64 items / 63 deselected / 1 selected
 
 tests/regression/test_golden_fixtures.py::test_deterministic_synthetic_pair_golden_metrics PASSED [100%]
 
-====================== 1 passed, 63 deselected in 6.56s =======================
+====================== 1 passed, 63 deselected in 7.04s =======================
 
 --- STDERR ---
 

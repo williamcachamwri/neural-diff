@@ -1,7 +1,7 @@
 === Suite: integration_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m integration -v
-Started (UTC): 2026-11-27T06:54:15.868621+00:00
-Completed (UTC): 2026-11-27T06:54:31.606860+00:00
+Started (UTC): 2026-11-27T08:01:54.287005+00:00
+Completed (UTC): 2026-11-27T08:02:12.093418+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -23,7 +23,7 @@ tests/integration/test_end_to_end_and_api.py::test_local_pretrained_qwen2_activa
 tests/integration/test_evolution_pipeline_and_api.py::test_orchestrator_representation_compat_caching_cancellation_and_exports PASSED [ 83%]
 tests/integration/test_evolution_pipeline_and_api.py::test_evolution_rest_api_and_cli_end_to_end PASSED [100%]
 
-====================== 6 passed, 58 deselected in 14.34s ======================
+====================== 6 passed, 58 deselected in 16.26s ======================
 
 --- STDERR ---
 

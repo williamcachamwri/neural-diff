@@ -19,6 +19,10 @@ export function humanizeEnum(raw: string | null | undefined): string {
     consecutive: "Step → Step",
     branch_to_branch: "Branch ↔ Branch",
     overall: "Overall suite",
+    huggingface_local_dir: "Hugging Face Directory",
+    safetensors_file: "Safetensors",
+    pytorch_weights_only: "PyTorch Archive",
+    lora_adapter: "LoRA Adapter",
   };
   if (map[raw]) return map[raw];
   const cleaned = raw.replace(/_/g, " ").trim();
@@ -237,10 +241,11 @@ export const PolarRadarChart: React.FC<{
   const m = axes.length;
   if (m < 3 || series.length === 0) return null;
 
-  const cx = size / 2 + 22;
+  const padX = 72;
+  const totalW = size + padX * 2;
+  const cx = totalW / 2;
   const cy = size / 2 + 2;
-  const radius = size * 0.33;
-  const totalW = size + 44;
+  const radius = size * 0.32;
 
   return (
     <svg
@@ -293,7 +298,7 @@ export const PolarRadarChart: React.FC<{
               textAnchor={anchor}
               fontFamily="JetBrains Mono, monospace"
             >
-              {lbl.slice(0, 14)}
+              {lbl.slice(0, 22)}
             </text>
           </g>
         );
@@ -444,8 +449,8 @@ export const DivergingDeltaBars: React.FC<{
   if (items.length === 0) return null;
   const maxAbs = Math.max(0.1, ...items.map((i) => Math.abs(i.delta)));
   const rowH = 25;
-  const leftPad = 148;
-  const halfW = 128;
+  const leftPad = 162;
+  const halfW = 126;
   const center = leftPad + halfW;
   const width = leftPad + halfW * 2 + 74;
   const height = items.length * rowH + 16;
@@ -476,7 +481,7 @@ export const DivergingDeltaBars: React.FC<{
               textAnchor="end"
               fontFamily="JetBrains Mono, monospace"
             >
-              {item.label.slice(0, 18)}
+              {item.label.slice(0, 22)}
             </text>
             <rect x={x} y={y + 2} width={w} height={10} rx={2} fill={col} />
             <text

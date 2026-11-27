@@ -1,7 +1,7 @@
 === Suite: full_coverage ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api --cov-report=term-missing -v
-Started (UTC): 2026-11-27T06:54:47.666752+00:00
-Completed (UTC): 2026-11-27T06:55:18.771917+00:00
+Started (UTC): 2026-11-27T08:02:29.704107+00:00
+Completed (UTC): 2026-11-27T08:03:03.177528+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -140,10 +140,10 @@ core\evolution\registry.py                         163     39    76%   34, 89, 9
 core\evolution\regression_origin.py                 94      8    91%   22, 63, 74, 88, 182, 263-270
 core\evolution\representation_evolution.py         299     35    88%   34, 60-67, 119-120, 159-160, 175-177, 179, 244, 256-265, 307-308, 384, 388, 392, 406-407, 415, 581-582
 core\evolution\store.py                            285     51    82%   282, 330-352, 482, 522-523, 599-604, 642, 689-729, 732-742, 758-766, 775-780, 925, 938, 971-975, 1035, 1122, 1124-1125
-core\evolution\tensor_evolution.py                 215      2    99%   218, 220
+core\evolution\tensor_evolution.py                 218      2    99%   219, 221
 core\evolution\types.py                            105      2    98%   67, 69
 core\exceptions.py                                  48      0   100%
-core\loaders\__init__.py                             4      0   100%
+core\loaders\__init__.py                             9      4    56%   16-20
 core\loaders\base.py                                43      3    93%   30-31, 57
 core\loaders\model_loader.py                        62      9    85%   44, 57-70
 core\orchestrator.py                               110      1    99%   90
@@ -173,8 +173,8 @@ core\tensor_engine\task_vector.py                   41      3    93%   39, 44, 5
 core\tensor_engine\top_elements.py                  48      4    92%   38, 46, 57, 76
 core\types.py                                      103      0   100%
 ------------------------------------------------------------------------------
-TOTAL                                             7590    872    89%
-============================= 64 passed in 29.36s =============================
+TOTAL                                             7598    876    88%
+============================= 64 passed in 31.65s =============================
 
 --- STDERR ---
 

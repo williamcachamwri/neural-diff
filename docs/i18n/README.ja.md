@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="../assets/logo.png" width="68" alt="Neural Diff Logo" />
+</p>
+
 # NEURAL DIFF — AIモデルのためのGit
 
 **事前学習済み・ファインチューニング済み基盤モデルの構造・内部表現・決定的行動比較エンジニアリング基盤**

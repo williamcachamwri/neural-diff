@@ -3,6 +3,9 @@ import {
   Background,
   BackgroundVariant,
   type Edge,
+  EdgeLabelRenderer,
+  type EdgeProps,
+  getBezierPath,
   Handle,
   MiniMap,
   type Node,
@@ -12,7 +15,7 @@ import {
   ReactFlowProvider,
   useReactFlow,
 } from "@xyflow/react";
-import { ChevronDown, ChevronRight, GitBranch, GitMerge } from "lucide-react";
+import { ChevronDown, ChevronRight, GitBranch, GitMerge, Maximize2, Minus, Plus } from "lucide-react";
 import type {
   BehavioralTimelineEntry,
   EvolutionGraphNode,
@@ -20,6 +23,7 @@ import type {
   RegressionOriginEvent,
   TransitionTensorRecord,
 } from "../../types/evolution";
+import { formatCategoryShort } from "../../utils/format";
 
 interface EvoNodeData extends Record<string, unknown> {
   node: EvolutionGraphNode;
@@ -39,19 +43,111 @@ interface EvoNodeData extends Record<string, unknown> {
   onSelectB: (id: string) => void;
 }
 
+interface EvoEdgeData extends Record<string, unknown> {
+  stroke: string;
+  active: boolean;
+  mergeWeight: number | null;
+}
+
+const EvoOpticalEdge: React.FC<EdgeProps> = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  data,
+}) => {
+  const d = (data ?? {}) as EvoEdgeData;
+  const stroke = d.stroke ?? "#a1a1aa";
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    curvature: 0.36,
+  });
+
+  return (
+    <>
+      <g className="evo-optical-edge">
+        <path
+          d={edgePath}
+          fill="none"
+          stroke="rgba(9, 9, 11, 0.78)"
+          strokeWidth={4.2}
+          strokeLinecap="round"
+        />
+        <path
+          d={edgePath}
+          fill="none"
+          stroke={stroke}
+          strokeOpacity={d.active ? 0.55 : 0.34}
+          strokeWidth={d.active ? 1.85 : 1.45}
+          strokeLinecap="round"
+        />
+        {d.active && (
+          <path
+            id={id}
+            d={edgePath}
+            fill="none"
+            stroke={stroke}
+            strokeWidth={2}
+            strokeOpacity={0.95}
+            strokeLinecap="round"
+            strokeDasharray="24 190"
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from="214"
+              to="0"
+              dur="2.8s"
+              repeatCount="indefinite"
+            />
+          </path>
+        )}
+      </g>
+      {d.mergeWeight != null && (
+        <EdgeLabelRenderer>
+          <div
+            style={{
+              position: "absolute",
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+              pointerEvents: "none",
+              padding: "2px 6px",
+              borderRadius: 6,
+              background: "rgba(13, 13, 17, 0.92)",
+              border: "1px solid rgba(214, 197, 169, 0.28)",
+              color: "#d6c5a9",
+              fontSize: 10,
+              fontFamily: "JetBrains Mono, monospace",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.55)",
+            }}
+          >
+            w={d.mergeWeight}
+          </div>
+        </EdgeLabelRenderer>
+      )}
+    </>
+  );
+};
+
 const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
   const d = data as EvoNodeData;
   const n = d.node;
 
   const borderColor = d.isRegressionOrigin
-    ? "rgba(248, 113, 113, 0.72)"
+    ? "rgba(248, 113, 113, 0.68)"
     : d.isSelectedInspect
-      ? "rgba(244, 244, 245, 0.55)"
+      ? "rgba(244, 244, 245, 0.52)"
       : d.isMajorWeightStep
-        ? "rgba(214, 197, 169, 0.60)"
-        : "rgba(255, 255, 255, 0.11)";
+        ? "rgba(214, 197, 169, 0.55)"
+        : "rgba(255, 255, 255, 0.1)";
 
-  const metricLabel = d.categoryFilter ? `${d.categoryFilter}` : "Pass rate";
+  const metricLabel = d.categoryFilter ? formatCategoryShort(d.categoryFilter) : "Pass rate";
   const metricVal = d.categoryFilter
     ? d.categoryScore != null
       ? `${(d.categoryScore * 100).toFixed(1)}%`
@@ -65,20 +161,25 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
       data-testid={`evo-node-${n.checkpoint_id}`}
       onClick={() => d.onInspect(n.checkpoint_id)}
       style={{
-        width: 210,
+        width: 218,
         background: "var(--bg-node)",
+        backdropFilter: "blur(20px)",
         border: `1px solid ${borderColor}`,
-        borderRadius: 10,
-        boxShadow: "var(--shadow-node)",
+        borderRadius: 14,
+        boxShadow: d.isSelectedInspect
+          ? "0 22px 46px -12px rgba(0,0,0,0.92), 0 0 0 1px rgba(244,244,245,0.14), inset 0 1px 0 rgba(255,255,255,0.1)"
+          : "var(--shadow-node)",
         color: "var(--text-main)",
         cursor: "pointer",
         overflow: "hidden",
+        transition:
+          "border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1), transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)",
       }}
     >
       <Handle
         type="target"
         position={Position.Left}
-        style={{ background: "#a1a1aa", width: 7, height: 7, border: "1px solid #09090b" }}
+        style={{ background: "#a1a1aa", width: 8, height: 8, border: "2px solid #09090b" }}
       />
 
       {/* Node Header */}
@@ -87,13 +188,13 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "8px 11px",
+          padding: "8.5px 12px",
           background: "var(--bg-node-header)",
           borderBottom: "1px solid var(--border-faint)",
           fontSize: 11.5,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6.5, minWidth: 0 }}>
           <span
             className={`dot ${
               d.isRegressionOrigin ? "dot-danger" : n.is_base_model ? "dot-ok" : "dot-ivory"
@@ -105,6 +206,7 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
           <strong
             style={{
               fontWeight: 600,
+              letterSpacing: "-0.01em",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -130,6 +232,7 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
                 border: "none",
                 color: "var(--text-secondary)",
                 padding: 2,
+                borderRadius: 6,
                 cursor: "pointer",
                 display: "grid",
                 placeItems: "center",
@@ -142,24 +245,26 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
       </div>
 
       {/* Node Body */}
-      <div style={{ padding: "9px 11px", fontSize: 11.5 }}>
+      <div style={{ padding: "10px 12px", fontSize: 11.5 }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: 5,
-            color: "var(--text-secondary)",
+            marginBottom: 5.5,
+            color: "var(--text-muted)",
           }}
         >
           <span>Stage</span>
-          <span className="mono">{n.transformation_type}</span>
+          <span className="mono" style={{ color: "var(--text-secondary)" }}>
+            {n.transformation_type}
+          </span>
         </div>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: 5,
-            color: "var(--text-secondary)",
+            marginBottom: 5.5,
+            color: "var(--text-muted)",
           }}
         >
           <span>{metricLabel}</span>
@@ -177,12 +282,15 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: 7,
-            color: "var(--text-secondary)",
+            marginBottom: 8,
+            color: "var(--text-muted)",
           }}
         >
           <span>Base L2</span>
-          <span className="mono" style={{ color: d.isMajorWeightStep ? "#d6c5a9" : undefined }}>
+          <span
+            className="mono"
+            style={{ color: d.isMajorWeightStep ? "#d6c5a9" : "var(--text-secondary)" }}
+          >
             {d.cumulativeL2 != null ? d.cumulativeL2.toFixed(4) : "—"}
           </span>
         </div>
@@ -193,7 +301,7 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            paddingTop: 6,
+            paddingTop: 6.5,
             borderTop: "1px solid var(--border-faint)",
             gap: 6,
           }}
@@ -210,10 +318,13 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
               }}
               style={{
                 fontSize: 10,
-                padding: "1px 6px",
-                borderRadius: 4,
-                border: "1px solid var(--border-subtle)",
-                background: d.isSelectedA ? "rgba(244,244,245,0.18)" : "transparent",
+                fontWeight: 600,
+                padding: "2px 7px",
+                borderRadius: 6,
+                border: d.isSelectedA
+                  ? "1px solid rgba(244,244,245,0.38)"
+                  : "1px solid var(--border-subtle)",
+                background: d.isSelectedA ? "rgba(244,244,245,0.16)" : "transparent",
                 color: d.isSelectedA ? "#f4f4f5" : "var(--text-muted)",
                 cursor: "pointer",
               }}
@@ -228,10 +339,13 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
               }}
               style={{
                 fontSize: 10,
-                padding: "1px 6px",
-                borderRadius: 4,
-                border: "1px solid var(--border-subtle)",
-                background: d.isSelectedB ? "rgba(214,197,169,0.22)" : "transparent",
+                fontWeight: 600,
+                padding: "2px 7px",
+                borderRadius: 6,
+                border: d.isSelectedB
+                  ? "1px solid rgba(214,197,169,0.42)"
+                  : "1px solid var(--border-subtle)",
+                background: d.isSelectedB ? "rgba(214,197,169,0.2)" : "transparent",
                 color: d.isSelectedB ? "#d6c5a9" : "var(--text-muted)",
                 cursor: "pointer",
               }}
@@ -245,23 +359,72 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
       <Handle
         type="source"
         position={Position.Right}
-        style={{ background: "#e4e4e7", width: 7, height: 7, border: "1px solid #09090b" }}
+        style={{ background: "#e4e4e7", width: 8, height: 8, border: "2px solid #09090b" }}
       />
     </div>
   );
 };
 
 const EVO_NODE_TYPES = { evoCheckpoint: EvolutionCheckpointNode };
+const EVO_EDGE_TYPES = { evoOptical: EvoOpticalEdge };
 
-const DagAutoFit: React.FC<{ triggerKey: string }> = ({ triggerKey }) => {
-  const { fitView } = useReactFlow();
+const DagViewportControls: React.FC<{ triggerKey: string }> = ({ triggerKey }) => {
+  const { fitView, zoomIn, zoomOut } = useReactFlow();
   useEffect(() => {
     const t = setTimeout(() => {
-      void fitView({ padding: 0.12, duration: 0 });
+      void fitView({ padding: 0.14, duration: 0 });
     }, 80);
     return () => clearTimeout(t);
   }, [fitView, triggerKey]);
-  return null;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 12,
+        bottom: 12,
+        zIndex: 15,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 2,
+        background: "rgba(12, 12, 15, 0.86)",
+        backdropFilter: "blur(16px)",
+        border: "1px solid var(--border-subtle)",
+        borderRadius: 10,
+        padding: "3.5px 6px",
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.6)",
+      }}
+    >
+      <button
+        type="button"
+        className="canvas-footer-btn"
+        onClick={() => void zoomOut({ duration: 200 })}
+        title="Zoom out"
+        aria-label="Zoom out DAG"
+      >
+        <Minus size={11} />
+      </button>
+      <button
+        type="button"
+        className="canvas-footer-btn"
+        onClick={() => void zoomIn({ duration: 200 })}
+        title="Zoom in"
+        aria-label="Zoom in DAG"
+      >
+        <Plus size={11} />
+      </button>
+      <span className="studio-divider-v" style={{ height: 11 }} />
+      <button
+        type="button"
+        className="canvas-footer-btn"
+        onClick={() => void fitView({ padding: 0.14, duration: 320 })}
+        title="Fit graph"
+      >
+        <Maximize2 size={10} />
+        <span>Fit</span>
+      </button>
+    </div>
+  );
 };
 
 export interface EvolutionDagCanvasProps {
@@ -312,7 +475,6 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
     });
   };
 
-  // Compute hidden nodes downstream of collapsed branch points
   const hiddenIds = useMemo(() => {
     const hidden = new Set<string>();
     if (collapsedRoots.size === 0) return hidden;
@@ -362,7 +524,11 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
   const regressionTargetIds = useMemo(() => {
     const s = new Set<string>();
     for (const r of regressions) {
-      if (!categoryFilter || r.affected_category === categoryFilter || r.affected_category === "overall") {
+      if (
+        !categoryFilter ||
+        r.affected_category === categoryFilter ||
+        r.affected_category === "overall"
+      ) {
         s.add(r.first_affected_checkpoint_id);
       }
     }
@@ -385,13 +551,13 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
   const rfNodes: Node[] = useMemo(() => {
     return visibleNodes.map((n) => {
       const beh = behById.get(n.checkpoint_id);
-      const yOffset = (n.lane_index - (n.lane_count - 1) / 2) * 176;
+      const yOffset = (n.lane_index - (n.lane_count - 1) / 2) * 190;
       return {
         id: n.checkpoint_id,
         type: "evoCheckpoint",
         position: {
-          x: 24 + n.generation_depth * 252,
-          y: 165 + yOffset,
+          x: 36 + n.generation_depth * 304,
+          y: 168 + yOffset,
         },
         data: {
           node: n,
@@ -438,18 +604,17 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
       .map((e) => {
         const isRegEdge = highlightRegressions && regressionTargetIds.has(e.child_checkpoint_id);
         const isMajorWt = highlightMajorWeights && peakConsecutiveTargetId === e.child_checkpoint_id;
-        const stroke = isRegEdge ? "#f87171" : isMajorWt ? "#d6c5a9" : "rgba(228,228,231,0.38)";
+        const stroke = isRegEdge ? "#f87171" : isMajorWt ? "#d6c5a9" : "#a1a1aa";
         return {
           id: e.relationship_id,
           source: e.parent_checkpoint_id,
           target: e.child_checkpoint_id,
-          label: e.merge_weight != null
-            ? `${e.transformation_type} (w=${e.merge_weight})`
-            : e.transformation_type,
-          animated: isRegEdge || isMajorWt,
-          labelStyle: { fill: "#a1a1aa", fontSize: 10, fontFamily: "monospace" },
-          labelBgStyle: { fill: "#0d0d10", fillOpacity: 0.9 },
-          style: { stroke, strokeWidth: isRegEdge || isMajorWt ? 2.1 : 1.35 },
+          type: "evoOptical",
+          data: {
+            stroke,
+            active: isRegEdge || isMajorWt,
+            mergeWeight: e.merge_weight,
+          } satisfies EvoEdgeData,
         };
       });
   }, [
@@ -469,12 +634,14 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
           padding: 16,
           background: "var(--bg-surface-subtle)",
           border: "1px solid var(--border-subtle)",
-          borderRadius: 10,
+          borderRadius: 12,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <GitBranch size={14} />
-          <span className="mono">{visibleNodes.length} checkpoints · {graph.branch_count} branches</span>
+          <span className="mono">
+            {visibleNodes.length} checkpoints · {graph.branch_count} branches
+          </span>
         </div>
         {visibleNodes.map((n) => (
           <div key={n.checkpoint_id} className="mono" style={{ fontSize: 12 }}>
@@ -490,10 +657,11 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
       data-testid="evolution-dag-canvas"
       style={{
         width: "100%",
-        height: 440,
-        background: "#09090b",
+        height: 452,
+        background:
+          "radial-gradient(760px 380px at 50% 45%, rgba(255,255,255,0.02), transparent 72%), #09090b",
         border: "1px solid var(--border-subtle)",
-        borderRadius: 10,
+        borderRadius: 14,
         overflow: "hidden",
         position: "relative",
       }}
@@ -503,21 +671,22 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
           nodes={rfNodes}
           edges={rfEdges}
           nodeTypes={EVO_NODE_TYPES}
+          edgeTypes={EVO_EDGE_TYPES}
           fitView
-          fitViewOptions={{ padding: 0.12 }}
+          fitViewOptions={{ padding: 0.14 }}
           minZoom={0.2}
           maxZoom={1.8}
           className="dark"
           proOptions={{ hideAttribution: true }}
         >
-          <DagAutoFit triggerKey={`${rfNodes.length}-${rfEdges.length}`} />
+          <DagViewportControls triggerKey={`${rfNodes.length}-${rfEdges.length}`} />
           <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#1e1e24" />
           <MiniMap
             pannable
             zoomable
             nodeColor="#52525b"
             maskColor="rgba(9, 9, 11, 0.82)"
-            style={{ bottom: 10, right: 10, width: 140, height: 86 }}
+            style={{ bottom: 12, right: 12, width: 144, height: 88 }}
           />
         </ReactFlow>
       </ReactFlowProvider>

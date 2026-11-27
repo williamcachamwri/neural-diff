@@ -112,10 +112,10 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
               {payload.visual?.kind === "heatmap" && payload.visual.matrix.length > 0 && (
                 <div
                   style={{
-                    background: "#0b0b0e",
+                    background: "#0b0b0f",
                     border: "1px solid var(--border-faint)",
-                    borderRadius: 7,
-                    padding: 6,
+                    borderRadius: 9,
+                    padding: 6.5,
                     marginTop: 3,
                   }}
                 >
@@ -163,9 +163,9 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
               {payload.visual?.kind === "oscilloscope" && payload.visual.cka.length > 1 && (
                 <div
                   style={{
-                    background: "#0b0b0e",
+                    background: "#0b0b0f",
                     border: "1px solid var(--border-faint)",
-                    borderRadius: 7,
+                    borderRadius: 9,
                     padding: "6px 8px 4px",
                     marginTop: 3,
                   }}
@@ -302,9 +302,9 @@ export const StudioModuleNode: React.FC<NodeProps> = ({ data, selected }) => {
                           style={{
                             flex: 1,
                             textAlign: "center",
-                            padding: "4px 0",
-                            borderRadius: 5,
-                            background: "rgba(255,255,255,0.03)",
+                            padding: "4.5px 0",
+                            borderRadius: 7,
+                            background: "rgba(255,255,255,0.032)",
                             border: "1px solid var(--border-subtle)",
                             color: "var(--text-secondary)",
                             fontSize: 10,

@@ -1,5 +1,5 @@
 {
-  "executed_at_utc": "2026-11-27T06:55:27.690999+00:00",
+  "executed_at_utc": "2026-11-27T08:03:13.681621+00:00",
   "all_passed": true,
   "suites": [
     {
@@ -16,8 +16,8 @@
         "tests",
         "scripts"
       ],
-      "started_at_utc": "2026-11-27T06:53:51.240676+00:00",
-      "completed_at_utc": "2026-11-27T06:53:51.348240+00:00",
+      "started_at_utc": "2026-11-27T08:01:23.428066+00:00",
+      "completed_at_utc": "2026-11-27T08:01:24.719703+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/ruff-lint.log"
@@ -33,8 +33,8 @@
         "benchmarks",
         "api"
       ],
-      "started_at_utc": "2026-11-27T06:53:51.349242+00:00",
-      "completed_at_utc": "2026-11-27T06:53:52.821539+00:00",
+      "started_at_utc": "2026-11-27T08:01:24.720708+00:00",
+      "completed_at_utc": "2026-11-27T08:01:27.041664+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/mypy-typecheck.log"
@@ -49,8 +49,8 @@
         "unit",
         "-v"
       ],
-      "started_at_utc": "2026-11-27T06:53:52.822543+00:00",
-      "completed_at_utc": "2026-11-27T06:54:07.202711+00:00",
+      "started_at_utc": "2026-11-27T08:01:27.041664+00:00",
+      "completed_at_utc": "2026-11-27T08:01:44.606982+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/unit-tests.log"
@@ -65,8 +65,8 @@
         "property",
         "-v"
       ],
-      "started_at_utc": "2026-11-27T06:54:07.203715+00:00",
-      "completed_at_utc": "2026-11-27T06:54:15.868621+00:00",
+      "started_at_utc": "2026-11-27T08:01:44.607984+00:00",
+      "completed_at_utc": "2026-11-27T08:01:54.287005+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/property-tests.log"
@@ -81,8 +81,8 @@
         "integration",
         "-v"
       ],
-      "started_at_utc": "2026-11-27T06:54:15.868621+00:00",
-      "completed_at_utc": "2026-11-27T06:54:31.606860+00:00",
+      "started_at_utc": "2026-11-27T08:01:54.287005+00:00",
+      "completed_at_utc": "2026-11-27T08:02:12.093418+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/integration-tests.log"
@@ -97,8 +97,8 @@
         "regression",
         "-v"
       ],
-      "started_at_utc": "2026-11-27T06:54:31.606860+00:00",
-      "completed_at_utc": "2026-11-27T06:54:39.476631+00:00",
+      "started_at_utc": "2026-11-27T08:02:12.093418+00:00",
+      "completed_at_utc": "2026-11-27T08:02:20.540570+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/regression-tests.log"
@@ -113,8 +113,8 @@
         "security",
         "-v"
       ],
-      "started_at_utc": "2026-11-27T06:54:39.476631+00:00",
-      "completed_at_utc": "2026-11-27T06:54:47.665757+00:00",
+      "started_at_utc": "2026-11-27T08:02:20.541584+00:00",
+      "completed_at_utc": "2026-11-27T08:02:29.704107+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/security-tests.log"
@@ -132,8 +132,8 @@
         "--cov-report=term-missing",
         "-v"
       ],
-      "started_at_utc": "2026-11-27T06:54:47.666752+00:00",
-      "completed_at_utc": "2026-11-27T06:55:18.771917+00:00",
+      "started_at_utc": "2026-11-27T08:02:29.704107+00:00",
+      "completed_at_utc": "2026-11-27T08:03:03.177528+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/coverage.log"
@@ -147,8 +147,8 @@
         "run",
         "typecheck"
       ],
-      "started_at_utc": "2026-11-27T06:55:18.771917+00:00",
-      "completed_at_utc": "2026-11-27T06:55:21.210342+00:00",
+      "started_at_utc": "2026-11-27T08:03:03.177528+00:00",
+      "completed_at_utc": "2026-11-27T08:03:06.151331+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/frontend-typecheck.log"
@@ -162,8 +162,8 @@
         "run",
         "test"
       ],
-      "started_at_utc": "2026-11-27T06:55:21.211753+00:00",
-      "completed_at_utc": "2026-11-27T06:55:24.621545+00:00",
+      "started_at_utc": "2026-11-27T08:03:06.151331+00:00",
+      "completed_at_utc": "2026-11-27T08:03:10.351732+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/frontend-vitest.log"
@@ -177,8 +177,8 @@
         "run",
         "build"
       ],
-      "started_at_utc": "2026-11-27T06:55:24.621545+00:00",
-      "completed_at_utc": "2026-11-27T06:55:27.690487+00:00",
+      "started_at_utc": "2026-11-27T08:03:10.352810+00:00",
+      "completed_at_utc": "2026-11-27T08:03:13.680055+00:00",
       "exit_code": 0,
       "passed": true,
       "log_file": "evidence/tests/frontend-build.log"

@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="../assets/logo.png" width="68" alt="Neural Diff Logo" />
+</p>
+
 # NEURAL DIFF — AI 模型大脑的 Git
 
 **面向预训练基座与微调大模型的结构拓扑、神经表征与确定性行为对比工程平台**

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Download } from "lucide-react";
 import { apiClient } from "../api/client";
 import type { ComparisonBundle } from "../types/api";
@@ -7,6 +8,12 @@ interface Props {
   activeBundle: ComparisonBundle | null;
   onError: (err: Error) => void;
 }
+
+const REPORT_TABS: Array<{ id: "html" | "markdown" | "json"; label: string }> = [
+  { id: "html", label: "Visual Report" },
+  { id: "markdown", label: "Markdown" },
+  { id: "json", label: "JSON" },
+];
 
 export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => {
   const [format, setFormat] = useState<"markdown" | "html" | "json">("html");
@@ -57,27 +64,27 @@ export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => 
 
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
             <div className="segmented-bar">
-              <button
-                type="button"
-                className={`segmented-btn ${format === "html" ? "active" : ""}`}
-                onClick={() => setFormat("html")}
-              >
-                Visual Report
-              </button>
-              <button
-                type="button"
-                className={`segmented-btn ${format === "markdown" ? "active" : ""}`}
-                onClick={() => setFormat("markdown")}
-              >
-                Markdown
-              </button>
-              <button
-                type="button"
-                className={`segmented-btn ${format === "json" ? "active" : ""}`}
-                onClick={() => setFormat("json")}
-              >
-                JSON
-              </button>
+              {REPORT_TABS.map((t) => {
+                const active = format === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={`segmented-btn ${active ? "active" : ""}`}
+                    style={{ background: "transparent", boxShadow: "none" }}
+                    onClick={() => setFormat(t.id)}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="report-format-seg-pill"
+                        className="studio-nav-pill"
+                        transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                      />
+                    )}
+                    <span className="studio-nav-label">{t.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <div style={{ display: "inline-flex", gap: 6 }}>
@@ -118,14 +125,14 @@ export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => 
               width: "100%",
               height: 600,
               border: "1px solid var(--border-subtle)",
-              borderRadius: 8,
+              borderRadius: 12,
               background: "#09090b",
             }}
           />
         ) : (
           <pre
             className="diff-box mono"
-            style={{ maxHeight: 600, overflow: "auto", margin: 0 }}
+            style={{ maxHeight: 600, overflow: "auto", margin: 0, borderRadius: 12 }}
           >
             {content || "Loading report..."}
           </pre>

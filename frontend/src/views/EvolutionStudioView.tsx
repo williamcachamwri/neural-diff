@@ -14,6 +14,7 @@ import {
 } from "../components/evolution/EvolutionAnalyticsTabs";
 import { EvolutionDagCanvas } from "../components/evolution/EvolutionDagCanvas";
 import type { DiscoveredModelsResponse } from "../types/api";
+import { formatCategory } from "../utils/format";
 import type {
   EvolutionCheckpoint,
   EvolutionOverviewResponse,
@@ -44,6 +45,22 @@ const EVO_TABS: Array<{ id: EvoTabId; label: string }> = [
   { id: "regressions", label: "Regressions" },
   { id: "experiments", label: "Provenance & Export" },
 ];
+
+function formatMetaSummary(meta: Record<string, unknown>, emptyLabel: string): string {
+  const entries = Object.entries(meta).filter(
+    ([, v]) => v !== null && v !== undefined && v !== ""
+  );
+  if (entries.length === 0) return emptyLabel;
+  return entries
+    .slice(0, 4)
+    .map(([k, v]) => {
+      const cleanKey = k.replace(/_/g, " ");
+      if (Array.isArray(v)) return `${cleanKey}: ${v.join(", ")}`;
+      if (typeof v === "object") return `${cleanKey}: ${Object.keys(v as object).length} fields`;
+      return `${cleanKey}: ${String(v)}`;
+    })
+    .join(" · ");
+}
 
 export interface EvolutionStudioViewProps {
   discovered: DiscoveredModelsResponse | null;
@@ -563,7 +580,11 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                             {humanizeEnum(ins.epistemic_status)}
                           </span>
                         </td>
-                        <td>{ins.statement}</td>
+                        <td>
+                          {ins.statement.replace(/'([a-z_]+)'/g, (_m, k: string) =>
+                            formatCategory(k)
+                          )}
+                        </td>
                         <td className="mono" style={{ color: "var(--text-muted)" }}>
                           {ins.evaluation_cases.length > 0
                             ? ins.evaluation_cases.join(", ")
@@ -635,11 +656,10 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
             <div className="panel-header">
               <div>
                 <h3 className="panel-title">
-                  Interactive Evolution DAG &amp; Branched Lineage Graph ({detail.project.name})
+                  Evolution Lineage Graph ({detail.project.name})
                 </h3>
                 <div className="panel-subtitle">
-                  Zoom/pan, collapse branch nodes, filter stages/categories, or mark any two
-                  checkpoints (A ↔ B) for direct comparison
+                  Branch topology, merge weights, and cross-generation pair selection
                 </div>
               </div>
 
@@ -669,7 +689,7 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                   <option value="">Overall pass rate</option>
                   {evalCategories.map((c) => (
                     <option key={c} value={c}>
-                      {c}
+                      {formatCategory(c)}
                     </option>
                   ))}
                 </select>
@@ -1013,7 +1033,16 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                       </td>
                       <td className="num">{c.tensor_count}</td>
                       <td className="mono">{c.sha256_fingerprint.slice(0, 14)}…</td>
-                      <td className="mono">{c.validation_status}</td>
+                      <td>
+                        <span className="status-inline">
+                          <span
+                            className={`dot ${
+                              c.validation_status === "VERIFIED" ? "dot-ok" : "dot-warn"
+                            }`}
+                          />
+                          <span>{humanizeEnum(c.validation_status)}</span>
+                        </span>
+                      </td>
                       <td className="num">
                         <button
                           type="button"
@@ -1043,7 +1072,7 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                     <span className="mono">{selectedCheckpoint.checkpoint_id}</span>)
                   </h3>
                   <div className="panel-subtitle">
-                    Verified disk &amp; config metadata — zero fabricated fields
+                    Content hashes, architecture dimensions, and lineage metadata
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -1106,10 +1135,12 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                     </tr>
                     <tr>
                       <th>Format / File Size</th>
-                      <td className="mono">
-                        {selectedCheckpoint.checkpoint_format} ·{" "}
-                        {(selectedCheckpoint.file_size_bytes / (1024 * 1024)).toFixed(2)} MiB (
-                        {selectedCheckpoint.dtypes_present.join(", ")})
+                      <td>
+                        {humanizeEnum(selectedCheckpoint.checkpoint_format)} ·{" "}
+                        <span className="mono">
+                          {(selectedCheckpoint.file_size_bytes / (1024 * 1024)).toFixed(2)} MiB (
+                          {selectedCheckpoint.dtypes_present.join(", ")})
+                        </span>
                       </td>
                       <th>Parent IDs</th>
                       <td className="mono">
@@ -1118,24 +1149,17 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                     </tr>
                     <tr>
                       <th>Tokenizer / Quantization</th>
-                      <td className="mono">
-                        {Object.keys(selectedCheckpoint.tokenizer_metadata).length > 0
-                          ? JSON.stringify(selectedCheckpoint.tokenizer_metadata)
-                          : "None"}{" "}
-                        ·{" "}
-                        {Object.keys(selectedCheckpoint.quantization_metadata).length > 0
-                          ? JSON.stringify(selectedCheckpoint.quantization_metadata)
-                          : "Unquantized"}
+                      <td>
+                        {formatMetaSummary(selectedCheckpoint.tokenizer_metadata, "Default")} ·{" "}
+                        {formatMetaSummary(
+                          selectedCheckpoint.quantization_metadata,
+                          "Unquantized"
+                        )}
                       </td>
-                      <th>LoRA / Training Metadata</th>
-                      <td className="mono">
-                        {Object.keys(selectedCheckpoint.lora_metadata).length > 0
-                          ? JSON.stringify(selectedCheckpoint.lora_metadata)
-                          : "Full weights"}{" "}
-                        ·{" "}
-                        {Object.keys(selectedCheckpoint.training_metadata).length > 0
-                          ? JSON.stringify(selectedCheckpoint.training_metadata)
-                          : "No trainer_state"}
+                      <th>Adapter / Training</th>
+                      <td>
+                        {formatMetaSummary(selectedCheckpoint.lora_metadata, "Full weights")} ·{" "}
+                        {formatMetaSummary(selectedCheckpoint.training_metadata, "Standard")}
                       </td>
                     </tr>
                   </tbody>

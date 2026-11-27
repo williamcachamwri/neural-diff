@@ -1,7 +1,7 @@
 [
   {
     "filename": "evidence/frontend/16-evolution-dashboard.png",
-    "timestamp_utc": "2026-11-27T07:00:47.054890+00:00",
+    "timestamp_utc": "2026-11-27T08:08:56.669238+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Evolution Dashboard & Insights",
@@ -11,7 +11,7 @@
   },
   {
     "filename": "evidence/frontend/18-evolution-branched-graph.png",
-    "timestamp_utc": "2026-11-27T07:00:47.864242+00:00",
+    "timestamp_utc": "2026-11-27T08:08:57.482200+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Branched & Merged Evolution Graph",
@@ -21,7 +21,7 @@
   },
   {
     "filename": "evidence/frontend/17-evolution-timeline.png",
-    "timestamp_utc": "2026-11-27T07:00:58.847961+00:00",
+    "timestamp_utc": "2026-11-27T08:09:09.431428+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Evolution Lineage Timeline & Pair Comparator",
@@ -31,7 +31,7 @@
   },
   {
     "filename": "evidence/frontend/19-evolution-checkpoint-registry.png",
-    "timestamp_utc": "2026-11-27T07:00:59.650068+00:00",
+    "timestamp_utc": "2026-11-27T08:09:10.147983+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Checkpoint Registry",
@@ -41,7 +41,7 @@
   },
   {
     "filename": "evidence/frontend/20-evolution-checkpoint-details.png",
-    "timestamp_utc": "2026-11-27T07:01:00.555607+00:00",
+    "timestamp_utc": "2026-11-27T08:09:10.888038+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Checkpoint Provenance & Details",
@@ -51,7 +51,7 @@
   },
   {
     "filename": "evidence/frontend/21-evolution-tensor-comparison.png",
-    "timestamp_utc": "2026-11-27T07:01:01.365627+00:00",
+    "timestamp_utc": "2026-11-27T08:09:11.517118+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Multi-Gen & Cumulative Tensor Evolution",
@@ -61,7 +61,7 @@
   },
   {
     "filename": "evidence/frontend/22-evolution-layer-heatmap.png",
-    "timestamp_utc": "2026-11-27T07:01:02.113013+00:00",
+    "timestamp_utc": "2026-11-27T08:09:12.186737+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Layer Evolution Heatmap",
@@ -71,7 +71,7 @@
   },
   {
     "filename": "evidence/frontend/23-evolution-behavioral-chart.png",
-    "timestamp_utc": "2026-11-27T07:01:02.935969+00:00",
+    "timestamp_utc": "2026-11-27T08:09:12.829351+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Behavioral Evolution Chart",
@@ -81,7 +81,7 @@
   },
   {
     "filename": "evidence/frontend/24-evolution-representation-matrix.png",
-    "timestamp_utc": "2026-11-27T07:01:03.777265+00:00",
+    "timestamp_utc": "2026-11-27T08:09:13.532060+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Representation CKA Evolution Matrix",
@@ -91,7 +91,7 @@
   },
   {
     "filename": "evidence/frontend/25-evolution-regression-origin.png",
-    "timestamp_utc": "2026-11-27T07:01:04.584640+00:00",
+    "timestamp_utc": "2026-11-27T08:09:14.213530+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Regression Origin Analysis",
@@ -101,7 +101,7 @@
   },
   {
     "filename": "evidence/frontend/26-evolution-experiment-details.png",
-    "timestamp_utc": "2026-11-27T07:01:05.378726+00:00",
+    "timestamp_utc": "2026-11-27T08:09:14.902854+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Experiment Reproducibility Details",
@@ -111,7 +111,7 @@
   },
   {
     "filename": "evidence/frontend/27-evolution-exported-report.png",
-    "timestamp_utc": "2026-11-27T07:01:05.930142+00:00",
+    "timestamp_utc": "2026-11-27T08:09:15.468955+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Exported Standalone Evolution Report",

@@ -11,7 +11,7 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import { GitCommitHorizontal, Maximize2, Spline } from "lucide-react";
+import { GitCommitHorizontal, Maximize2, Minus, Plus, Spline } from "lucide-react";
 import type {
   ComparisonBundle,
   ExperimentSummaryItem,
@@ -561,7 +561,7 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
   onSelectView,
 }) => {
   const [routingMode, setRoutingMode] = useState<"bezier" | "pcb">("bezier");
-  const { fitView } = useReactFlow();
+  const { fitView, zoomIn, zoomOut } = useReactFlow();
 
   const onInspect = useCallback(
     (view: ViewId) => {
@@ -644,23 +644,8 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
         />
       </ReactFlow>
 
-      {/* Subtle Cable & Viewport Controls integrated into Bottom-Right beside MiniMap */}
-      <div
-        style={{
-          position: "absolute",
-          right: 196,
-          bottom: 14,
-          zIndex: 20,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-          background: "var(--bg-chrome)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: 9,
-          padding: "4px 8px",
-        }}
-      >
+      {/* Precision Cable & Camera Dock integrated beside MiniMap */}
+      <div className="canvas-dock-controls">
         <button
           type="button"
           className="canvas-footer-btn"
@@ -669,6 +654,25 @@ const InnerCanvas: React.FC<WorkflowCanvasProps> = ({
         >
           {routingMode === "bezier" ? <Spline size={12} /> : <GitCommitHorizontal size={12} />}
           <span>Cables: {routingMode === "bezier" ? "Bezier Spline" : "Orthogonal PCB"}</span>
+        </button>
+        <span className="studio-divider-v" style={{ height: 12 }} />
+        <button
+          type="button"
+          className="canvas-footer-btn"
+          onClick={() => void zoomOut({ duration: 220 })}
+          title="Zoom out"
+          aria-label="Zoom out canvas"
+        >
+          <Minus size={12} />
+        </button>
+        <button
+          type="button"
+          className="canvas-footer-btn"
+          onClick={() => void zoomIn({ duration: 220 })}
+          title="Zoom in"
+          aria-label="Zoom in canvas"
+        >
+          <Plus size={12} />
         </button>
         <span className="studio-divider-v" style={{ height: 12 }} />
         <button

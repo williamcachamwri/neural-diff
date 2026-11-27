@@ -1,7 +1,7 @@
 === Suite: unit_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m unit -v
-Started (UTC): 2026-11-27T06:53:52.822543+00:00
-Completed (UTC): 2026-11-27T06:54:07.202711+00:00
+Started (UTC): 2026-11-27T08:01:27.041664+00:00
+Completed (UTC): 2026-11-27T08:01:44.606982+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -59,7 +59,7 @@ tests/unit/test_tensor_metrics.py::test_distribution_summary_and_shift PASSED [ 
 tests/unit/test_tie_weights.py::test_detect_accidental_weight_untying_between_checkpoints PASSED [ 97%]
 tests/unit/test_top_elements.py::test_extract_top_k_element_deltas_2d_and_3d PASSED [100%]
 
-===================== 42 passed, 22 deselected in 12.93s ======================
+===================== 42 passed, 22 deselected in 15.74s ======================
 
 --- STDERR ---
 

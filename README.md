@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="docs/assets/logo.png" width="68" alt="Neural Diff Logo" />
+</p>
+
 # NEURAL DIFF — Git for AI Brains
 
 **Structural, Neural & Behavioral Intelligence Comparison for Pretrained and Fine-Tuned Foundation Models**

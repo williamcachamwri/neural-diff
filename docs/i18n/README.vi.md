@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="../assets/logo.png" width="68" alt="Neural Diff Logo" />
+</p>
+
 # NEURAL DIFF — Git cho Bộ Não AI
 
 **Nền Tảng So Sánh Cấu Trúc, Biểu Diễn Nơ-ron & Hành Vi Tất Định Cho Các Mô Hình Nền Tảng và Tinh Chỉnh**

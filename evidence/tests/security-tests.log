@@ -1,7 +1,7 @@
 === Suite: security_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m security -v
-Started (UTC): 2026-11-27T06:54:39.476631+00:00
-Completed (UTC): 2026-11-27T06:54:47.665757+00:00
+Started (UTC): 2026-11-27T08:02:20.541584+00:00
+Completed (UTC): 2026-11-27T08:02:29.704107+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -25,7 +25,7 @@ tests/security/test_security_controls.py::test_unsafe_pickle_rce_gadget_rejected
 tests/security/test_security_controls.py::test_api_security_headers_payload_limit_and_traversal_blocking PASSED [ 87%]
 tests/security/test_security_controls.py::test_default_allowed_roots_honors_cwd_and_env_override PASSED [100%]
 
-====================== 8 passed, 56 deselected in 6.84s =======================
+====================== 8 passed, 56 deselected in 7.66s =======================
 
 --- STDERR ---
 

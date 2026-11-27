@@ -1,7 +1,7 @@
 === Suite: property_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m property -v
-Started (UTC): 2026-11-27T06:54:07.203715+00:00
-Completed (UTC): 2026-11-27T06:54:15.868621+00:00
+Started (UTC): 2026-11-27T08:01:44.607984+00:00
+Completed (UTC): 2026-11-27T08:01:54.287005+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -24,7 +24,7 @@ tests/property/test_tensor_properties.py::test_l2_triangle_inequality PASSED [ 7
 tests/property/test_tensor_properties.py::test_chunk_partition_invariance PASSED [ 85%]
 tests/property/test_tensor_properties.py::test_linear_cka_planar_rotation_invariance PASSED [100%]
 
-====================== 7 passed, 57 deselected in 7.30s =======================
+====================== 7 passed, 57 deselected in 8.10s =======================
 
 --- STDERR ---
 
