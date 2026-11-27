@@ -1,9 +1,11 @@
 {
-  "captured_at_utc": "2026-11-27T10:39:08.197289+00:00",
-  "commit_count": 131,
+  "captured_at_utc": "2026-11-27T11:58:58.430802+00:00",
+  "commit_count": 133,
   "clean_working_tree": true,
   "status_short": [],
   "recent_commits": [
+    "bb40cc1 fix(evolution): separate behavioral/score/causal flags, hash coexisting adapter metadata, and sync 5-language epistemic docs",
+    "76cff8d chore(evidence): seal 99-artifact SHA-256 manifest for final evolution audit",
     "29f89e9 fix(evolution): enforce 4-condition causal provenance, complete-DAG lineage DP, and orthogonal 5-part SHA-256",
     "3a29ddf chore(evidence): refresh SHA-256 manifest and git ledger for evolution audit fixes",
     "6fa0915 fix(evolution): enforce 4-tier causal rigor, Holm-Bonferroni stats, 5-part SHA-256, and distinct v3/v4 pruning benchmark",
@@ -26,8 +28,6 @@
     "4ced9a1 ci: replace monolithic workflow with 8 specialized CI, security, SAST, benchmark & release pipelines",
     "f0c606d fix(ci): seed demo fixtures and launch live FastAPI + Vite servers before Playwright E2E",
     "91d0fe5 chore(evidence): update SHA-256 manifest prior to GitHub release push",
-    "0d0fcf6 docs(evidence): refresh git history log after 5-language architectural documentation",
-    "add3f2f docs(readme): expand 7-layer architecture specification, sequence diagrams, and API reference across all 5 languages",
-    "d2938bf chore(evidence): update SHA-256 evidence manifest for final artifacts"
+    "0d0fcf6 docs(evidence): refresh git history log after 5-language architectural documentation"
   ]
 }
