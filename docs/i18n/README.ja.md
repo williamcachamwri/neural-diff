@@ -4,20 +4,23 @@
 
 [**English**](../../README.md) · [**Tiếng Việt**](README.vi.md) · [**简体中文**](README.zh-CN.md) · [**日本語**](README.ja.md) · [**Français**](README.fr.md)
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B%20(3.12%20Verified)-18181b?style=flat-square)](../../pyproject.toml)
+[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](../../.github/workflows)
+[![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](../../pyproject.toml)
+[![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 90%](https://img.shields.io/badge/Core%20Coverage-90%25%20(55%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
 
-**NEURAL DIFF** は、ニューラルネットワークのチェックポイント間における進化を数学的厳密さで検査・比較・検証・リグレッションゲート管理するためのプロダクション品質オープンソース ML エンジニアリング基盤です。Python ライブラリ、CLI（`neural-diff`）、FastAPI + SQLite バックエンド、および **ComfyUI Nodes 2.0 モノクローム・スタジオ**（React 19 + TypeScript + `@xyflow/react`）を備え、**疎結合な 7 層システムアーキテクチャ** と **4 つの直交解析軸** によってモデル更新を分解します：
+**NEURAL DIFF** は、ニューラルネットワークのチェックポイント間および多世代ライフサイクルにわたる進化を数学的厳密さで検査・比較・検証・リグレッションゲート管理するためのプロダクション品質オープンソース ML エンジニアリング基盤です。Python ライブラリ、CLI（`neural-diff`）、FastAPI + SQLite バックエンド、および **ComfyUI Nodes 2.0 モノクローム・スタジオ**（React 19 + TypeScript + `@xyflow/react`）を備え、**疎結合な 8 層システムアーキテクチャ** と **5 つの直交解析軸** によってモデル更新を分解します：
 
 1. **構造・トポロジー差分（Structural & Topology Diff）** — テンソルキーの追加・削除、二部グラフ・コサインマッチング（$\cos \ge 0.985$）によるリネーム推論、形状・データ型のシフト、GQA（Grouped-Query Attention）ヘッド単位スライス、入出力埋め込みの重み共有（Weight Tying）検証、構造化プルーニングおよび NVIDIA `2:4` 半構造化スパース性適合率。
 2. **Float64 チャンクストリーミング数値解析・SVD スペクトル有効ランク** — 定数メモリオーバーヘッドでチャンク単位に `float64` 昇格して累積する精密演算（`max_abs_diff`、`mean_abs_diff`、`RMSE`、`Relative L2`、`Cosine Similarity`、ゼロ交差遷移、分位数、Wasserstein-1 距離、共通ビン TVD/JS ヒストグラム、Top-$K$ 多次元座標特定）、および特異値スペクトルの Roy-Vetterli **Shannon 有効ランク** による低ランク LoRA 結合とフルランク SFT 更新の判別。
 3. **機構的解釈可能性・Logit Lens・反事実活性化パッチング** — 同一トークン列に対する順伝播フックでブロックごとの隠れ状態/Attention/MLP コサイン、直交変換不変な **中心化線形 CKA**（異種アーキテクチャ間の異なる隠れ次元比較に対応）、観測的 **Logit Lens** 語彙投影、および反事実 **残差ストリーム活性化パッチング（Residual-Stream Activation Patching）**（対象プロンプト対において `CAUSALLY VERIFIED` を達成）を実行。
 4. **8 領域の決定的行動評価・リグレッションゲート** — 外部 LLM ジャッジを一切呼ばない 8 種の決定的評価器（Unicode NFC、Python `ast.parse` 構文木、厳密 JSON スキーマ、数値抽出、安全拒否など計 24 対テストケース）、2,000 回リサンプリングのペアード・ブートストラップ 95% 信頼区間、正確両側 McNemar 検定、バージョン管理ベースライン、複数実行推移解析（`diff-of-diffs`）、およびワンクリックコピー対応 CLI 再現コマンド。
+5. **多世代ニューラル進化追跡（`Module I`）＆ミニマリスト 5 形式ビジュアルレポート** — 分岐・複数親モデル統合 DAG（`Base → SFT → DPO → Merge → Quantization → Pruning`）、3 色 DFS 循環検出、4 MiB ストリーミング SHA-256 指紋＆PEFT LoRA 検出、直接累積距離 $\|W_{\text{current}} - W_{\text{base}}\|_2$、世代横断 CKA 行列、劣化起点自動特定（`Regression Origin Pinpointing`）、および 5 種の SVG 埋め込み `HTML`・Mermaid＋`█░`ゲージ付き `Markdown`・純 Python ベクタ `%PDF-1.4`・`CSV`・厳密 `JSON` レポート出力。
 
 ![NEURAL DIFF Studio — 9 ノード・インタラクティブ・ワークフローグラフ](../../evidence/frontend/01-dashboard.png)
 
@@ -240,6 +243,18 @@ sequenceDiagram
 ### 15. 直交 PCB 配線モードにおける最終スタジオ状態
 ![15 — Final Application State](../../evidence/frontend/15-final-application-state.png)
 
+### 16–27. 多世代ニューラル進化スタジオ＆5-SVG ビジュアルレポート全画面キャプチャ（`SmolLM2-135M` 6 世代 DAG）
+
+| 16 · 進化 3 チャート・ダッシュボード | 17 · 分岐系譜＆任意ペア比較 | 18 · 分岐・マージ対話型 DAG |
+| :---: | :---: | :---: |
+| ![16](../../evidence/frontend/16-evolution-dashboard.png) | ![17](../../evidence/frontend/17-evolution-timeline.png) | ![18](../../evidence/frontend/18-evolution-branched-graph.png) |
+| **19 · SHA-256 チェックポイント台帳** | **20 · 量子化メタデータ詳細** | **21 · 直接累積 $L_2$ 軌跡比較** |
+| ![19](../../evidence/frontend/19-evolution-checkpoint-registry.png) | ![20](../../evidence/frontend/20-evolution-checkpoint-details.png) | ![21](../../evidence/frontend/21-evolution-tensor-comparison.png) |
+| **22 · 30 層重み進化ヒートマップ** | **23 · 行動推移＆8 軸レーダー** | **24 · 中心化線形 CKA 行列** |
+| ![22](../../evidence/frontend/22-evolution-layer-heatmap.png) | ![23](../../evidence/frontend/23-evolution-behavioral-chart.png) | ![24](../../evidence/frontend/24-evolution-representation-matrix.png) |
+| **25 · 劣化起点の自動特定** | **26 · 再現性台帳＆ライブプレビュー** | **27 · 出力された単体 5-SVG HTML レポート** |
+| ![25](../../evidence/frontend/25-evolution-regression-origin.png) | ![26](../../evidence/frontend/26-evolution-experiment-details.png) | ![27](../../evidence/frontend/27-evolution-exported-report.png) |
+
 ---
 
 ## 6. 公開実モデルベンチマーク（`REAL MODEL EXPERIMENT`）
@@ -314,10 +329,11 @@ npm --prefix frontend run dev
 | `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | 決定的行動評価の実行および単一カテゴリの再現検証 |
 | `suites` | `python -m core.cli suites` | 登録済み決定的ベンチマークスイート一覧の表示 |
 | `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | 2 次元重み差分の SVD 特異値スペクトルと Shannon 有効ランク算出 |
+| `evolution` | `neural-diff evolution {create-project,register,analyze}` | 多世代進化 DAG プロジェクト管理・SHA-256 登録・`json`/`csv`/`md`/`html`/`pdf` 5 形式出力 |
 
 ---
 
-## 10. REST API リファレンス（全 17 エンドポイント）
+## 10. REST API リファレンス（全 37 エンドポイント）
 
 | メソッド | エンドポイント | 役割 |
 | :--- | :--- | :--- |
@@ -337,15 +353,16 @@ npm --prefix frontend run dev
 | `GET` | `/api/diagnostics/history-trends` | 複数実行にわたる `diff-of-diffs` カテゴリ推移解析 |
 | `GET/POST/DELETE` | `/api/baselines*` | バージョン管理されたリグレッションベースラインの操作 |
 | `GET/PUT` | `/api/settings` | ランタイムおよびシリアライズ安全ポリシーの取得・更新 |
+| `GET/POST/PUT/PATCH/DELETE` | `/api/evolution/*`（20 エンドポイント） | 進化 DAG 管理、SHA-256 登録、3 色 DFS 循環防止、任意ペア比較、5 形式（`json`/`csv`/`markdown`/`html`/`pdf`）出力 |
 
 ---
 
-## 11. 自動テスト・`90%` カバレッジ・セキュリティ監査
+## 11. 10 系統マルチノード CI/CD・`89%` カバレッジ・セキュリティ監査
 
-* **静的解析：** `ruff check`（`exit 0`）および全 70 ファイルに対する `mypy` 型検査（`exit 0`）。
-* **Python テストスイート（`55 passed`）：** 単体テスト `36` 件、Hypothesis プロパティテスト `7` 件、統合テスト `4` 件、ゴールデン回帰テスト `1` 件、敵対的セキュリティテスト `5` 件を通過し、コアステートメントカバレッジ **`90%`**（`4,682` 文、[`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）を達成。
-* **フロントエンド＆E2E：** `tsc --noEmit`（`exit 0`）、Vitest（`3 passed`）、Vite 8 本番ビルド（`exit 0`）、Playwright Chromium ライブ E2E（`1 passed`）。
-* **脆弱性＆シークレット監査：** `pip-audit` 脆弱性 `0` 件、`npm audit` 脆弱性 `0` 件、シークレットスキャン検出 `0` 件。
+* **10 系統マルチノード GitHub Actions（[`.github/workflows/`](../../.github/workflows)）：** `Python 3.11 / 3.12` マトリクス、`Node.js 20 / 22 LTS` マトリクス、`ubuntu-latest` + `windows-latest` 移植性検証、Playwright 並列シャーディング E2E、進化 DAG ＆ 5 形式レポート検証（`evolution-pipeline.yml`）、37 エンドポイント OpenAPI ＆ SQLite WAL 並行性検証（`api-contract-and-db.yml`）、CodeQL、CVE/シークレット監査、クリーンルーム `.whl` スモークテストを実行。
+* **静的解析＆Python テスト（`64 passed`）：** `ruff check`（`exit 0`）、全 `86` ファイルの `mypy` 型検査（`exit 0`）、ステートメントカバレッジ **`89%`**（`7,590` 文、[`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
+* **フロントエンド＆E2E：** `tsc --noEmit`（`exit 0`）、Vitest（`4 passed`）、Vite 8 ビルド（`exit 0`、全 JS チャンク `< 500 KB`）、Playwright Chromium E2E（`2 passed`）。
+* **変更履歴＆技術ガイド：** [`CHANGELOG.md`](../../CHANGELOG.md) および [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md) を参照。
 
 ---
 

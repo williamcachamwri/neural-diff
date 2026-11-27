@@ -4,7 +4,9 @@
 
 [**English**](README.md) · [**Tiếng Việt**](docs/i18n/README.vi.md) · [**简体中文**](docs/i18n/README.zh-CN.md) · [**日本語**](docs/i18n/README.ja.md) · [**Français**](docs/i18n/README.fr.md)
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B%20(3.12%20Verified)-18181b?style=flat-square)](pyproject.toml)
+[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](.github/workflows)
+[![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](pyproject.toml)
+[![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](frontend/package.json)
 [![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
@@ -12,12 +14,13 @@
 
 ---
 
-**NEURAL DIFF** is a production-grade open-source ML engineering platform, Python library, CLI (`neural-diff`), FastAPI + SQLite backend, and **ComfyUI Nodes 2.0 Monochrome Studio** designed to inspect, compare, verify, and regression-gate neural network checkpoints with mathematical rigor. Rather than treating model updates as opaque weight blobs or relying on cherry-picked prompt anecdotes, NEURAL DIFF decomposes checkpoint evolution across **seven decoupled architectural layers** and **four orthogonal analytical axes**:
+**NEURAL DIFF** is a production-grade open-source ML engineering platform, Python library, CLI (`neural-diff`), FastAPI + SQLite backend, and **ComfyUI Nodes 2.0 Architectural Monochrome Studio** designed to inspect, compare, track multi-generation lineages, verify, and regression-gate neural network checkpoints with mathematical rigor. Rather than treating model updates as opaque weight blobs or relying on cherry-picked prompt anecdotes, NEURAL DIFF decomposes checkpoint evolution across **eight decoupled architectural layers** and **five orthogonal analytical axes**:
 
 1. **Structural & Topological Diffing** — Key additions/removals, cosine-matched rename inference ($\cos \ge 0.985$), shape/dtype shifts, grouped-query attention (GQA) head slicing, input/output weight-tying verification, structured channel pruning, and NVIDIA `2:4` semi-structured sparsity compliance.
 2. **Float64 Chunk-Streamed Tensor Math & SVD Spectral Rank** — Constant-overhead chunked `float64` accumulation (`max_abs_diff`, `mean_abs_diff`, `RMSE`, `Relative L2`, `Cosine Similarity`, zero $\leftrightarrow$ nonzero transitions, quantiles, Wasserstein-1, aligned TVD/JS histograms, exact top-$k$ coordinate unravelling) plus SVD singular spectrum & Roy-Vetterli Shannon effective rank to distinguish low-rank LoRA merges from full-rank SFT updates.
 3. **Mechanistic Representation, Logit Lens & Causal Activation Patching** — Identical-prompt PyTorch forward hooks measuring block-by-block hidden/attention/MLP cosine, orthogonal-invariant **Centered Linear CKA** (supporting cross-architecture width changes), observational **Logit Lens** vocabulary projections, and counterfactual **Residual-Stream Activation Patching** (`CAUSALLY VERIFIED` on paired prompts).
 4. **Deterministic 8-Suite Behavioral Evaluation & Regression Gating** — 24 paired test cases scored by 8 deterministic AST/Unicode/schema/numeric evaluators (zero external LLM judge calls), paired 2,000-resample bootstrap 95% confidence intervals, exact two-sided McNemar tests, versioned SQLite/JSON baselines, multi-run `diff-of-diffs` trend analysis, and 1-click copyable CLI reproduction commands.
+5. **Multi-Generation Neural Evolution Tracking & 5-Format Visual Reporting (`Module I`)** — Branched & merged lifecycle Directed Acyclic Graphs (`Base -> SFT -> DPO -> Merge -> Quantization -> Pruning`) with 3-color DFS cycle prevention, streaming SHA-256 checkpoint & LoRA fingerprinting, direct `||W_current - W_base||_2` cumulative geometry, layer/CKA/behavioral trajectories, automatic Regression Origin Pinpointing, and zero-slop **5-format visual exports** (`HTML` with 5 embedded SVGs, `Markdown` with Mermaid + Unicode `█░` gauges, pure-Python `%PDF-1.4` vector charts, `CSV`, and strict `JSON`).
 
 ![NEURAL DIFF Studio — Interactive 9-Node Workflow Graph](evidence/frontend/01-dashboard.png)
 
@@ -26,16 +29,16 @@
 ## Table of Contents
 
 1. [Epistemic & Provenance Discipline](#1-epistemic--provenance-discipline)
-2. [Deep Dive: 7-Layer System Architecture](#2-deep-dive-7-layer-system-architecture)
+2. [Deep Dive: 8-Layer System Architecture](#2-deep-dive-8-layer-system-architecture)
 3. [End-to-End Execution Pipeline & Dataflow](#3-end-to-end-execution-pipeline--dataflow)
 4. [Mathematical & Statistical Formulations](#4-mathematical--statistical-formulations)
-5. [Complete Studio Walkthrough (100% of All 15 Live Screenshots)](#5-complete-studio-walkthrough-100-of-all-15-live-screenshots)
-6. [Verified Real Model Benchmarks (`REAL MODEL EXPERIMENT`)](#6-verified-real-model-benchmarks-real-model-experiment)
+5. [Complete Studio & Evolution Walkthrough (100% of All 27 Live Screenshots)](#5-complete-studio--evolution-walkthrough-100-of-all-27-live-screenshots)
+6. [Verified Real Model & Multi-Generation DAG Benchmarks (`REAL MODEL EXPERIMENT`)](#6-verified-real-model--multi-generation-dag-benchmarks-real-model-experiment)
 7. [Synthetic Streaming Throughput & Memory Benchmarks](#7-synthetic-streaming-throughput--memory-benchmarks)
 8. [Installation & Reproducible Quickstart](#8-installation--reproducible-quickstart)
 9. [CLI Reference (`neural-diff`)](#9-cli-reference-neural-diff)
 10. [REST API Reference (37 Endpoints)](#10-rest-api-reference-37-endpoints)
-11. [Automated Testing, Coverage & Security Hardening](#11-automated-testing-coverage--security-hardening)
+11. [Multi-Node CI/CD Architecture, Testing (`89%` Coverage) & Security Hardening](#11-multi-node-cicd-architecture-testing-89-coverage--security-hardening)
 12. [Evidence Integrity & Known Limitations](#12-evidence-integrity--known-limitations)
 13. [Repository Layout & Documentation Index](#13-repository-layout--documentation-index)
 
@@ -57,22 +60,28 @@ Every comparison bundle also carries an immutable provenance tag—either **`REA
 
 ---
 
-## 2. Deep Dive: 7-Layer System Architecture
+## 2. Deep Dive: 8-Layer System Architecture
 
-NEURAL DIFF is architected as seven strictly decoupled horizontal layers, ensuring the core mathematical engines have zero web-framework coupling and can run identically inside Python scripts, CI pipelines, the `neural-diff` CLI, or the FastAPI + React studio.
+NEURAL DIFF is architected as eight strictly decoupled horizontal layers, ensuring the core mathematical and lineage engines have zero web-framework coupling and execute identically inside Python scripts, CI pipelines, the `neural-diff` CLI, or the FastAPI + React studio.
 
 ```mermaid
 flowchart TB
-    subgraph L7["Layer 7 · Presentation, API & Orchestration"]
-        UI["ComfyUI Nodes 2.0 Monochrome Studio (React 19 · TypeScript · XYFlow · Framer Motion)"]
-        API["FastAPI Application + Diagnostics Router + WAL SQLite Store"]
-        CLI["neural-diff CLI & ComparisonOrchestrator"]
+    subgraph L8["Layer 8 · Presentation, 37-Endpoint REST API, CLI & 5-Format Visual Reporting"]
+        UI["Architectural Monochrome Studio + StudioVisuals SVG Suite (React 19 · TypeScript · XYFlow)"]
+        API["FastAPI Application + Evolution & Diagnostics Routers + WAL SQLite Stores"]
+        REP["Minimalist Report Engine (5-SVG HTML · Mermaid+Gauge MD · Vector PDF 1.4 · CSV · JSON)"]
     end
 
-    subgraph L6["Layer 6 · Behavioral Intelligence, Regression Gate & Reporting"]
+    subgraph L7["Layer 7 · Multi-Generation Neural Evolution DAG & Provenance Engine (Module I)"]
+        DAG["Branched & Merged EvolutionDAG · 3-Color DFS Cycle Guard · LCA · 14 Stage Types"]
+        REG_CKPT["4 MiB Streaming SHA-256 Registry · Duplicate & PEFT LoRA Detector · Content Cache"]
+        EVO_ENG["Direct Base-to-Current L2 · Layer Matrix · CKA Drift · Regression Origin Pinpointing"]
+    end
+
+    subgraph L6["Layer 6 · Behavioral Intelligence & Regression Gate"]
         BEH["8 Deterministic Evaluators (Vietnamese NFC · Python AST · JSON · Math · Refusal · Factual)"]
-        STATS_B["Paired Bootstrap 95% CI & Exact Two-Sided McNemar Test"]
-        REG["Regression Threshold Engine · Versioned Baselines · Diff-of-Diffs · SVG/MD/JSON Exporters"]
+        STATS_B["Wilson 95% CI · Paired Bootstrap 95% CI · Exact Two-Sided McNemar Test"]
+        REG["Regression Threshold Engine · Versioned Baselines · Diff-of-Diffs · CLI Reproducers"]
     end
 
     subgraph L5["Layer 5 · Mechanistic Representation & Causal Intervention"]
@@ -94,7 +103,7 @@ flowchart TB
     end
 
     subgraph L2["Layer 2 · Safe Ingestion & Architecture Normalization"]
-        SAFE["Zero-Copy Safetensors Reader (Single & Multi-Shard Index)"]
+        SAFE["Safe Safetensors Reader (Single & Multi-Shard Index)"]
         PTSAFE["Opcode-Scanned PyTorch weights_only Reader"]
         HFHUB["Hugging Face Snapshot Resolver & Naming-Agnostic Canonical Role Registry"]
     end
@@ -104,8 +113,9 @@ flowchart TB
         RES["Live CUDA Kernel Verifier · Process RSS / VRAM Telemetry · Cooperative Cancellation"]
     end
 
-    UI --> API --> CLI
-    CLI --> L6 & L5 & L4 & L3
+    UI --> API --> REP
+    API --> L7 & L6 & L5 & L4 & L3
+    L7 --> L6 & L5 & L4 & L3
     L6 & L5 & L4 --> L3 --> L2 --> L1
 ```
 
@@ -151,10 +161,16 @@ flowchart TB
   8. `factual_accuracy` — Deterministic entity and invariant fact matching.
 * **Statistical & Regression Rigor:** Computes paired bootstrap 95% CIs (`2,000` deterministic resamples) and exact binomial McNemar two-sided $p$-values; gates runs against `RegressionThresholds`, generates 1-click CLI reproducers, tracks multi-run category trends (`compare_run_history`), and exports standalone SVG-equipped HTML, Markdown, and JSON reports.
 
-### Layer 7 — Orchestration, Persistence, REST API & ComfyUI Studio UI
-* **Modules:** [`core/orchestrator.py`](core/orchestrator.py), [`core/cli.py`](core/cli.py), [`api/app.py`](api/app.py), [`api/routes/diagnostics.py`](api/routes/diagnostics.py), [`api/store.py`](api/store.py), [`frontend/src/`](frontend/src/)
-* **Backend & Persistence:** `ComparisonOrchestrator` executes selected pipeline modules sequentially with live step telemetry and deterministic VRAM cleanup. `ExperimentStore` persists comparison bundles, baselines, and runtime settings in WAL-mode SQLite (`data/neural_diff.db`).
-* **Monochrome ComfyUI Nodes 2.0 Studio:** Built with React 19, TypeScript, Vite 8 (vendor-chunked into `vendor-xyflow`, `vendor-motion`, `vendor-react`, and app core), `@xyflow/react`, and `framer-motion`. Features a unified top navigation bar with spring pill transitions, a 9-node interactive DAG with toggleable Bezier Spline and Orthogonal PCB cables, collapsible inline node micro-visualizations, proportional GQA head bars, a 2-column master-detail behavioral comparator, and live on-demand SVD/sparsity probing.
+### Layer 7 — Multi-Generation Neural Evolution DAG & Provenance Engine (`Module I`)
+* **Modules:** [`core/evolution/dag.py`](core/evolution/dag.py), [`core/evolution/registry.py`](core/evolution/registry.py), [`core/evolution/store.py`](core/evolution/store.py), [`core/evolution/tensor_evolution.py`](core/evolution/tensor_evolution.py), [`core/evolution/layer_evolution.py`](core/evolution/layer_evolution.py), [`core/evolution/behavioral_evolution.py`](core/evolution/behavioral_evolution.py), [`core/evolution/representation_evolution.py`](core/evolution/representation_evolution.py), [`core/evolution/regression_origin.py`](core/evolution/regression_origin.py), [`core/evolution/orchestrator.py`](core/evolution/orchestrator.py)
+* **Branched & Merged Lifecycle DAG:** Models arbitrary post-training histories (`Base -> SFT -> DPO -> Merge -> Quantization -> Pruning`) as a validated Directed Acyclic Graph with multi-parent merge weights, Kahn topological ordering, Lowest Common Ancestor (LCA) queries, and 3-color DFS cycle rejection (`CYCLIC_DEPENDENCY_ERROR`).
+* **SHA-256 Registry & Content-Addressed Caching:** Computes 4 MiB streaming SHA-256 content hashes and tensor-structure digests, flags exact duplicates (`DUPLICATE_CONTENT`) and PEFT `adapter_config.json` LoRA checkpoints, and invalidates cached runs whenever any checkpoint hash, DAG edge, benchmark suite, seed, or numerical tolerance mutates.
+* **Direct Cumulative Math & Regression Origin Pinpointing:** Computes exact direct Euclidean distance $\|W_{\text{current}} - W_{\text{base}}\|_2$ alongside `path_cancellation_ratio` (never summing consecutive step norms), tracks `Versions × Layers` Linear CKA matrices, and automatically pinpoints the earliest transition responsible for each behavioral drop (`CORRELATED` vs. `CAUSALLY VERIFIED` via cross-checkpoint residual patching).
+
+### Layer 8 — Presentation, 37-Endpoint REST API, CLI & Minimalist 5-Format Visual Reporting
+* **Modules:** [`core/orchestrator.py`](core/orchestrator.py), [`core/cli.py`](core/cli.py), [`core/report_engine/visuals.py`](core/report_engine/visuals.py), [`core/report_engine/exporter.py`](core/report_engine/exporter.py), [`core/evolution/exporter.py`](core/evolution/exporter.py), [`core/evolution/pdf_writer.py`](core/evolution/pdf_writer.py), [`api/app.py`](api/app.py), [`api/routes/evolution.py`](api/routes/evolution.py), [`frontend/src/`](frontend/src/)
+* **Zero-Slop 5-Format Visual Exporters:** Produces Architectural Monochrome `HTML` reports with **5 embedded data-driven SVGs** (vector Bezier DAG, dual-curve oscilloscope trajectories, champagne luminance heatmaps, 8-axis capability radar polygons, lollipop charts), `Markdown` reports with dynamic `mermaid` DAGs and proportional Unicode `█░` gauges, zero-dependency `%PDF-1.4` reports with vector bar & polyline charts, multi-section `CSV`, and strict RFC-8259 `JSON`.
+* **Architectural Monochrome Studio (`React 19 · TypeScript · XYFlow · StudioVisuals`):** Combines the 9-node Pairwise Studio canvas, dense interactive SVG charts (`DualTrajectoryChart`, `PolarRadarChart`, `PixelMatrixHeatmap`, `DivergingDeltaBars`), and the 9-tab **Neural Evolution Studio** (`Dashboard` 3-chart triptych, interactive ReactFlow branched DAG, Registry, Weights, Layers, Behavior, Representations, Regressions, and live HTML/MD/CSV/JSON/PDF Export preview).
 
 ---
 
@@ -199,61 +215,104 @@ sequenceDiagram
    $$\text{CKA}(X, Y) = \frac{\|Y_c^\top X_c\|_F^2}{\|X_c^\top X_c\|_F \, \|Y_c^\top Y_c\|_F} \in [0, 1]$$
 4. **Counterfactual Residual Patching Recovery:**
    $$\text{Recovery}(\ell) = \frac{\big(z_{\text{patched}}^{(\ell)}[t^+] - z_{\text{patched}}^{(\ell)}[t^-]\big) - \big(z_{\text{corr}}[t^+] - z_{\text{corr}}[t^-]\big)}{\big(z_{\text{clean}}[t^+] - z_{\text{clean}}[t^-]\big) - \big(z_{\text{corr}}[t^+] - z_{\text{corr}}[t^-]\big)}$$
+5. **Direct Multi-Generation Cumulative Weight Distance & Path Cancellation:**
+   For a root-to-current lineage $W_0 \to W_1 \to \dots \to W_k$, cumulative drift is computed directly against $W_0$ rather than summing consecutive steps:
+   $$D_{\text{cum}}(W_0, W_k) = \|W_k - W_0\|_2 \le \sum_{s=1}^{k} \|W_s - W_{s-1}\|_2, \qquad \rho_{\text{path}} = \frac{\|W_k - W_0\|_2}{\sum_{s=1}^{k} \|W_s - W_{s-1}\|_2} \in [0, 1]$$
 
 ---
 
-## 5. Complete Studio Walkthrough (100% of All 15 Live Screenshots)
+## 5. Complete Studio & Evolution Walkthrough (100% of All 27 Live Screenshots)
 
-Every screenshot below was captured automatically via headless Playwright Chromium (`1600×980 @ 1.5x`) against live FastAPI (`127.0.0.1:8000`) and Vite (`127.0.0.1:4173`) servers via [`scripts/capture_screenshots.py`](scripts/capture_screenshots.py). Full provenance metadata is recorded in [`evidence/SCREENSHOT_INDEX.md`](evidence/SCREENSHOT_INDEX.md).
+Every screenshot below (`01`..`27`) was captured automatically via headless Playwright Chromium against live FastAPI (`127.0.0.1:8000`) and Vite (`127.0.0.1:4173`) servers via [`scripts/capture_screenshots.py`](scripts/capture_screenshots.py) and [`scripts/capture_evolution_evidence.py`](scripts/capture_evolution_evidence.py). Full provenance metadata is recorded in [`evidence/SCREENSHOT_INDEX.md`](evidence/SCREENSHOT_INDEX.md).
 
-### 01. Interactive 9-Node Workflow Graph Canvas (Bezier Spline Mode)
+### Part A — Pairwise Model Diff Studio (`01`..`15`)
+
+#### 01. Interactive 9-Node Workflow Graph Canvas (Bezier Spline Mode)
 ![01 — Workflow Graph Canvas](evidence/frontend/01-dashboard.png)
 
-### 02. Model A & Model B Comparison Configuration
+#### 02. Model A & Model B Comparison Configuration
 ![02 — Model Comparison Setup](evidence/frontend/02-model-selection.png)
 
-### 03. Checkpoint Compatibility & Architecture Validation (`Qwen/Qwen2.5-0.5B` vs `Instruct`)
+#### 03. Checkpoint Compatibility & Architecture Validation (`Qwen/Qwen2.5-0.5B` vs `Instruct`)
 ![03 — Compatibility Validation](evidence/frontend/03-compatibility-validation.png)
 
-### 04. Float64 Tensor Explorer & Live SVD / 2:4 Sparsity Probe
+#### 04. Float64 Tensor Explorer & Live SVD / 2:4 Sparsity Probe
 ![04 — Tensor Explorer](evidence/frontend/04-tensor-diff.png)
 
-### 05. Cross-Architecture Structural Topology Diff (`Qwen2.5-0.5B` 24L vs `SmolLM2-135M` 30L)
+#### 05. Cross-Architecture Structural Topology Diff (`Qwen2.5-0.5B` 24L vs `SmolLM2-135M` 30L)
 ![05 — Structural Topology Diff](evidence/frontend/05-structural-diff.png)
 
-### 06. 24-Layer Submodule Relative $L_2$ Heatmap & Proportional GQA Head Divergence Bars
+#### 06. 24-Layer Submodule Relative $L_2$ Heatmap & Proportional GQA Head Divergence Bars
 ![06 — Layer & Head Analysis](evidence/frontend/06-layer-analysis.png)
 
-### 07. Forward-Hook Activation Alignment, Linear CKA & Top-5 Next-Token Distributions
+#### 07. Depth Representation Oscilloscope Trajectory (Linear CKA vs Hidden Cosine) & Top-5 Logits
 ![07 — Activation & Linear CKA](evidence/frontend/07-activation-comparison.png)
 
-### 08. 8-Suite Behavioral Evaluation & Master-Detail Paired Response Workbench
+#### 08. 8-Axis Polar Capability Polygon, Diverging Suite Deltas & Paired Response Workbench
 ![08 — Behavioral Evaluation](evidence/frontend/08-behavioral-diff.png)
 
-### 09. Regression Gate Verdict, Threshold Findings & 1-Click CLI Reproduction
+#### 09. Regression Gate Verdict, Threshold Findings & 1-Click CLI Reproduction
 ![09 — Regression Gate](evidence/frontend/09-regression-report.png)
 
-### 10. SQLite Experiment Ledger & Wall-Clock Runtime Audit
+#### 10. SQLite Experiment Ledger & Wall-Clock Runtime Audit
 ![10 — Experiment Ledger](evidence/frontend/10-benchmark-results.png)
 
-### 11. Multi-Format Standalone Report Preview & Export (`.html`, `.md`, `.json`)
+#### 11. Minimalist Architectural Monochrome Visual HTML Report Preview (`.html`, `.md`, `.json`)
 ![11 — Report Artifacts](evidence/frontend/11-report-export.png)
 
-### 12. Automated Verification & `90%` Statement Coverage Ledger
+#### 12. Automated Verification & `89%` Statement Coverage Ledger
 ![12 — Verification & Coverage Summary](evidence/frontend/12-test-execution-summary.png)
 
-### 13. Live Path-Traversal Security Rejection (`HTTP 403`)
+#### 13. Live Path-Traversal Security Rejection (`HTTP 403`)
 ![13 — Security Error Handling](evidence/frontend/13-error-handling.png)
 
-### 14. Persisted Runtime & Safe Serialization Policy Settings
+#### 14. Persisted Runtime & Safe Serialization Policy Settings
 ![14 — Runtime Settings](evidence/frontend/14-settings.png)
 
-### 15. Final Studio State in Orthogonal PCB Cable Routing Mode
+#### 15. Final Studio State in Orthogonal PCB Cable Routing Mode
 ![15 — Final Studio State (Orthogonal PCB Cables)](evidence/frontend/15-final-application-state.png)
+
+### Part B — Neural Evolution Studio & Multi-Format Visual Reports (`16`..`27`)
+
+#### 16. Evolution Analytics Dashboard — 3-Chart Trajectory Triptych & Empirical Findings
+![16 — Evolution Dashboard](evidence/frontend/16-evolution-dashboard.png)
+
+#### 17. Evolution Lineage Timeline & Live Arbitrary Cross-Version Pair Comparator (`A ↔ B`)
+![17 — Evolution Timeline](evidence/frontend/17-evolution-timeline.png)
+
+#### 18. Interactive Branched & Merged Evolution DAG (`Base → Instruct-SFT || SFT-B → Merged → Quantized → Pruned`)
+![18 — Branched Evolution Graph](evidence/frontend/18-evolution-branched-graph.png)
+
+#### 19. SHA-256 Content-Fingerprinted Checkpoint Registry (`6` SmolLM2-135M Generations)
+![19 — Checkpoint Registry](evidence/frontend/19-evolution-checkpoint-registry.png)
+
+#### 20. Checkpoint Provenance & Quantization Metadata Inspector (`v3 · Quantized-LowBit`)
+![20 — Checkpoint Details](evidence/frontend/20-evolution-checkpoint-details.png)
+
+#### 21. Direct Cumulative Weight Distance (`||W_current − W_base||_2`) vs. Step Summation Trajectory
+![21 — Cumulative Weight Evolution](evidence/frontend/21-evolution-tensor-comparison.png)
+
+#### 22. Layer Weight Evolution Luminance Matrix (`Transitions × 30 SmolLM2 Decoder Blocks`)
+![22 — Layer Evolution Heatmap](evidence/frontend/22-evolution-layer-heatmap.png)
+
+#### 23. Multi-Generation Behavioral Trajectory (`95%` Wilson CI Band) & 8-Domain Capability Radar
+![23 — Behavioral Evolution Chart](evidence/frontend/23-evolution-behavioral-chart.png)
+
+#### 24. Representation Evolution Matrix (`Centered Linear CKA vs Base` Across 30 Blocks)
+![24 — Representation CKA Matrix](evidence/frontend/24-evolution-representation-matrix.png)
+
+#### 25. Automatic Regression Origin Pinpointing (`v2 · Merged-AB → v3 · Quantized-LowBit`)
+![25 — Regression Origin Analysis](evidence/frontend/25-evolution-regression-origin.png)
+
+#### 26. Reproducibility Provenance Ledger & Embedded Multi-Format Visual Report Preview
+![26 — Experiment Provenance & Export](evidence/frontend/26-evolution-experiment-details.png)
+
+#### 27. Standalone Exported 5-SVG Architectural Monochrome Evolution Report (`evorun-real-smollm2.html`)
+![27 — Exported Standalone Evolution Report](evidence/frontend/27-evolution-exported-report.png)
 
 ---
 
-## 6. Verified Real Model Benchmarks (`REAL MODEL EXPERIMENT`)
+## 6. Verified Real Model & Multi-Generation DAG Benchmarks (`REAL MODEL EXPERIMENT`)
 
 Executed on **Windows 11 (`10.0.26320`, 16 logical CPUs, `15.71 GB` RAM, `NVIDIA GeForce RTX 5050 Laptop GPU` `sm_120` 8 GB VRAM, `CPython 3.12.16`, `torch 2.10.0+cu128`)** via [`scripts/run_benchmarks.py`](scripts/run_benchmarks.py). Raw telemetry is archived in [`evidence/benchmarks/real_model_benchmarks.json`](evidence/benchmarks/real_model_benchmarks.json).
 
@@ -281,6 +340,22 @@ Executed on **Windows 11 (`10.0.26320`, 16 logical CPUs, `15.71 GB` RAM, `NVIDIA
 | **Safety & Refusal** (`refusal_behavior`) | 3 | `67%` | `100%` | `0.800` | `1.000` | `+0.200` | `+1 / -0` |
 | **Factual Grounding** (`factual_accuracy`) | 3 | `100%` | `100%` | `1.000` | `1.000` | `0.000` | `+0 / -0` |
 | **Total (24 Paired Cases)** | **24** | **`45.8%`** | **`70.8%`** | **`0.629`** | **`0.756`** | **`+0.1265`** | **`9W · 12T · 3L`** |
+
+### 6.3 Real 6-Checkpoint Branched & Merged `SmolLM2-135M` Evolution Benchmark (`evorun-real-smollm2`)
+
+Archived in [`evidence/evolution/evolution_benchmark.json`](evidence/evolution/evolution_benchmark.json) with 5-format exports under [`evidence/evolution/exports/`](evidence/evolution/exports/):
+
+| Checkpoint | Stage | Parents | Direct Base $L_2$ | Step Sum $L_2$ | Mean CKA vs Base | Pass Rate (`95%` Wilson CI) | Mean Score |
+| :--- | :--- | :--- | ---: | ---: | ---: | :--- | ---: |
+| `v0 · SmolLM2-Base` | `Base Model` | — | `0.0000` | `0.0000` | `1.0000` | `20.8%` (`[9%, 40%]`) | `0.405` |
+| `v1a · Instruct-SFT` | `Instruction Tuning` | `v0` | `180.6458` | `180.6458` | `0.8522` | `33.3%` (`[18%, 53%]`) | `0.595` |
+| `v1b · SFT-Conservative` | `SFT` | `v0` | `63.2538` | `63.2538` | `0.8728` | `20.8%` (`[9%, 40%]`) | `0.334` |
+| `v2 · Merged-AB` | `Model Merging` | `0.75 v1a + 0.25 v1b` | `151.2651` | `209.6877` | `0.8517` | **`37.5%`** (`[21%, 57%]`) | `0.559` |
+| `v3 · Quantized-LowBit` | `Quantization` | `v2` | `293.2059` | `461.5365` | `0.8446` | **`12.5%`** (`[4%, 31%]`) | `0.256` |
+| `v4 · Pruned-MLP` | `Pruning` | `v3` | `293.2059` | `461.5365` | `0.8446` | `12.5%` (`[4%, 31%]`) | `0.256` |
+
+* **Non-Collinear Path Cancellation (`OBSERVED`):** Direct `Base -> Quantized-LowBit` distance is **`293.2059`** vs **`461.5365`** summed across individual steps (`path_cancellation_ratio = 0.6353`).
+* **Regression Origin Pinpointing:** Automatically identifies `v2 · Merged-AB -> v3 · Quantized-LowBit` (`Quantization`) as the origin of the overall pass-rate drop (`37.5% -> 12.5%`) and `code_preservation` drop (`66.7% -> 0.0%`), separating `CORRELATED` layer shifts from `CAUSALLY VERIFIED` residual patching.
 
 ---
 
@@ -326,6 +401,9 @@ npm --prefix frontend run dev
 | `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | Deterministic behavioral evaluation & single-category regression reproduction |
 | `suites` | `python -m core.cli suites` | List registered deterministic evaluation suites and case counts |
 | `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | Compute 2D task-vector SVD singular spectrum and Shannon effective rank |
+| `evolution create-project` | `neural-diff evolution create-project --name "SmolLM2 DAG"` | Create an isolated multi-generation evolution tracking project |
+| `evolution register` | `neural-diff evolution register --project-id <id> --source <path> --parents <ids> --transformation SFT` | Fingerprint checkpoint (SHA-256 + PEFT/quant metadata), guard cycles, and register into DAG |
+| `evolution analyze` | `neural-diff evolution analyze --project-id <id> --output-dir ./evo_out` | Run multi-gen tensor, layer, CKA, behavioral & regression origin analysis and export `json`/`csv`/`md`/`html`/`pdf` |
 
 ---
 
@@ -357,29 +435,24 @@ npm --prefix frontend run dev
 
 ---
 
-## 10.5 Neural Evolution Tracking (`Module I` — Branched & Merged Lifecycle DAG)
+## 11. Multi-Node CI/CD Architecture, Testing (`89%` Coverage) & Security Hardening
 
-Full documentation: [`docs/NEURAL_EVOLUTION_TRACKING.md`](docs/NEURAL_EVOLUTION_TRACKING.md) · Runnable script: [`examples/track_model_evolution.py`](examples/track_model_evolution.py).
+### 11.1 10 Multi-Node GitHub Actions Pipelines ([`.github/workflows/`](.github/workflows))
 
-**Real 6-Checkpoint `SmolLM2-135M` Branched & Merged DAG Experiment (`evorun-real-smollm2`):**
-- **Lineage:** `v0 · SmolLM2-Base` (`134.5M` params, `30` layers) $\to$ (`v1a · Instruct-SFT` $\parallel$ `v1b · SFT-Conservative`) $\to$ `v2 · Merged-AB` (`0.75/0.25` multi-parent merge) $\to$ `v3 · Quantized-LowBit` $\to$ `v4 · Pruned-MLP`.
-- **Direct Cumulative Weight Geometry (`OBSERVED`):** Direct `Base -> Quantized-LowBit` Euclidean distance is **`293.2059`** vs **`461.5365`** summed across individual steps (`path_cancellation_ratio = 0.6353`), proving non-collinear multi-stage updates without naive step summation.
-- **Representation Evolution (`OBSERVED`):** Largest step drift occurred on `SFT-Conservative -> Merged-AB` (`mean Linear CKA = 0.8353`, `drift = 0.1647`, `Logit JS = 0.4082`).
-- **Automatic Regression Origin Pinpointing:** Pinpointed `v2 · Merged-AB -> v3 · Quantized-LowBit` (`Quantization`) as the origin of the overall pass-rate drop (`37.5% -> 12.5%`) and `code_preservation` drop (`66.7% -> 0.0%`), strictly separating `CORRELATED` layer weight/CKA shifts from `CAUSALLY VERIFIED` cross-checkpoint residual-stream patching.
+| Workflow | Multi-Node Job DAG & Runtime Matrices | Engineering Gate |
+| :--- | :--- | :--- |
+| [`backend-ci.yml`](.github/workflows/backend-ci.yml) | `lint-and-typecheck` $\to$ (`unit-property-matrix` [`Py 3.11`, `3.12`] $\parallel$ `windows-portability` [`windows-latest`]) $\to$ `integration-and-api` | Enforces `ruff`, `mypy` (86 files), `>=85%` coverage, and Windows Safetensors mmap & SQLite WAL safety |
+| [`frontend-ci.yml`](.github/workflows/frontend-ci.yml) | `typecheck-and-vitest` [`Node 20`, `Node 22` LTS] $\to$ `production-bundle` $\to$ `chunk-budget-gate` | Verifies Node 20/22 LTS compatibility, Vitest suites, Vite 8 build, and `<500 KB` JS chunk ceiling |
+| [`evolution-pipeline.yml`](.github/workflows/evolution-pipeline.yml) | `dag-and-migrations` $\to$ (`cumulative-math-and-origin` $\parallel$ `live-evolution-example`) $\to$ `multiformat-export-gate` | Verifies 3-color DFS cycle guard, direct base $L_2$, regression origin pinpointing, and 5-format (`JSON`/`CSV`/`MD`/`HTML`/`PDF`) exports |
+| [`api-contract-and-db.yml`](.github/workflows/api-contract-and-db.yml) | (`openapi-schema-audit` $\parallel$ `sqlite-wal-concurrency`) $\to$ `cli-json-contract` | Audits all 37 FastAPI OpenAPI routes, concurrent SQLite WAL writes/cache invalidation, and CLI JSON schemas |
+| [`e2e-playwright.yml`](.github/workflows/e2e-playwright.yml) | `build-studio` $\to$ `playwright-sharded` [`e2e.spec.ts` $\parallel$ `evolution.e2e.spec.ts`] | Parallel live FastAPI + Vite Chromium E2E across Pairwise Studio and Branched Evolution Studio |
+| [`security-audit.yml`](.github/workflows/security-audit.yml) | `secret-scan` $\parallel$ `adversarial-deserialization` $\parallel$ `python-cve-audit` $\parallel$ `npm-cve-matrix` [`Node 20`, `22`] | Blocks leaked credentials, malicious pickle opcodes, path/symlink escapes, and Python/npm CVEs |
+| [`codeql.yml`](.github/workflows/codeql.yml) | `analyze` [`python` $\parallel$ `javascript-typescript`] | GitHub CodeQL dataflow & taint security analysis across backend and studio UI |
+| [`numerical-benchmarks.yml`](.github/workflows/numerical-benchmarks.yml) | (`tensor-and-svd-invariants` $\parallel$ `hypothesis-properties`) $\to$ `publish-telemetry` | Verifies analytical `float64` metrics, SVD LoRA vs SFT rank, `2:4` sparsity, Linear CKA, and residual patching |
+| [`docs-and-evidence.yml`](.github/workflows/docs-and-evidence.yml) | (`evidence-sha256` $\parallel$ `multilingual-docs-links`) $\to$ `screenshot-png-provenance` | Verifies 100% SHA-256 manifest integrity, 400+ links across 5 languages, and valid PNG headers on `01`..`27` |
+| [`package-and-release.yml`](.github/workflows/package-and-release.yml) | (`build-wheel-sdist` $\parallel$ `build-frontend-tarball`) $\to$ `cleanroom-cli-smoke` $\to$ `release-bundle` | Installs `.whl` into isolated `/tmp`, runs pairwise + evolution CLI smoke tests, and publishes `SHA256SUMS.txt` |
 
-| Evolution Dashboard & Insights | Branched & Merged DAG | Lineage Timeline & Pair Compare |
-| :---: | :---: | :---: |
-| ![16 Dashboard](evidence/frontend/16-evolution-dashboard.png) | ![18 Branched Graph](evidence/frontend/18-evolution-branched-graph.png) | ![17 Timeline](evidence/frontend/17-evolution-timeline.png) |
-| **Checkpoint Registry** | **Checkpoint Provenance Details** | **Cumulative Weight Evolution** |
-| ![19 Registry](evidence/frontend/19-evolution-checkpoint-registry.png) | ![20 Details](evidence/frontend/20-evolution-checkpoint-details.png) | ![21 Weights](evidence/frontend/21-evolution-tensor-comparison.png) |
-| **Layer Evolution Heatmap** | **Behavioral Evolution Chart** | **Representation CKA Matrix** |
-| ![22 Layers](evidence/frontend/22-evolution-layer-heatmap.png) | ![23 Behavioral](evidence/frontend/23-evolution-behavioral-chart.png) | ![24 CKA Matrix](evidence/frontend/24-evolution-representation-matrix.png) |
-| **Regression Origin Analysis** | **Experiment Reproducibility** | **Exported Standalone Report** |
-| ![25 Regression Origin](evidence/frontend/25-evolution-regression-origin.png) | ![26 Provenance](evidence/frontend/26-evolution-experiment-details.png) | ![27 Exported Report](evidence/frontend/27-evolution-exported-report.png) |
-
----
-
-## 11. Automated Testing, Coverage & Security Hardening
+### 11.2 Local Verification Suites
 
 Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\python.exe scripts/run_security_audit.py`:
 
@@ -401,7 +474,7 @@ Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\p
 
 * **5-Language READMEs:** [English](README.md) · [Tiếng Việt](docs/i18n/README.vi.md) · [简体中文](docs/i18n/README.zh-CN.md) · [日本語](docs/i18n/README.ja.md) · [Français](docs/i18n/README.fr.md)
 * **Technical Guides:** [`NEURAL_EVOLUTION_TRACKING.md`](docs/NEURAL_EVOLUTION_TRACKING.md) · [`INSTALLATION.md`](docs/INSTALLATION.md) · [`ENVIRONMENT_AUDIT.md`](docs/ENVIRONMENT_AUDIT.md) · [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`RESEARCH.md`](docs/RESEARCH.md) · [`COMPETITIVE_ANALYSIS.md`](docs/COMPETITIVE_ANALYSIS.md) · [`TENSOR_COMPARISON.md`](docs/TENSOR_COMPARISON.md) · [`ACTIVATION_ANALYSIS.md`](docs/ACTIVATION_ANALYSIS.md) · [`BEHAVIORAL_EVALUATION.md`](docs/BEHAVIORAL_EVALUATION.md) · [`BENCHMARKS.md`](docs/BENCHMARKS.md) · [`SECURITY.md`](docs/SECURITY.md) · [`LIMITATIONS.md`](docs/LIMITATIONS.md) · [`ROADMAP.md`](docs/ROADMAP.md)
-* **Final Acceptance Report:** [`evidence/FINAL_ENGINEERING_REPORT.md`](evidence/FINAL_ENGINEERING_REPORT.md)
+* **Release & Acceptance History:** [`CHANGELOG.md`](CHANGELOG.md) · [`evidence/FINAL_ENGINEERING_REPORT.md`](evidence/FINAL_ENGINEERING_REPORT.md)
 
 ## License
 

@@ -4,20 +4,23 @@
 
 [**English**](../../README.md) · [**Tiếng Việt**](README.vi.md) · [**简体中文**](README.zh-CN.md) · [**日本語**](README.ja.md) · [**Français**](README.fr.md)
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B%20(3.12%20Verified)-18181b?style=flat-square)](../../pyproject.toml)
+[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](../../.github/workflows)
+[![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](../../pyproject.toml)
+[![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 90%](https://img.shields.io/badge/Core%20Coverage-90%25%20(55%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
 
-**NEURAL DIFF** là nền tảng kỹ thuật ML mã nguồn mở cấp độ sản xuất gồm thư viện Python, công cụ dòng lệnh (`neural-diff`), hệ thống backend FastAPI + SQLite và không gian làm việc đồ thị **ComfyUI Nodes 2.0 Monochrome Studio** (React 19 + TypeScript + `@xyflow/react`). Thay vì xem các bản cập nhật trọng số như những khối nhị phân hộp đen hoặc đánh giá cảm tính qua vài câu thử rời rạc, NEURAL DIFF phân rã sự tiến hóa giữa hai checkpoint qua **7 tầng kiến trúc độc lập** và **4 trục phân tích trực giao**:
+**NEURAL DIFF** là nền tảng kỹ thuật ML mã nguồn mở cấp độ sản xuất gồm thư viện Python, công cụ dòng lệnh (`neural-diff`), hệ thống backend FastAPI + SQLite và không gian làm việc đồ thị **ComfyUI Nodes 2.0 Architectural Monochrome Studio** (React 19 + TypeScript + `@xyflow/react`). Thay vì xem các bản cập nhật trọng số như những khối nhị phân hộp đen hoặc đánh giá cảm tính qua vài câu thử rời rạc, NEURAL DIFF phân rã sự tiến hóa của mô hình qua **8 tầng kiến trúc độc lập** và **5 trục phân tích trực giao**:
 
 1. **So Sánh Cấu Trúc & Topo (`Structural & Topology Diff`)** — Phát hiện khóa tensor thêm/xóa, suy luận đổi tên bằng ghép cặp lưỡng phân cosine ($\cos \ge 0.985$), thay đổi kích thước/kiểu dữ liệu, cắt lát từng đầu chú ý Grouped-Query Attention (GQA), kiểm tra ràng buộc trọng số đầu vào/đầu ra (`weight tying`), tỉa kênh có cấu trúc và độ tuân thủ thưa bán cấu trúc NVIDIA `2:4`.
 2. **Toán Học Tensor Tích Lũy `Float64` Theo Khối & Hạng Hiệu Dụng Phổ SVD** — Đọc lười theo từng khối (`chunked streaming`) ép kiểu lên `float64` với chi phí bộ nhớ hằng số (`max_abs_diff`, `mean_abs_diff`, `RMSE`, `Relative L2`, `Cosine Similarity`, chuyển trạng thái `0 ↔ ≠0`, phân vị, khoảng cách Wasserstein-1, biểu đồ tần suất ghép cặp TVD/JS, giải mã tọa độ đa chiều đỉnh $|\Delta w|$) kết hợp phân tích phổ giá trị kỳ dị SVD & hạng hiệu dụng Shannon (Roy-Vetterli) để phân biệt bản gộp LoRA hạng thấp với SFT toàn hạng.
 3. **Cơ Học Giải Thích Biểu Diễn, Logit Lens & Vá Kích Hoạt Nhân Quả** — Gắn forward hook tất định trên cùng chuỗi token đầu vào để đo cosine trạng thái ẩn/attention/MLP từng tầng, **Centered Linear CKA** bất biến phép quay trực giao (hỗ trợ so sánh liên kiến trúc khác chiều ẩn), phép chiếu từ vựng **Logit Lens** và **Vá Dòng Dư Phản Thực Tế (`Residual-Stream Activation Patching`)** đạt mức xác minh nhân quả `CAUSALLY VERIFIED`.
 4. **Đánh Giá Hành Vi Tất Định 8 Miền & Cổng Chặn Hồi Quy (`Regression Gate`)** — 24 ca kiểm thử ghép cặp chấm điểm bằng 8 bộ đánh giá tất định (Unicode NFC, cây cú pháp AST Python, lược đồ JSON, toán học, từ chối an toàn... hoàn toàn không dùng LLM chấm điểm), khoảng tin cậy Bootstrap 95% (2.000 lần lấy mẫu lại), kiểm định chính xác McNemar hai phía, quản lý baseline SQLite/JSON, phân tích xu hướng đa phiên `diff-of-diffs` và lệnh CLI tái hiện lỗi sao chép 1 chạm.
+5. **Theo Dõi Tiến Hóa Đa Thế Hệ (`Module I`) & Hệ Thống Báo Cáo Trực Quan 5 Định Dạng** — Quản lý đồ thị có hướng không chu trình phân nhánh & hợp nhất đa cha (`Base → SFT → DPO → Merge → Quantization → Pruning`), kiểm tra chu trình DFS 3 màu, định danh SHA-256 từng khối 4 MiB, khoảng cách trọng số tích lũy trực tiếp $\|W_{\text{current}} - W_{\text{base}}\|_2$, ma trận CKA đa thế hệ, tự động chỉ đích danh bước chuyển gây suy giảm (`Regression Origin Pinpointing`) và xuất báo cáo tối giản 5 định dạng (`HTML` nhúng 5 biểu đồ SVG, `Markdown` sơ đồ Mermaid + thanh đo `█░`, `%PDF-1.4` đồ họa vector, `CSV`, `JSON`).
 
 ![Giao diện NEURAL DIFF Studio — Đồ thị Quy trình 9 Node](../../evidence/frontend/01-dashboard.png)
 
@@ -26,16 +29,16 @@
 ## Mục Lục
 
 1. [Kỷ Luật Nhận Thức Luận & Nguồn Gốc Dữ Liệu](#1-kỷ-luật-nhận-thức-luận--nguồn-gốc-dữ-liệu)
-2. [Đặc Tả Chuyên Sâu 7 Tầng Kiến Trúc Hệ Thống](#2-đặc-tả-chuyên-sâu-7-tầng-kiến-trúc-hệ-thống)
+2. [Đặc Tả Chuyên Sâu 8 Tầng Kiến Trúc Hệ Thống](#2-đặc-tả-chuyên-sâu-8-tầng-kiến-trúc-hệ-thống)
 3. [Luồng Thực Thi & Chuỗi Xử Lý Dữ Liệu Đầu-Cuối](#3-luồng-thực-thi--chuỗi-xử-lý-dữ-liệu-đầu-cuối)
 4. [Nền Tảng Công Thức Toán Học & Thống Kê](#4-nền-tảng-công-thức-toán-học--thống-kê)
-5. [Trọn Bộ 15 Ảnh Chụp Giao Diện Thực Tế (100% Live Capture)](#5-trọn-bộ-15-ảnh-chụp-giao-diện-thực-tế-100-live-capture)
-6. [Benchmark Thực Tế Trên Các Mô Hình Công Khai (`REAL MODEL EXPERIMENT`)](#6-benchmark-thực-tế-trên-các-mô-hình-công-khai-real-model-experiment)
+5. [Trọn Bộ 27 Ảnh Chụp Giao Diện & Báo Cáo Thực Tế (100% Live Capture)](#5-trọn-bộ-27-ảnh-chụp-giao-diện--báo-cáo-thực-tế-100-live-capture)
+6. [Benchmark Mô Hình Thực & Đồ Thị Tiến Hóa DAG (`REAL MODEL EXPERIMENT`)](#6-benchmark-mô-hình-thực--đồ-thị-tiến-hóa-dag-real-model-experiment)
 7. [Benchmark Băng Thông Streaming & Bộ Nhớ (`SYNTHETIC FIXTURE EXPERIMENT`)](#7-benchmark-băng-thông-streaming--bộ-nhớ-synthetic-fixture-experiment)
 8. [Hướng Dẫn Cài Đặt & Khởi Chạy Tái Lập](#8-hướng-dẫn-cài-đặt--khởi-chạy-tái-lập)
 9. [Tham Chiếu Công Cụ Dòng Lệnh (`neural-diff`)](#9-tham-chiếu-công-cụ-dòng-lệnh-neural-diff)
-10. [Tham Chiếu Hệ Thống REST API (17 Endpoint)](#10-tham-chiếu-hệ-thống-rest-api-17-endpoint)
-11. [Kiểm Thử Tự Động, Độ Bao Phủ `90%` & Kiểm Toán Bảo Mật](#11-kiểm-thử-tự-động-độ-bao-phủ-90--kiểm-toán-bảo-mật)
+10. [Tham Chiếu Hệ Thống REST API (37 Endpoint)](#10-tham-chiếu-hệ-thống-rest-api-37-endpoint)
+11. [Kiến Trúc CI/CD Đa Node, Kiểm Thử (`89%` Độ Phủ) & Kiểm Toán Bảo Mật](#11-kiến-trúc-cicd-đa-node-kiểm-thử-89-độ-phủ--kiểm-toán-bảo-mật)
 12. [Toàn Vẹn Bằng Chứng SHA-256 & Giới Hạn Kỹ Thuật](#12-toàn-vẹn-bằng-chứng-sha-256--giới-hạn-kỹ-thuật)
 
 ---
@@ -54,22 +57,28 @@ NEURAL DIFF định nghĩa tường minh các nhãn nhận thức luận ngay tr
 
 ---
 
-## 2. Đặc Tả Chuyên Sâu 7 Tầng Kiến Trúc Hệ Thống
+## 2. Đặc Tả Chuyên Sâu 8 Tầng Kiến Trúc Hệ Thống
 
-Kiến trúc của NEURAL DIFF được chia thành **7 tầng ngang tách rời hoàn toàn**, đảm bảo các động cơ toán học ở tầng lõi không phụ thuộc vào web framework và vận hành đồng nhất trên thư viện Python, CLI, CI hoặc giao diện Studio.
+Kiến trúc của NEURAL DIFF được chia thành **8 tầng ngang tách rời hoàn toàn**, đảm bảo các động cơ toán học và đồ thị tiến hóa ở tầng lõi không phụ thuộc vào web framework và vận hành đồng nhất trên thư viện Python, CLI, CI hoặc giao diện Studio.
 
 ```mermaid
 flowchart TB
-    subgraph L7["Tầng 7 · Giao Diện Đồ Thị Studio, REST API & Điều Phối"]
-        UI["ComfyUI Nodes 2.0 Monochrome Studio (React 19 · TypeScript · XYFlow · Framer Motion)"]
-        API["FastAPI Server + Router Chẩn Đoán + Lưu Trữ SQLite WAL"]
-        CLI["Công Cụ Dòng Lệnh neural-diff & ComparisonOrchestrator"]
+    subgraph L8["Tầng 8 · Giao Diện Studio, 37 REST Endpoints, CLI & Báo Cáo Trực Quan 5 Định Dạng"]
+        UI["Architectural Monochrome Studio + StudioVisuals SVG (React 19 · TypeScript · XYFlow)"]
+        API["FastAPI Server + Router Tiến Hóa & Chẩn Đoán + Lưu Trữ SQLite WAL"]
+        REP["Minimalist Report Engine (5-SVG HTML · Mermaid+Gauge MD · Vector PDF 1.4 · CSV · JSON)"]
     end
 
-    subgraph L6["Tầng 6 · Đánh Giá Hành Vi Tất Định, Cổng Hồi Quy & Xuất Báo Cáo"]
+    subgraph L7["Tầng 7 · Động Cơ Tiến Hóa Đa Thế Hệ DAG & Truy Nguyên (Module I)"]
+        DAG["Đồ Thị Nhánh & Gộp EvolutionDAG · Chặn Chu Trình DFS 3 Màu · LCA · 14 Phép Biến Đổi"]
+        REG_CKPT["Sổ Đăng Ký SHA-256 4 MiB · Phát Hiện Trùng Lặp & PEFT LoRA · Content Cache"]
+        EVO_ENG["Khoảng Cách Tích Lũy Trực Tiếp Gốc · Ma Trận CKA · Truy Vết Nguồn Gốc Suy Giảm"]
+    end
+
+    subgraph L6["Tầng 6 · Đánh Giá Hành Vi Tất Định & Cổng Hồi Quy"]
         BEH["8 Bộ Chấm Tất Định (Tiếng Việt NFC · AST Python · JSON · Toán · An Toàn · Sự Kiện)"]
-        STATS_B["Khoảng Tin Cậy Bootstrap Ghép Cặp 95% & Kiểm Định Chính Xác McNemar"]
-        REG["Regression Gate · Baselines Phiên Bản · Diff-of-Diffs · Xuất HTML/MD/JSON"]
+        STATS_B["Khoảng Tin Cậy Wilson 95% · Bootstrap 95% · Kiểm Định Chính Xác McNemar"]
+        REG["Regression Gate · Baselines Phiên Bản · Diff-of-Diffs · CLI Reproducers"]
     end
 
     subgraph L5["Tầng 5 · Biểu Diễn Cơ Học & Can Thiệp Nhân Quả"]
@@ -91,7 +100,7 @@ flowchart TB
     end
 
     subgraph L2["Tầng 2 · Nạp Checkpoint An Toàn & Chuẩn Hóa Kiến Trúc"]
-        SAFE["Bộ Đọc Safetensors Ánh Xạ Bộ Nhớ (Đơn Tệp & Đa Mảnh Sharded)"]
+        SAFE["Bộ Đọc Safetensors An Toàn (Đơn Tệp & Đa Mảnh Sharded)"]
         PTSAFE["Bộ Đọc PyTorch weights_only Quét Mã Lệnh Pickle"]
         HFHUB["Bộ Phân Giải Snapshot Hugging Face & Từ Điển Vai Trò Chuẩn Hóa"]
     end
@@ -101,8 +110,9 @@ flowchart TB
         RES["Thử Nghiệm Nhân CUDA Thực Tế · Đo RSS / VRAM · Hủy Tác Vụ Hợp Tác"]
     end
 
-    UI --> API --> CLI
-    CLI --> L6 & L5 & L4 & L3
+    UI --> API --> REP
+    API --> L7 & L6 & L5 & L4 & L3
+    L7 --> L6 & L5 & L4 & L3
     L6 & L5 & L4 --> L3 --> L2 --> L1
 ```
 
@@ -140,10 +150,15 @@ flowchart TB
 * **8 Bộ chấm điểm tất định 100% (Không gọi LLM bên ngoài):** Kiểm tra dấu thanh tiếng Việt chuẩn NFC (`vietnamese`), phân tích cú pháp cây `ast.parse` Python (`code_preservation`), kiểm định lược đồ JSON nghiêm ngặt (`json_reliability`), trích xuất đáp số toán học (`math_reasoning`), ràng buộc cấu trúc câu lệnh (`instruction_following`), giới hạn độ dài súc tích (`conciseness`), từ chối an toàn không từ chối nhầm (`refusal_behavior`) và đối chiếu sự kiện chuẩn (`factual_accuracy`).
 * **Kiểm định thống kê & cổng chặn hồi quy:** Tính khoảng tin cậy Bootstrap ghép cặp 95% (`2.000` mẫu) và kiểm định chính xác McNemar hai phía; đối chiếu chính sách ngưỡng `RegressionThresholds`, sinh câu lệnh CLI tái hiện từng ca suy giảm, phân tích xu hướng qua nhiều phiên chạy (`compare_run_history`) và xuất báo cáo HTML (biểu đồ SVG nhúng nội tuyến), Markdown, JSON.
 
-### Tầng 7 — Điều Phối, Lưu Trữ SQLite WAL, REST API & Giao Diện Studio (`Layer 7`)
-* **Mã nguồn:** [`core/orchestrator.py`](../../core/orchestrator.py), [`core/cli.py`](../../core/cli.py), [`api/`](../../api/), [`frontend/`](../../frontend/)
-* **Điều phối & lưu trữ bền vững:** `ComparisonOrchestrator` điều hành tuần tự từng giai đoạn kèm báo cáo tiến độ thực và thu hồi bộ nhớ `gc.collect()` + `torch.cuda.empty_cache()`. `ExperimentStore` lưu trữ toàn bộ kết quả, baseline và cấu hình trong cơ sở dữ liệu SQLite chế độ WAL (`data/neural_diff.db`).
-* **Giao diện ComfyUI Nodes 2.0 Monochrome Studio:** Xây dựng bằng React 19, TypeScript, Vite 8 (tách gói vendor tối ưu), `@xyflow/react` và `framer-motion`. Hợp nhất toàn bộ 12 không gian làm việc vào **một thanh điều hướng duy nhất** phía trên đồ thị 9 node tương tác, hỗ trợ chuyển đổi dây Bezier Spline / mạch in vuông góc Orthogonal PCB, thanh phân kỳ GQA trực quan, trình đối chiếu hành vi Master-Detail và nút thăm dò SVD trực tiếp.
+### Tầng 7 — Động Cơ Tiến Hóa Đa Thế Hệ DAG & Truy Nguyên (`Layer 7 · Module I`)
+* **Mã nguồn:** [`core/evolution/`](../../core/evolution/) (`dag.py`, `registry.py`, `store.py`, `tensor_evolution.py`, `layer_evolution.py`, `behavioral_evolution.py`, `representation_evolution.py`, `regression_origin.py`, `orchestrator.py`)
+* **Đồ thị tiến hóa phân nhánh & gộp mô hình:** Hỗ trợ 14 phép biến đổi (`Base Model`, `SFT`, `DPO`, `RLHF`, `LoRA`, `QLoRA`, `Model Merging`, `Quantization`, `Pruning`, `Distillation`...), đa cha có trọng số gộp, sắp xếp topo Kahn, truy vấn tổ tiên chung thấp nhất (LCA) và chặn chu trình DFS 3 màu (`CYCLIC_DEPENDENCY_ERROR`).
+* **Khoảng cách tích lũy trực tiếp & Truy vết nguồn gốc suy giảm:** Tính trực tiếp $\|W_{\text{current}} - W_{\text{base}}\|_2$ bằng `float64` (tuyệt đối không cộng dồn bước), theo dõi ma trận Linear CKA đa thế hệ và tự động chỉ đích danh bước chuyển đầu tiên gây suy giảm năng lực (`CORRELATED` so với `CAUSALLY VERIFIED`).
+
+### Tầng 8 — Giao Diện Studio, 37 REST Endpoints, CLI & Báo Cáo Trực Quan 5 Định Dạng (`Layer 8`)
+* **Mã nguồn:** [`core/report_engine/visuals.py`](../../core/report_engine/visuals.py), [`core/report_engine/exporter.py`](../../core/report_engine/exporter.py), [`core/evolution/exporter.py`](../../core/evolution/exporter.py), [`core/evolution/pdf_writer.py`](../../core/evolution/pdf_writer.py), [`api/`](../../api/), [`frontend/src/`](../../frontend/src/)
+* **Xuất báo cáo tối giản giàu visual (Zero AI Slop):** Xuất `HTML` nhúng **5 biểu đồ SVG dữ liệu thực**, `Markdown` kèm sơ đồ `mermaid` và thanh đo `█░`, `%PDF-1.4` thuần Python kèm biểu đồ cột & đường gấp khúc vector, `CSV` đa phân vùng và `JSON` chuẩn RFC-8259.
+* **Architectural Monochrome Studio:** Tích hợp bộ biểu đồ SVG tương tác [`StudioVisuals.tsx`](../../frontend/src/components/charts/StudioVisuals.tsx) (`DualTrajectoryChart`, `PolarRadarChart`, `PixelMatrixHeatmap`, `DivergingDeltaBars`) trên toàn bộ không gian làm việc đôi và không gian 9 phân hệ **Neural Evolution Studio**.
 
 ---
 
@@ -191,58 +206,98 @@ sequenceDiagram
 
 ---
 
-## 5. Trọn Bộ 15 Ảnh Chụp Giao Diện Thực Tế (100% Live Capture)
+## 5. Trọn Bộ 27 Ảnh Chụp Giao Diện & Báo Cáo Thực Tế (100% Live Capture)
 
-Toàn bộ 15 ảnh chụp dưới đây được ghi lại tự động bằng Playwright Chromium (`1600×980 @ 1.5x`) trên máy chủ FastAPI (`127.0.0.1:8000`) và Vite (`127.0.0.1:4173`) đang hoạt động thực tế qua [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py).
+Toàn bộ 27 ảnh chụp dưới đây (`01`..`27`) được ghi lại tự động bằng Playwright Chromium trên máy chủ FastAPI (`127.0.0.1:8000`) và Vite (`127.0.0.1:4173`) thực tế qua [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) và [`scripts/capture_evolution_evidence.py`](../../scripts/capture_evolution_evidence.py).
 
-### 01. Đồ Thị Quy Trình 9 Node Tương Tác (Chế Độ Dây Bezier Spline)
+### Phần A — Không Gian So Sánh Đôi (`01`..`15`)
+
+#### 01. Đồ Thị Quy Trình 9 Node Tương Tác (Chế Độ Dây Bezier Spline)
 ![01 — Dashboard Graph Canvas](../../evidence/frontend/01-dashboard.png)
 
-### 02. Thiết Lập So Sánh Mô Hình A & Mô Hình B
+#### 02. Thiết Lập So Sánh Mô Hình A & Mô Hình B
 ![02 — Model Selection](../../evidence/frontend/02-model-selection.png)
 
-### 03. Kiểm Định Tương Thích & Siêu Dữ Liệu Kiến Trúc (`Qwen/Qwen2.5-0.5B` vs `Instruct`)
+#### 03. Kiểm Định Tương Thích & Siêu Dữ Liệu Kiến Trúc (`Qwen/Qwen2.5-0.5B` vs `Instruct`)
 ![03 — Compatibility Validation](../../evidence/frontend/03-compatibility-validation.png)
 
-### 04. Trình Khám Phá Tensor `Float64` & Thăm Dò Phổ SVD / Độ Thưa 2:4 Trực Tiếp
+#### 04. Trình Khám Phá Tensor `Float64` & Thăm Dò Phổ SVD / Độ Thưa 2:4 Trực Tiếp
 ![04 — Tensor Explorer](../../evidence/frontend/04-tensor-diff.png)
 
-### 05. So Sánh Topo Liên Kiến Trúc (`Qwen2.5-0.5B` 24 Tầng vs `SmolLM2-135M` 30 Tầng)
+#### 05. So Sánh Topo Liên Kiến Trúc (`Qwen2.5-0.5B` 24 Tầng vs `SmolLM2-135M` 30 Tầng)
 ![05 — Structural Diff](../../evidence/frontend/05-structural-diff.png)
 
-### 06. Ma Trận Nhiệt 24 Tầng & Thanh Phân Kỳ Tỷ Lệ Từng Đầu Chú Ý GQA
+#### 06. Ma Trận Nhiệt 24 Tầng & Thanh Phân Kỳ Tỷ Lệ Từng Đầu Chú Ý GQA
 ![06 — Layer & Head Analysis](../../evidence/frontend/06-layer-analysis.png)
 
-### 07. Căn Chỉnh Kích Hoạt Forward-Hook, Linear CKA & Phân Phối Top-5 Token Kế Tiếp
+#### 07. Quỹ Đạo Biểu Diễn Theo Chiều Sâu (Linear CKA vs Hidden Cosine) & Top-5 Token
 ![07 — Activation Comparison](../../evidence/frontend/07-activation-comparison.png)
 
-### 08. Đánh Giá Hành Vi 8 Miền & Không Gian Đối Chiếu Cặp Phản Hồi Master-Detail
+#### 08. Đa Giác Năng Lực Radar 8 Trục, Biểu Đồ Độ Lệch & So Sánh Phản Hồi Ghép Cặp
 ![08 — Behavioral Diff](../../evidence/frontend/08-behavioral-diff.png)
 
-### 09. Cổng Chặn Hồi Quy, Bảng Phát Hiện Vượt Ngưỡng & Sao Chép Lệnh CLI 1 Chạm
+#### 09. Cổng Chặn Hồi Quy, Bảng Phát Hiện Vượt Ngưỡng & Sao Chép Lệnh CLI 1 Chạm
 ![09 — Regression Gate](../../evidence/frontend/09-regression-report.png)
 
-### 10. Sổ Cái Lịch Sử Thí Nghiệm SQLite & Thời Gian Chạy Thực Tế
+#### 10. Sổ Cái Lịch Sử Thí Nghiệm SQLite & Thời Gian Chạy Thực Tế
 ![10 — Experiment Ledger](../../evidence/frontend/10-benchmark-results.png)
 
-### 11. Xem Trước & Xuất Báo Cáo Đa Định Dạng (`.html`, `.md`, `.json`)
+#### 11. Xem Trước Trực Tiếp Báo Cáo Trực Quan HTML Tối Giản (`.html`, `.md`, `.json`)
 ![11 — Report Export](../../evidence/frontend/11-report-export.png)
 
-### 12. Sổ Cái Kiểm Thử Tự Động & Độ Bao Phủ Câu Lệnh `90%` (55 Test Python)
+#### 12. Sổ Cái Kiểm Thử Tự Động & Độ Bao Phủ Câu Lệnh `89%` (64 Test Python)
 ![12 — Test Execution Summary](../../evidence/frontend/12-test-execution-summary.png)
 
-### 13. Chặn Tấn Công Leo Thang Đường Dẫn Trực Tiếp (`HTTP 403`)
+#### 13. Chặn Tấn Công Leo Thang Đường Dẫn Trực Tiếp (`HTTP 403`)
 ![13 — Error Handling](../../evidence/frontend/13-error-handling.png)
 
-### 14. Cấu Hình Thiết Bị Tính Toán & Chính Sách Nạp An Toàn
+#### 14. Cấu Hình Thiết Bị Tính Toán & Chính Sách Nạp An Toàn
 ![14 — Settings](../../evidence/frontend/14-settings.png)
 
-### 15. Trạng Thái Hoàn Thiện Với Chế Độ Đi Dây Mạch In Vuông Góc (`Orthogonal PCB`)
+#### 15. Trạng Thái Hoàn Thiện Với Chế Độ Đi Dây Mạch In Vuông Góc (`Orthogonal PCB`)
 ![15 — Final Application State](../../evidence/frontend/15-final-application-state.png)
+
+### Phần B — Không Gian Tiến Hóa Đa Thế Hệ & Báo Cáo Trực Quan (`16`..`27`)
+
+#### 16. Bảng Điều Khiển Tiến Hóa — Bộ 3 Biểu Đồ Quỹ Đạo & Phát Hiện Thực Nghiệm
+![16 — Evolution Dashboard](../../evidence/frontend/16-evolution-dashboard.png)
+
+#### 17. Dòng Thời Gian Nhánh & Bộ So Sánh Cặp Phiên Bản Bất Kỳ Trực Tiếp (`A ↔ B`)
+![17 — Evolution Timeline](../../evidence/frontend/17-evolution-timeline.png)
+
+#### 18. Đồ Thị Tiến Hóa Phân Nhánh & Hợp Nhất Tương Tác (`SmolLM2-135M` 6 Thế Hệ)
+![18 — Branched Graph](../../evidence/frontend/18-evolution-branched-graph.png)
+
+#### 19. Sổ Đăng Ký Checkpoint Kèm Dấu Vân Tay Nội Dung SHA-256
+![19 — Checkpoint Registry](../../evidence/frontend/19-evolution-checkpoint-registry.png)
+
+#### 20. Trình Kiểm Tra Chi Tiết Nguồn Gốc & Lượng Tử Hóa (`v3 · Quantized-LowBit`)
+![20 — Checkpoint Details](../../evidence/frontend/20-evolution-checkpoint-details.png)
+
+#### 21. Khoảng Cách Trọng Số Tích Lũy Trực Tiếp (`||W_current − W_base||_2`) So Với Tổng Từng Bước
+![21 — Cumulative Weight Evolution](../../evidence/frontend/21-evolution-tensor-comparison.png)
+
+#### 22. Ma Trận Nhiệt Biến Thiên Trọng Số Theo 30 Tầng Decoder
+![22 — Layer Heatmap](../../evidence/frontend/22-evolution-layer-heatmap.png)
+
+#### 23. Quỹ Đạo Hành Vi Đa Thế Hệ (`95%` Wilson CI) & Đa Giác Năng Lực Radar 8 Miền
+![23 — Behavioral Trajectory](../../evidence/frontend/23-evolution-behavioral-chart.png)
+
+#### 24. Ma Trận Tiến Hóa Biểu Diễn (`Centered Linear CKA` So Với Mô Hình Gốc)
+![24 — Representation CKA Matrix](../../evidence/frontend/24-evolution-representation-matrix.png)
+
+#### 25. Tự Động Chỉ Đích Danh Bước Chuyển Gây Suy Giảm (`Quantization`)
+![25 — Regression Origin](../../evidence/frontend/25-evolution-regression-origin.png)
+
+#### 26. Sổ Cái Tái Lập SHA-256 & Xem Trước Trực Tiếp Báo Cáo Đa Định Dạng
+![26 — Provenance & Export](../../evidence/frontend/26-evolution-experiment-details.png)
+
+#### 27. Báo Cáo HTML Độc Lập 5 Biểu Đồ SVG Xuất Từ `evorun-real-smollm2`
+![27 — Exported Standalone Report](../../evidence/frontend/27-evolution-exported-report.png)
 
 ---
 
-## 6. Benchmark Thực Tế Trên Các Mô Hình Công Khai (`REAL MODEL EXPERIMENT`)
+## 6. Benchmark Mô Hình Thực & Đồ Thị Tiến Hóa DAG (`REAL MODEL EXPERIMENT`)
 
 Thực thi trên **Windows 11 (`10.0.26320`, 16 luồng CPU, `15.71 GB` RAM, `NVIDIA GeForce RTX 5050 Laptop GPU` `sm_120` 8 GB VRAM, `CPython 3.12.16`, `torch 2.10.0+cu128`)** qua [`scripts/run_benchmarks.py`](../../scripts/run_benchmarks.py) và lưu trữ tại [`evidence/benchmarks/real_model_benchmarks.json`](../../evidence/benchmarks/real_model_benchmarks.json).
 
@@ -270,6 +325,19 @@ Thực thi trên **Windows 11 (`10.0.26320`, 16 luồng CPU, `15.71 GB` RAM, `NV
 | **Từ Chối An Toàn** (`refusal_behavior`) | 3 | `67%` | `100%` | `0.800` | `1.000` | `+0.200` | `+1 / -0` |
 | **Độ Chính Xác Sự Kiện** (`factual_accuracy`) | 3 | `100%` | `100%` | `1.000` | `1.000` | `0.000` | `+0 / -0` |
 | **Tổng Cộng (24 Ca Ghép Cặp)** | **24** | **`45.8%`** | **`70.8%`** | **`0.629`** | **`0.756`** | **`+0.1265`** | **`9W · 12T · 3L`** |
+
+### 6.3 Benchmark Chuỗi Tiến Hóa 6 Checkpoint `SmolLM2-135M` (`evorun-real-smollm2`)
+
+Lưu trữ tại [`evidence/evolution/evolution_benchmark.json`](../../evidence/evolution/evolution_benchmark.json) và 5 định dạng báo cáo tại [`evidence/evolution/exports/`](../../evidence/evolution/exports/):
+
+| Phiên Bản | Giai Đoạn | Cha | Chuẩn $L_2$ Gốc Trực Tiếp | Tổng $L_2$ Từng Bước | CKA TB So Với Gốc | Tỷ Lệ Đạt (`95%` Wilson CI) | Điểm TB |
+| :--- | :--- | :--- | ---: | ---: | ---: | :--- | ---: |
+| `v0 · SmolLM2-Base` | `Base Model` | — | `0.0000` | `0.0000` | `1.0000` | `20.8%` (`[9%, 40%]`) | `0.405` |
+| `v1a · Instruct-SFT` | `Instruction Tuning` | `v0` | `180.6458` | `180.6458` | `0.8522` | `33.3%` (`[18%, 53%]`) | `0.595` |
+| `v1b · SFT-Conservative` | `SFT` | `v0` | `63.2538` | `63.2538` | `0.8728` | `20.8%` (`[9%, 40%]`) | `0.334` |
+| `v2 · Merged-AB` | `Model Merging` | `0.75 v1a + 0.25 v1b` | `151.2651` | `209.6877` | `0.8517` | **`37.5%`** (`[21%, 57%]`) | `0.559` |
+| `v3 · Quantized-LowBit` | `Quantization` | `v2` | `293.2059` | `461.5365` | `0.8446` | **`12.5%`** (`[4%, 31%]`) | `0.256` |
+| `v4 · Pruned-MLP` | `Pruning` | `v3` | `293.2059` | `461.5365` | `0.8446` | `12.5%` (`[4%, 31%]`) | `0.256` |
 
 ---
 
@@ -315,10 +383,13 @@ npm --prefix frontend run dev
 | `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | Chạy đánh giá hành vi tất định & tái hiện lỗi theo miền cụ thể |
 | `suites` | `python -m core.cli suites` | Liệt kê danh sách các bộ kiểm thử hành vi tất định đã đăng ký |
 | `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | Phân tích phổ kỳ dị SVD và hạng hiệu dụng Shannon của ma trận trọng số 2D |
+| `evolution create-project` | `neural-diff evolution create-project --name "SmolLM2 DAG"` | Khởi tạo dự án theo dõi tiến hóa đa thế hệ độc lập |
+| `evolution register` | `neural-diff evolution register --project-id <id> --source <path> --parents <ids> --transformation SFT` | Định danh SHA-256, kiểm tra chu trình DAG và đăng ký checkpoint |
+| `evolution analyze` | `neural-diff evolution analyze --project-id <id> --output-dir ./evo_out` | Chạy phân tích tiến hóa toàn diện và xuất 5 định dạng `json`/`csv`/`md`/`html`/`pdf` |
 
 ---
 
-## 10. Tham Chiếu Hệ Thống REST API (17 Endpoint)
+## 10. Tham Chiếu Hệ Thống REST API (37 Endpoint)
 
 | Phương Thức | Đường Dẫn Endpoint | Tầng / Chức Năng |
 | :--- | :--- | :--- |
@@ -338,21 +409,26 @@ npm --prefix frontend run dev
 | `GET` | `/api/diagnostics/history-trends` | Phân tích xu hướng đa phiên chạy `diff-of-diffs` |
 | `GET/POST/DELETE` | `/api/baselines*` | Quản lý danh sách baseline hồi quy có phiên bản |
 | `GET/PUT` | `/api/settings` | Đọc và lưu cấu hình thiết bị, dung sai và chính sách bảo mật |
+| `GET/POST/PUT/DELETE` | `/api/evolution/projects*` | Quản lý vòng đời dự án tiến hóa DAG đa thế hệ |
+| `POST/GET/PATCH/DELETE` | `/api/evolution/projects/{id}/checkpoints*` | Đăng ký checkpoint SHA-256, phát hiện trùng lặp/PEFT LoRA, đổi tên, xóa |
+| `POST/DELETE` | `/api/evolution/projects/{id}/relationships*` | Tạo/xóa cạnh cha-con & gộp mô hình kèm chặn chu trình DFS 3 màu |
+| `GET/POST` | `/api/evolution/projects/{id}/{graph,compare,analyze,runs,regressions}` | Truy vấn đồ thị DAG, so sánh cặp bất kỳ, chạy phân tích tiến hóa & truy vết suy giảm |
+| `GET` | `/api/evolution/runs/{run_id}/export/{json,csv,markdown,html,pdf}` | Xuất báo cáo 5 định dạng (`JSON`, `CSV`, `Mermaid-MD`, `5-SVG HTML`, `%PDF-1.4`) |
 
 ---
 
-## 11. Kiểm Thử Tự Động, Độ Bao Phủ `90%` & Kiểm Toán Bảo Mật
+## 11. Kiến Trúc CI/CD Đa Node, Kiểm Thử (`89%` Độ Phủ) & Kiểm Toán Bảo Mật
 
-* **Phân tích tĩnh:** `ruff check` (`exit 0`) và `mypy` trên toàn bộ `70` tệp nguồn Python (`exit 0`).
-* **Kiểm thử Python (`55 passed`):** `36` unit test, `7` property test dùng Hypothesis, `4` integration test đa định dạng & API, `1` regression test và `5` security test chống tấn công — đạt **`90%` độ bao phủ câu lệnh** trên `4,682` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
-* **Frontend & E2E thực tế:** `tsc --noEmit` (`exit 0`), Vitest (`3 passed`), Vite 8 build (`exit 0`) và Playwright Chromium E2E (`1 passed`, `exit 0`).
+* **10 Quy Trình GitHub Actions Đa Node ([`.github/workflows/`](../../.github/workflows)):** Bao gồm ma trận `Python 3.11 / 3.12`, ma trận `Node.js 20 / 22 LTS`, kiểm chứng chéo `ubuntu-latest` + `windows-latest` (kiểm định an toàn mmap Safetensors & khóa SQLite WAL trên Windows), phân mảnh song song Playwright E2E (`e2e.spec.ts` $\parallel$ `evolution.e2e.spec.ts`), quy trình kiểm định đồ thị tiến hóa & 5 định dạng báo cáo (`evolution-pipeline.yml`), cổng kiểm tra hợp đồng 37 REST OpenAPI & đồng thời SQLite (`api-contract-and-db.yml`), CodeQL, quét CVE/bí mật, kiểm chứng toán học Hypothesis và cài đặt sạch `.whl` tại `/tmp`.
+* **Phân tích tĩnh & Kiểm thử Python (`64 passed`):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `7,590` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
+* **Frontend & E2E thực tế:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 build (`exit 0`, mọi JS chunk `< 500 KB`) và Playwright Chromium E2E (`2 passed`, `exit 0`).
 * **Kiểm toán lỗ hổng & bí mật:** `pip-audit` (`0` lỗ hổng), `npm audit` (`0` lỗ hổng) và trình quét khóa bí mật (`0` phát hiện).
 
 ---
 
 ## 12. Toàn Vẹn Bằng Chứng SHA-256 & Giới Hạn Kỹ Thuật
 
-* **Xác minh SHA-256:** Chạy `.\.venv\Scripts\python.exe scripts/verify_evidence.py` để đối chiếu toàn bộ `73` tệp bằng chứng trong [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json).
+* **Xác minh SHA-256 & Nhật ký thay đổi:** Chạy `.\.venv\Scripts\python.exe scripts/verify_evidence.py` để đối chiếu toàn bộ các tệp bằng chứng trong [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json); lịch sử phát hành chi tiết xem tại [`CHANGELOG.md`](../../CHANGELOG.md) và [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md).
 * **Giới hạn kỹ thuật ([`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)):** Các chỉ số tọa độ cơ sở MLP/head mang tính đa nghĩa dưới hiện tượng chồng chập nếu không đi kèm phân rã thưa; bộ `default_suite_v1` gồm 24 câu kiểm thử tất định cho thời gian chạy cục bộ hợp lý; và `run_residual_patching` chứng minh tính nhân quả trong phạm vi cặp câu sạch/nhiễu và vị trí khối được thử nghiệm.
 
 ## Giấy Phép

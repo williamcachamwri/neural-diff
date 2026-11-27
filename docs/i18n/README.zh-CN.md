@@ -4,20 +4,23 @@
 
 [**English**](../../README.md) · [**Tiếng Việt**](README.vi.md) · [**简体中文**](README.zh-CN.md) · [**日本語**](README.ja.md) · [**Français**](README.fr.md)
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B%20(3.12%20Verified)-18181b?style=flat-square)](../../pyproject.toml)
+[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](../../.github/workflows)
+[![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](../../pyproject.toml)
+[![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 90%](https://img.shields.io/badge/Core%20Coverage-90%25%20(55%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
 
-**NEURAL DIFF** 是一套生产级开源机器学习工程平台，集成 Python 核心库、命令行工具（`neural-diff`）、FastAPI + SQLite 后端服务，以及采用 **ComfyUI Nodes 2.0 单色极简建筑设计语言**（React 19 + TypeScript + `@xyflow/react`）构建的交互式节点图工作室。NEURAL DIFF 摒弃主观感觉与黑盒权重对比，通过 **七层解耦系统架构** 与 **四大正交分析维度** 严谨解构检查点演化：
+**NEURAL DIFF** 是一套生产级开源机器学习工程平台，集成 Python 核心库、命令行工具（`neural-diff`）、FastAPI + SQLite 后端服务，以及采用 **ComfyUI Nodes 2.0 单色极简建筑设计语言**（React 19 + TypeScript + `@xyflow/react`）构建的交互式节点图与演化追踪工作室。NEURAL DIFF 摒弃主观感觉与黑盒权重对比，通过 **八层解耦系统架构** 与 **五大正交分析维度** 严谨解构检查点全生命周期演化：
 
 1. **结构与拓扑差异（Structural & Topology Diff）** — 检测新增/删除张量、基于二分图余弦匹配（$\cos \ge 0.985$）的重命名推断、形状与精度变更、分组查询注意力（GQA）逐头切片、输入输出词嵌入权重绑定验证（Weight Tying）、结构化通道剪枝及 NVIDIA `2:4` 半结构化稀疏合规率。
 2. **Float64 分块流式数学与 SVD 谱有效秩** — 恒定内存开销的 `float64` 分块累加器（`max_abs_diff`、`mean_abs_diff`、`RMSE`、`Relative L2`、`Cosine Similarity`、零值跃迁、经验分位数、Wasserstein-1 距离、对齐直方图 TVD/JS 散度、Top-$K$ 多维坐标反解），以及基于奇异值谱 Roy-Vetterli **Shannon 有效秩** 的低秩 LoRA 合并与全秩 SFT 更新判别。
 3. **机制可解释性表征对齐、Logit Lens 与因果激活修补** — 在受控同输入序列上挂载确定性前向钩子，测量逐层隐藏态/注意力/MLP 余弦、正交尺度不变的 **中心化线性 CKA**（支持跨架构不同隐藏维度对比）、观测型 **Logit Lens** 词表投影，以及反事实 **残差流激活修补（Residual-Stream Activation Patching）**（达到 `CAUSALLY VERIFIED` 因果验证级别）。
 4. **8 大领域确定性行为评测与回归门禁（Regression Gate）** — 24 个配对测试用例，由 8 个确定性评估器（Unicode NFC、Python `ast.parse` 语法树、严格 JSON Schema、数学数值提取、安全拒答等，零外部 LLM 裁判调用）打分，支持 2,000 次重采样配对 Bootstrap 95% 置信区间、精确双侧 McNemar 检验、版本化 SQLite/JSON 基线、多轮 `diff-of-diffs` 趋势追踪及一键复制 CLI 复现指令。
+5. **多代神经演化追踪（`Module I`）与极简五格式可视化报告** — 支持分叉与多父节点合并有向无环图（`Base → SFT → DPO → Merge → Quantization → Pruning`）、三色 DFS 环路拦截、4 MiB 流式 SHA-256 指纹与 PEFT LoRA 识别、精确直接累积距离 $\|W_{\text{current}} - W_{\text{base}}\|_2$、跨代 CKA 矩阵、自动退化起源定位（`Regression Origin Pinpointing`），并导出零冗余极简五格式报告（内嵌 5 幅 SVG 图表的 `HTML`、含 Mermaid 与 `█░` 进度条的 `Markdown`、纯 Python 矢量图 `%PDF-1.4`、`CSV` 与严格 `JSON`）。
 
 ![NEURAL DIFF Studio — 9 节点交互式工作流画布](../../evidence/frontend/01-dashboard.png)
 
@@ -240,6 +243,18 @@ sequenceDiagram
 ### 15. 正交 PCB 走线模式下的最终工作室状态
 ![15 — Final Application State](../../evidence/frontend/15-final-application-state.png)
 
+### 16–27. 多代神经演化追踪工作室与极简 5-SVG 导出报告实拍（`SmolLM2-135M` 6 代分叉合并 DAG）
+
+| 16 · 演化三联轨迹仪表盘 | 17 · 分支谱系与任意版本对比 | 18 · 分叉与合并交互式 DAG |
+| :---: | :---: | :---: |
+| ![16](../../evidence/frontend/16-evolution-dashboard.png) | ![17](../../evidence/frontend/17-evolution-timeline.png) | ![18](../../evidence/frontend/18-evolution-branched-graph.png) |
+| **19 · SHA-256 检查点注册表** | **20 · 量化元数据溯源详情** | **21 · 直接累积 $L_2$ 轨迹对比** |
+| ![19](../../evidence/frontend/19-evolution-checkpoint-registry.png) | ![20](../../evidence/frontend/20-evolution-checkpoint-details.png) | ![21](../../evidence/frontend/21-evolution-tensor-comparison.png) |
+| **22 · 30 层权重演化热力矩阵** | **23 · 行为轨迹与 8 维雷达图** | **24 · 中心化线性 CKA 矩阵** |
+| ![22](../../evidence/frontend/22-evolution-layer-heatmap.png) | ![23](../../evidence/frontend/23-evolution-behavioral-chart.png) | ![24](../../evidence/frontend/24-evolution-representation-matrix.png) |
+| **25 · 自动退化起源定位** | **26 · SHA-256 缓存与报告预览** | **27 · 独立导出的 5-SVG HTML 报告** |
+| ![25](../../evidence/frontend/25-evolution-regression-origin.png) | ![26](../../evidence/frontend/26-evolution-experiment-details.png) | ![27](../../evidence/frontend/27-evolution-exported-report.png) |
+
 ---
 
 ## 6. 真实公开模型基准测试（`REAL MODEL EXPERIMENT`）
@@ -314,10 +329,11 @@ npm --prefix frontend run dev
 | `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | 运行确定性行为评测或单领域退化复现 |
 | `suites` | `python -m core.cli suites` | 列出已注册的确定性评测套件与用例统计 |
 | `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | 计算指定二维权重差值的 SVD 奇异值谱与 Shannon 有效秩 |
+| `evolution` | `neural-diff evolution {create-project,register,analyze}` | 管理多代演化 DAG 项目、SHA-256 指纹注册及 `json`/`csv`/`md`/`html`/`pdf` 五格式报告导出 |
 
 ---
 
-## 10. REST API 接口参考手册（17 个端点）
+## 10. REST API 接口参考手册（37 个端点）
 
 | 方法 | 路径 | 职责说明 |
 | :--- | :--- | :--- |
@@ -337,15 +353,16 @@ npm --prefix frontend run dev
 | `GET` | `/api/diagnostics/history-trends` | 跨历史行为实验的 `diff-of-diffs` 趋势对比 |
 | `GET/POST/DELETE` | `/api/baselines*` | 管理版本化回归基线 |
 | `GET/PUT` | `/api/settings` | 读取或更新持久化的引擎运行与安全策略 |
+| `GET/POST/PUT/PATCH/DELETE` | `/api/evolution/*`（20 个演化端点） | 管理多代演化项目、SHA-256 检查点、3 色 DFS 防环边、任意对比较、演化分析与 `json`/`csv`/`markdown`/`html`/`pdf` 导出 |
 
 ---
 
-## 11. 自动化测试、`90%` 覆盖率与安全加固审计
+## 11. 10 条多节点 CI/CD 流水线、`89%` 覆盖率与安全加固审计
 
-* **静态检查：** `ruff check`（`exit 0`）与 `mypy` 全量 70 个源文件类型检查（`exit 0`）。
-* **Python 测试套件（`55 passed`）：** 含 `36` 项单元测试、`7` 项 Hypothesis 属性不变量测试、`4` 项多格式检查点与 API 集成测试、`1` 项黄金回归测试及 `5` 项对抗安全测试，核心语句覆盖率达 **`90%`**（共 `4,682` 条语句，见 [`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
-* **前端与端到端测试：** `tsc --noEmit`（`exit 0`）、Vitest（`3 passed`）、Vite 8 生产构建（`exit 0`）及 Playwright Chromium 实机全栈 E2E（`1 passed`）。
-* **安全扫描：** `pip-audit` 零漏洞、`npm audit` 零漏洞、仓库密钥扫描零发现。
+* **10 条多节点 GitHub Actions 流水线（[`.github/workflows/`](../../.github/workflows)）：** 覆盖 `Python 3.11 / 3.12` 矩阵、`Node.js 20 / 22 LTS` 矩阵、`ubuntu-latest` + `windows-latest` 跨平台验证、Playwright 分片并行 E2E、多代演化 DAG 与五格式报告门禁（`evolution-pipeline.yml`）、37 端点 OpenAPI 与 SQLite WAL 并发门禁（`api-contract-and-db.yml`）、CodeQL 静态污点分析、CVE/密钥扫描及隔离 `/tmp` Wheel 冒烟测试。
+* **静态检查与 Python 测试套件（`64 passed`）：** `ruff check`（`exit 0`）、全量 `86` 个源文件 `mypy` 检查（`exit 0`），核心语句覆盖率达 **`89%`**（共 `7,590` 条语句，见 [`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
+* **前端与端到端测试：** `tsc --noEmit`（`exit 0`）、Vitest（`4 passed`）、Vite 8 生产构建（`exit 0`，单块 `< 500 KB`）及 Playwright Chromium 全栈 E2E（`2 passed`）。
+* **安全扫描与发布记录：** `pip-audit` 零漏洞、`npm audit` 零漏洞、仓库密钥扫描零发现；完整版本演进见 [`CHANGELOG.md`](../../CHANGELOG.md) 与 [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md)。
 
 ---
 

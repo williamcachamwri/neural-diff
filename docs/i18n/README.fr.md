@@ -4,20 +4,23 @@
 
 [**English**](../../README.md) · [**Tiếng Việt**](README.vi.md) · [**简体中文**](README.zh-CN.md) · [**日本語**](README.ja.md) · [**Français**](README.fr.md)
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B%20(3.12%20Verified)-18181b?style=flat-square)](../../pyproject.toml)
+[![CI Pipelines](https://img.shields.io/badge/CI-10%20Multi--Node%20Workflows-18181b?style=flat-square)](../../.github/workflows)
+[![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%C2%B7%203.12-18181b?style=flat-square)](../../pyproject.toml)
+[![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 90%](https://img.shields.io/badge/Core%20Coverage-90%25%20(55%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
 
-**NEURAL DIFF** est une plateforme d'ingénierie ML open-source de qualité industrielle réunissant une bibliothèque Python, une interface CLI (`neural-diff`), un serveur FastAPI + SQLite et un atelier graphique nodal **ComfyUI Nodes 2.0 Monochrome Studio** (React 19 + TypeScript + `@xyflow/react`). Plutôt que de considérer les checkpoints comme des blocs binaires opaques ou de se fier à des exemples anecdotiques, NEURAL DIFF décompose l'évolution d'un modèle à travers **sept couches architecturales découplées** et **quatre axes analytiques orthogonaux** :
+**NEURAL DIFF** est une plateforme d'ingénierie ML open-source de qualité industrielle réunissant une bibliothèque Python, une interface CLI (`neural-diff`), un serveur FastAPI + SQLite et un atelier graphique nodal **ComfyUI Nodes 2.0 Architectural Monochrome Studio** (React 19 + TypeScript + `@xyflow/react`). Plutôt que de considérer les checkpoints comme des blocs binaires opaques ou de se fier à des exemples anecdotiques, NEURAL DIFF décompose l'évolution multi-générations d'un modèle à travers **huit couches architecturales découplées** et **cinq axes analytiques orthogonaux** :
 
 1. **Différentiel Structurel et Topologique** — Ajouts et suppressions de clés, inférence de renommage par couplage biparti cosinus ($\cos \ge 0.985$), changements de formes et de types, découpage fin des têtes d'attention groupées (GQA), vérification du partage des poids d'entrée/sortie (`weight tying`), élagage structuré et conformité à la parcimonie semi-structurée NVIDIA `2:4`.
 2. **Mathématiques Tensorielles `Float64` par Flux et Rang Effectif SVD** — Accumulation paresseuse par blocs promus en `float64` à empreinte mémoire constante (`max_abs_diff`, `mean_abs_diff`, `RMSE`, `Relative L2`, `Cosine Similarity`, transitions zéro $\leftrightarrow$ non-zéro, quantiles, distance de Wasserstein-1, histogrammes alignés TVD/JS, coordonnées exactes Top-$K$), complétée par le spectre singulier SVD et le **rang effectif de Shannon** (Roy-Vetterli) distinguant une fusion LoRA de faible rang d'un affinage complet (Full SFT).
 3. **Représentations Mécanistes, Logit Lens et Patching Causal** — Crochets d'exécution (`forward hooks`) sur séquences identiques mesurant le cosinus des états cachés/attention/MLP bloc par bloc, la **CKA linéaire centrée** invariante aux transformations orthogonales (compatible inter-architectures de dimensions distinctes), la projection **Logit Lens** et le **patching contrefactuel du flux résiduel** (`CAUSALLY VERIFIED` sur paires d'invites contrôlées).
 4. **Évaluation Comportementale Déterministe (8 Suites) et Porte de Régression** — 24 cas appariés évalués par 8 validateurs déterministes (Unicode NFC, arbre syntaxique Python `ast.parse`, schéma JSON strict, extraction numérique, sécurité sans faux refus — aucun appel à un juge LLM externe), intervalles de confiance Bootstrap à 95 % (2 000 rééchantillonnages), test exact bilatéral de McNemar, baselines SQLite/JSON versionnées, analyse de tendances multi-exécutions (`diff-of-diffs`) et commandes CLI copiables en un clic.
+5. **Suivi d'Évolution Neuronale Multi-Générations (`Module I`) et Rapports Visuels en 5 Formats** — Graphes orientés acycliques (DAG) ramifiés et fusions multi-parents (`Base → SFT → DPO → Merge → Quantization → Pruning`), détection de cycles DFS tricolore, empreintes SHA-256 par blocs de 4 Mio, distance cumulée directe $\|W_{\text{current}} - W_{\text{base}}\|_2$, matrices CKA, localisation automatique de l'origine des régressions (`Regression Origin Pinpointing`) et rapports minimalistes en 5 formats (`HTML` à 5 SVG intégrés, `Markdown` Mermaid + jauges `█░`, `%PDF-1.4` vectoriel, `CSV`, `JSON`).
 
 ![NEURAL DIFF Studio — Graphe Nodal Interactif à 9 Modules](../../evidence/frontend/01-dashboard.png)
 
@@ -240,6 +243,18 @@ Toutes les captures ci-dessous ont été prises automatiquement par [`scripts/ca
 ### 15. État Final du Studio en Mode Routage PCB Orthogonal
 ![15 — Final Application State](../../evidence/frontend/15-final-application-state.png)
 
+### 16–27. Atelier d'Évolution Neuronale et Rapports Visuels 5-SVG (`SmolLM2-135M`, DAG à 6 Générations)
+
+| 16 · Tableau de Bord Triptyque | 17 · Chronologie & Comparaison A↔B | 18 · Graphe DAG Ramifié & Fusionné |
+| :---: | :---: | :---: |
+| ![16](../../evidence/frontend/16-evolution-dashboard.png) | ![17](../../evidence/frontend/17-evolution-timeline.png) | ![18](../../evidence/frontend/18-evolution-branched-graph.png) |
+| **19 · Registre SHA-256** | **20 · Détails & Quantification** | **21 · Distance Cumulée Directe $L_2$** |
+| ![19](../../evidence/frontend/19-evolution-checkpoint-registry.png) | ![20](../../evidence/frontend/20-evolution-checkpoint-details.png) | ![21](../../evidence/frontend/21-evolution-tensor-comparison.png) |
+| **22 · Matrice Thermique 30 Couches** | **23 · Trajectoire & Radar 8 Axes** | **24 · Matrice CKA Linéaire Centrée** |
+| ![22](../../evidence/frontend/22-evolution-layer-heatmap.png) | ![23](../../evidence/frontend/23-evolution-behavioral-chart.png) | ![24](../../evidence/frontend/24-evolution-representation-matrix.png) |
+| **25 · Origine des Régressions** | **26 · Reproductibilité & Aperçu** | **27 · Rapport HTML 5-SVG Exporté** |
+| ![25](../../evidence/frontend/25-evolution-regression-origin.png) | ![26](../../evidence/frontend/26-evolution-experiment-details.png) | ![27](../../evidence/frontend/27-evolution-exported-report.png) |
+
 ---
 
 ## 6. Benchmarks sur Modèles Réels (`REAL MODEL EXPERIMENT`)
@@ -314,10 +329,11 @@ npm --prefix frontend run dev
 | `behavior` | `python -m core.cli behavior --model-a A --model-b B --category vietnamese --seed 42` | Évaluation comportementale déterministe et reproduction ciblée |
 | `suites` | `python -m core.cli suites` | Liste des suites d'évaluation déterministes enregistrées |
 | `svd` | `python -m core.cli svd --model-a A --model-b B --tensor <name>` | Spectre singulier SVD et rang effectif de Shannon d'une matrice 2D |
+| `evolution` | `neural-diff evolution {create-project,register,analyze}` | Gestion de projets DAG, empreinte SHA-256 et export `json`/`csv`/`md`/`html`/`pdf` |
 
 ---
 
-## 10. Référence REST API (17 Endpoints)
+## 10. Référence REST API (37 Endpoints)
 
 | Méthode | Endpoint | Rôle |
 | :--- | :--- | :--- |
@@ -337,15 +353,16 @@ npm --prefix frontend run dev
 | `GET` | `/api/diagnostics/history-trends` | Analyse de progression multi-exécutions `diff-of-diffs` |
 | `GET/POST/DELETE` | `/api/baselines*` | Gestion des baselines de régression versionnées |
 | `GET/PUT` | `/api/settings` | Lecture et mise à jour des paramètres d'exécution et de sécurité |
+| `GET/POST/PUT/PATCH/DELETE` | `/api/evolution/*` (20 endpoints) | Projets DAG, registre SHA-256, anti-cycle DFS, comparaison arbitraire et export 5 formats (`json`/`csv`/`markdown`/`html`/`pdf`) |
 
 ---
 
-## 11. Tests Automatisés, Couverture à `90 %` et Sécurité
+## 11. 10 Pipelines CI/CD Multi-Nœuds, Couverture à `89 %` et Sécurité
 
-* **Analyse statique :** `ruff check` (`exit 0`) et typage statique `mypy` sur `70` fichiers sources (`exit 0`).
-* **Suites Python (`55 passed`) :** `36` tests unitaires, `7` tests d'invariants Hypothesis, `4` tests d'intégration multi-formats et API, `1` test de régression de référence et `5` tests de sécurité adversariaux — soit **`90 %` de couverture d'instructions** sur `4 682` instructions ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
-* **Frontend et E2E réel :** `tsc --noEmit` (`exit 0`), Vitest (`3 passed`), build de production Vite 8 (`exit 0`) et test E2E Playwright Chromium (`1 passed`).
-* **Audits de vulnérabilités et secrets :** `pip-audit` (`0` vulnérabilité), `npm audit` (`0` vulnérabilité) et scan de secrets (`0` détection).
+* **10 Workflows GitHub Actions Multi-Nœuds ([`.github/workflows/`](../../.github/workflows)) :** Matrices `Python 3.11 / 3.12`, matrices `Node.js 20 / 22 LTS`, portabilité `ubuntu-latest` + `windows-latest`, E2E Playwright parallélisés, validation DAG & 5 formats d'export (`evolution-pipeline.yml`), contrat OpenAPI 37 routes & concurrence SQLite WAL (`api-contract-and-db.yml`), CodeQL, audits CVE/secrets et test `.whl` isolé dans `/tmp`.
+* **Analyse statique & Suites Python (`64 passed`) :** `ruff check` (`exit 0`), `mypy` sur `86` fichiers (`exit 0`), **`89 %` de couverture d'instructions** sur `7 590` instructions ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
+* **Frontend et E2E réel :** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), build Vite 8 (`exit 0`, chunks `< 500 Ko`) et Playwright Chromium E2E (`2 passed`).
+* **Journal des versions & Documentation :** Voir [`CHANGELOG.md`](../../CHANGELOG.md) et [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md).
 
 ---
 
