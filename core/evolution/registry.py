@@ -96,6 +96,16 @@ def _extract_optional_directory_metadata(
     if directory is None or not directory.is_dir():
         return tokenizer_meta, quantization_meta, training_meta, lora_meta
 
+    # Full config.json nested quantization_config extraction
+    cfg_json_path = directory / "config.json"
+    if cfg_json_path.is_file():
+        try:
+            full_cfg = read_validated_json(cfg_json_path)
+            if isinstance(full_cfg.get("quantization_config"), dict):
+                quantization_meta.update(full_cfg["quantization_config"])
+        except Exception as exc:
+            _ = exc
+
     # Tokenizer metadata
     tok_cfg_path = directory / "tokenizer_config.json"
     if tok_cfg_path.is_file():

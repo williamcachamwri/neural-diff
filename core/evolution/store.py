@@ -11,7 +11,6 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from api.store import DEFAULT_DB_PATH
 from core.evolution.dag import EvolutionDAG
 from core.evolution.types import (
     CheckpointValidationStatus,
@@ -21,6 +20,8 @@ from core.evolution.types import (
     normalize_transformation_type,
 )
 from core.exceptions import EvolutionEntityNotFoundError
+
+DEFAULT_EVOLUTION_DB_PATH = Path(__file__).resolve().parents[2] / "data" / "neural_diff.db"
 
 EVOLUTION_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     (
@@ -176,7 +177,7 @@ class EvolutionStore:
     """Thread-safe SQLite store managing evolution projects, DAG checkpoints, runs, and caches."""
 
     def __init__(self, db_path: str | Path | None = None) -> None:
-        self.db_path = Path(db_path) if db_path is not None else DEFAULT_DB_PATH
+        self.db_path = Path(db_path) if db_path is not None else DEFAULT_EVOLUTION_DB_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
         self.applied_migrations: list[dict[str, str]] = []

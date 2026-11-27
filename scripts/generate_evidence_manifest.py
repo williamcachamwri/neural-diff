@@ -29,6 +29,7 @@ CATEGORY_METADATA: dict[str, tuple[str, str]] = {
     "security": ("Secret Scanning & Dependency Vulnerability Audits", "scripts/run_security_audit.py"),
     "git": ("Repository Commit History & Working Tree Verification", "git log / git rev-list"),
     "releases": ("Release Readiness & Exported Sample Reports", "ReportEngine"),
+    "evolution": ("Neural Evolution Tracking Multi-Gen DAG, Regressions & Exports", "scripts/capture_evolution_evidence.py"),
     "final_report": ("Final Engineering Acceptance Summary", "Phase 20 Final Verification"),
 }
 
