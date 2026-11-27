@@ -90,3 +90,24 @@ class OperationCancelledError(NeuralDiffError):
 
     code = "OPERATION_CANCELLED"
     http_status = 499
+
+
+class EvolutionGraphError(NeuralDiffError):
+    """Raised on invalid evolution DAG mutations (cycles, missing parents, self-loops)."""
+
+    code = "EVOLUTION_GRAPH_ERROR"
+    http_status = 422
+
+
+class CyclicDependencyError(EvolutionGraphError):
+    """Raised when adding or updating a relationship introduces a cycle in the evolution DAG."""
+
+    code = "CYCLIC_DEPENDENCY_ERROR"
+    http_status = 422
+
+
+class EvolutionEntityNotFoundError(NeuralDiffError):
+    """Raised when an evolution project, checkpoint, relationship, or run ID is not found."""
+
+    code = "EVOLUTION_NOT_FOUND_ERROR"
+    http_status = 404
