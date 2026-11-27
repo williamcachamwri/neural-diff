@@ -170,6 +170,14 @@ EVOLUTION_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
         CREATE INDEX IF NOT EXISTS idx_evo_reg_project ON evolution_regression_events(project_id, run_id);
         """,
     ),
+    (
+        "0002_checkpoint_component_fingerprints",
+        "Add structured 5-domain SHA-256 component_fingerprints_json column to evolution_checkpoints",
+        """
+        ALTER TABLE evolution_checkpoints
+        ADD COLUMN component_fingerprints_json TEXT NOT NULL DEFAULT '{}';
+        """,
+    ),
 )
 
 
@@ -304,6 +312,7 @@ class EvolutionStore:
             ckpts = self.list_checkpoints(p.project_id)
             rels = self.list_relationships(p.project_id)
             dag = EvolutionDAG(ckpts, rels) if ckpts else None
+            branch_meta = dag.enumerate_branches_with_meta() if dag else None
             reg_events = self.list_latest_regressions(p.project_id)
             latest_runs = self.list_runs(p.project_id, limit=1)[1]
             enriched.append(
@@ -311,7 +320,8 @@ class EvolutionStore:
                     **p.to_dict(),
                     "checkpoint_count": len(ckpts),
                     "relationship_count": len(rels),
-                    "branch_count": len(dag.enumerate_branches()) if dag else 0,
+                    "branch_count": branch_meta.total_branch_count if branch_meta else 0,
+                    "branches_truncated": branch_meta.truncated if branch_meta else False,
                     "regression_count": len(reg_events),
                     "latest_run": latest_runs[0] if latest_runs else None,
                 }
@@ -402,8 +412,9 @@ class EvolutionStore:
                     transformation_metadata_json, created_at_utc, framework_info_json,
                     tokenizer_metadata_json, quantization_metadata_json,
                     training_metadata_json, lora_metadata_json, experiment_notes,
-                    validation_status, duplicate_of_checkpoint_id, security_notes_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    validation_status, duplicate_of_checkpoint_id, security_notes_json,
+                    component_fingerprints_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     ckpt.checkpoint_id,
@@ -439,6 +450,7 @@ class EvolutionStore:
                     ckpt.validation_status.value,
                     ckpt.duplicate_of_checkpoint_id,
                     json.dumps(ckpt.security_notes),
+                    json.dumps(ckpt.component_fingerprints),
                 ),
             )
             for rel in new_rels:
@@ -1163,6 +1175,7 @@ class EvolutionStore:
 
     @staticmethod
     def _row_to_checkpoint(row: sqlite3.Row, parent_ids: list[str]) -> RegisteredCheckpoint:
+        raw_comp = dict(row).get("component_fingerprints_json")
         return RegisteredCheckpoint(
             checkpoint_id=row["checkpoint_id"],
             project_id=row["project_id"],
@@ -1198,4 +1211,5 @@ class EvolutionStore:
             validation_status=CheckpointValidationStatus(row["validation_status"]),
             duplicate_of_checkpoint_id=row["duplicate_of_checkpoint_id"],
             security_notes=json.loads(row["security_notes_json"]),
+            component_fingerprints=json.loads(raw_comp) if raw_comp else {},
         )

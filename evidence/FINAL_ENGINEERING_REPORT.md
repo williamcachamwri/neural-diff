@@ -46,12 +46,12 @@ Executed via `.venv\Scripts\python.exe scripts/run_all_tests.py` and `.venv\Scri
 | :--- | :--- | ---: | :--- | :--- |
 | Ruff Linting | `python -m ruff check core adapters benchmarks api tests scripts` | `0` | **PASS** | [`evidence/tests/ruff-lint.log`](tests/ruff-lint.log) |
 | MyPy Typecheck | `python -m mypy core adapters benchmarks api` (`86` files) | `0` | **PASS** | [`evidence/tests/mypy-typecheck.log`](tests/mypy-typecheck.log) |
-| Unit Tests | `python -m pytest -m unit -v` | `0` | **42 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
+| Unit Tests | `python -m pytest -m unit -v` | `0` | **46 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
 | Property Tests | `python -m pytest -m property -v` (Hypothesis) | `0` | **7 passed** | [`evidence/tests/property-tests.log`](tests/property-tests.log) |
 | Integration Tests | `python -m pytest -m integration -v` | `0` | **6 passed** | [`evidence/tests/integration-tests.log`](tests/integration-tests.log) |
 | Regression Tests | `python -m pytest -m regression -v` | `0` | **1 passed** | [`evidence/tests/regression-tests.log`](tests/regression-tests.log) |
-| Security Tests | `python -m pytest -m security -v` | `0` | **7 passed** | [`evidence/tests/security-tests.log`](tests/security-tests.log) |
-| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **64 passed · `89%` (`7,590` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
+| Security Tests | `python -m pytest -m security -v` | `0` | **8 passed** | [`evidence/tests/security-tests.log`](tests/security-tests.log) |
+| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **68 passed · `89%` (`7,828` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
 | Frontend Typecheck | `npm --prefix frontend run typecheck` | `0` | **PASS** | [`evidence/tests/frontend-typecheck.log`](tests/frontend-typecheck.log) |
 | Frontend Unit | `npm --prefix frontend run test` (Vitest) | `0` | **4 passed (3 files)** | [`evidence/tests/frontend-vitest.log`](tests/frontend-vitest.log) |
 | Production Build | `npm --prefix frontend run build` (Vite 8) | `0` | **PASS** | [`evidence/tests/frontend-build.log`](tests/frontend-build.log) |
@@ -83,6 +83,18 @@ All 27 live screenshots (`01`..`15` Pairwise Studio + `16`..`27` Neural Evolutio
 13. [`evidence/frontend/13-error-handling.png`](frontend/13-error-handling.png) — Live `HTTP 403` path-traversal rejection banner.
 14. [`evidence/frontend/14-settings.png`](frontend/14-settings.png) — SQLite runtime and safe serialization policy settings.
 15. [`evidence/frontend/15-final-application-state.png`](frontend/15-final-application-state.png) — Final studio state in Orthogonal PCB wire-routing mode.
+16. [`evidence/frontend/16-evolution-dashboard.png`](frontend/16-evolution-dashboard.png) — Evolution Analytics Dashboard with 3-panel SVG trajectory triptych and empirical findings.
+17. [`evidence/frontend/17-evolution-timeline.png`](frontend/17-evolution-timeline.png) — Evolution lineage timeline and live arbitrary pair comparison (`classify_pair_scope` + LCA).
+18. [`evidence/frontend/18-evolution-branched-graph.png`](frontend/18-evolution-branched-graph.png) — Interactive branched & merged optical DAG (`v0 → v1a/v1b → v2 → v3 → v4`).
+19. [`evidence/frontend/19-evolution-checkpoint-registry.png`](frontend/19-evolution-checkpoint-registry.png) — Checkpoint Registry displaying all 6 SmolLM2-135M checkpoints and verification states.
+20. [`evidence/frontend/20-evolution-checkpoint-details.png`](frontend/20-evolution-checkpoint-details.png) — Checkpoint Details inspector showing 5-domain SHA-256 component hashes (`Weights`, `Config`, `Tokenizer`, `Adapter`, `Metadata`).
+21. [`evidence/frontend/21-evolution-tensor-comparison.png`](frontend/21-evolution-tensor-comparison.png) — Multi-generation direct cumulative weight distance (`||W_current − W_base||_2` vs step sum), sparsity deltas, and `≠0 → 0` transitions.
+22. [`evidence/frontend/22-evolution-layer-heatmap.png`](frontend/22-evolution-layer-heatmap.png) — 30-layer weight evolution pixel heatmap and canonical submodule breakdown.
+23. [`evidence/frontend/23-evolution-behavioral-chart.png`](frontend/23-evolution-behavioral-chart.png) — Multi-generation behavioral pass-rate curve (95% Wilson CI) and 8-domain capability radar polygon.
+24. [`evidence/frontend/24-evolution-representation-matrix.png`](frontend/24-evolution-representation-matrix.png) — Layer-wise Centered Linear CKA matrix, representation drift, and diagnostic `CAUSAL SUPPORT` patching.
+25. [`evidence/frontend/25-evolution-regression-origin.png`](frontend/25-evolution-regression-origin.png) — Automatic Regression Origin pinpointing with 4-tier epistemic labels, `regression_kind` separation, and Holm-Bonferroni small-sample safeguards.
+26. [`evidence/frontend/26-evolution-experiment-details.png`](frontend/26-evolution-experiment-details.png) — Experiment reproducibility provenance and 5-format report export workbench.
+27. [`evidence/frontend/27-evolution-exported-report.png`](frontend/27-evolution-exported-report.png) — Standalone rendered HTML Evolution Report with 5 embedded data-driven SVGs.
 
 ---
 
@@ -169,6 +181,6 @@ Implemented in `core/evolution/`, `api/routes/evolution.py`, and `frontend/src/v
 
 ## K. Residual Limitations (`PARTIALLY VERIFIED` / Disclosed)
 
-1. **Remote CI Runner Hardware Scope:** [`.github/workflows/`](../.github/workflows) executes 8 specialized GitHub Actions workflows (`backend-ci.yml`, `frontend-ci.yml`, `e2e-playwright.yml`, `security-audit.yml`, `codeql.yml`, `numerical-benchmarks.yml`, `docs-and-evidence.yml`, `package-and-release.yml`) on `ubuntu-latest` CPU runners; multi-hundred-million-parameter CUDA model benchmarks are executed on local RTX 5050 hardware and archived under `evidence/`.
-2. **Sample Size of Default Behavioral Suite:** `default_suite_v1` contains 24 deterministic prompts (3 per category) for tractable local execution; statistical power for small behavioral differences is correspondingly modest (`McNemar p = 0.1094` on `Qwen2.5-0.5B`).
-3. **Polysemanticity & Intervention Scope:** Parameter basis shifts (`OBSERVED`) do not identify monosemantic features, and `run_residual_patching` (`CAUSALLY VERIFIED`) establishes causal recovery strictly for the tested clean/corrupted prompt pair and residual site.
+1. **Remote CI Runner Hardware Scope:** [`.github/workflows/`](../.github/workflows) executes **10 specialized multi-node GitHub Actions workflows** (`backend-ci.yml`, `frontend-ci.yml`, `evolution-pipeline.yml`, `api-contract-and-db.yml`, `e2e-playwright.yml`, `security-audit.yml`, `codeql.yml`, `numerical-benchmarks.yml`, `docs-and-evidence.yml`, `package-and-release.yml` — `31` job blocks / `37` runner nodes across `ubuntu-latest` + `windows-latest`, `Python 3.11/3.12`, and `Node 20.x/22.x/24.x`); multi-hundred-million-parameter CUDA model benchmarks are executed on local RTX 5050 hardware and archived under `evidence/`.
+2. **Sample Size & Exploratory Gating of Default Behavioral Suite:** `default_suite_v1` contains 24 deterministic prompts (3 per category) for tractable local execution; `RegressionOriginEngine` enforces `min_category_sample_size = 8` (`is_exploratory = true`, `statistically_significant = false` when $n < 8$) alongside step-down Holm-Bonferroni adjustment, and supports larger custom suites via `benchmark_suite_path`.
+3. **4-Tier Epistemic & Intervention Scope:** Parameter basis shifts (`OBSERVED`) do not identify monosemantic features; generic diagnostic-prompt patching provides transition-level `CAUSAL SUPPORT` only, while `CAUSALLY VERIFIED` is restricted exclusively to case-targeted counterfactual interventions with verified target/foil margins and negative-control checks on the specific failed prompt(s).

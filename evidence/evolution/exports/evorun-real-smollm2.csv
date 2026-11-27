@@ -1,30 +1,30 @@
 # NEURAL DIFF EVOLUTION REPORT,evorun-real-smollm2
 project_id,evo-smollm2-dag,project_name,SmolLM2-135M Post-Training & Compression DAG
-content_cache_key,d984226c67dc9c7a2a474ec783bdbd503ecf960d4226a25a2ea904c1b080a9b8,seed,42
+content_cache_key,4559df78467d3d57b19923b50757c2fab67c6488216c560dfb3d7a1a8b6f50c2,seed,42
 
 [CHECKPOINT_REGISTRY]
 checkpoint_id,version_label,transformation_type,parent_ids,parameter_count,layer_count,hidden_size,vocab_size,tensor_count,format,file_size_bytes,sha256_fingerprint,validation_status
-ckpt-smol-00-base,v0 · SmolLM2-Base,Base Model,,134515008,30,576,49152,272,huggingface_hub_cached,269061256,63ab1871ad3c75fc48cb5e13ea2c513b8de8fce592809075eceb3e53c55387d8,VERIFIED
-ckpt-smol-01a-instruct,v1a · Instruct-SFT,Instruction Tuning,ckpt-smol-00-base,134515008,30,576,49152,272,huggingface_hub_cached,269067933,f3f4354aca65b660200a7774eb4e0e807d0e07dfc8b06bf46f99143d4aa186d5,VERIFIED
-ckpt-smol-01b-branch,v1b · SFT-Conservative,SFT,ckpt-smol-00-base,134515008,30,576,49152,272,huggingface_local_dir,269061381,9c08df59e186d163f43bdbdbb6d5ff5928b799f74e49c80b2c89e66949cbff29,VERIFIED
-ckpt-smol-02-merged,v2 · Merged-AB,Model Merging,ckpt-smol-01a-instruct;ckpt-smol-01b-branch,134515008,30,576,49152,272,huggingface_local_dir,269061381,47d3304b11ee1ede82bb7de1c2f17b8ce7e1b3d9696c37aca14f9b647ca5e426,VERIFIED
-ckpt-smol-03-quant,v3 · Quantized-LowBit,Quantization,ckpt-smol-02-merged,134515008,30,576,49152,272,huggingface_local_dir,269061518,a7bc6af1db3af889290736ff490fb1ea0a181b60abb717db5315ac1f8e24a4bb,VERIFIED
-ckpt-smol-04-pruned,v4 · Pruned-MLP,Pruning,ckpt-smol-03-quant,134515008,30,576,49152,272,huggingface_local_dir,269061381,1843abcb58ed9810a6c9967a4599cd77f4765ae9e65a5c62ffd6fff31b26d394,VERIFIED
+ckpt-smol-00-base,v0 · SmolLM2-Base,Base Model,,134515008,30,576,49152,272,huggingface_hub_cached,272437465,cff3853ede6018c9b73f867aac70df17ba9d4e94969b750863867bfedc90675e,VERIFIED
+ckpt-smol-01a-instruct,v1a · Instruct-SFT,Instruction Tuning,ckpt-smol-00-base,134515008,30,576,49152,272,huggingface_hub_cached,272444093,48511b85401c213adffc58a8ca8b195866e89f50f7e10ad03e22a72a81c6c3a2,VERIFIED
+ckpt-smol-01b-branch,v1b · SFT-Conservative,SFT,ckpt-smol-00-base,134515008,30,576,49152,272,huggingface_local_dir,272437541,077d0e450295a09979245f4706ce441982c3c1cead2f27efdd8b2f7276774386,VERIFIED
+ckpt-smol-02-merged,v2 · Merged-AB,Model Merging,ckpt-smol-01b-branch;ckpt-smol-01a-instruct,134515008,30,576,49152,272,huggingface_local_dir,272437541,93376a898fcf240906f533baae02a4e6a54fc84056a807bda9ec42f92029a8b3,VERIFIED
+ckpt-smol-03-quant,v3 · Quantized-LowBit,Quantization,ckpt-smol-02-merged,134515008,30,576,49152,272,huggingface_local_dir,272437678,4d80198e87abfa4887deb371c6bf051f6b61a3634c2414e85e7fe6e47cfdbf34,VERIFIED
+ckpt-smol-04-pruned,v4 · Pruned-MLP,Pruning,ckpt-smol-03-quant,134515008,30,576,49152,272,huggingface_local_dir,272437541,e8cab17c9e414fb4c8129506e5e2dd78d1e9923e28d3ca1c0f4a499921361d50,VERIFIED
 
 [TENSOR_EVOLUTION_TRANSITIONS]
 scope,source_label,target_label,transformation_type,epistemic_status,l2_distance,relative_l2_distance,rmse,max_abs_diff,global_cosine_similarity,modified_parameter_pct,sparsity_delta,zero_to_nonzero,nonzero_to_zero
 consecutive,v0 · SmolLM2-Base,v1a · Instruct-SFT,Instruction Tuning,OBSERVED,180.6457852395814,0.08575296307303772,0.01557551668323811,0.154296875,0.9963397015652642,97.672795,0.0,0,0
 consecutive,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,OBSERVED,63.253832121652785,0.030026737258012255,0.0054538284199817325,0.0546875,0.9995493411628146,93.094155,2.72e-06,0,366
-consecutive,v1a · Instruct-SFT,v2 · Merged-AB,Model Merging,OBSERVED,29.64896203632234,0.01403024294406391,0.0025563724181274015,0.025390625,0.9999019950774711,86.565566,7.3e-06,0,982
 consecutive,v1b · SFT-Conservative,v2 · Merged-AB,Model Merging,OBSERVED,88.17913895012134,0.04184839125222579,0.007602921086753659,0.078125,0.9991277562127305,97.672786,4.58e-06,366,982
-consecutive,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,OBSERVED,251.2417673633857,0.11901182925437641,0.021662394912257348,0.0390625,0.9929841123331832,98.711479,0.19242454,0,25883989
-consecutive,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,OBSERVED,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0,0
+consecutive,v1a · Instruct-SFT,v2 · Merged-AB,Model Merging,OBSERVED,29.64896203632234,0.01403024294406391,0.0025563724181274015,0.025390625,0.9999019950774711,86.565566,7.3e-06,0,982
+consecutive,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,OBSERVED,150.4053524128317,0.07124617975804315,0.01296814687731264,0.03125,0.9974664150153639,97.96928,0.11712507,0,15755080
+consecutive,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,OBSERVED,157.41089083305656,0.0744623722045008,0.013572173593986733,0.044921875,0.9972238239862095,9.128156,0.09128156,0,12278740
 base_to_current,v0 · SmolLM2-Base,v0 · SmolLM2-Base,Base Model,OBSERVED,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0,0
 base_to_current,v0 · SmolLM2-Base,v1a · Instruct-SFT,Instruction Tuning,OBSERVED,180.6457852395814,0.08575296307303772,0.01557551668323811,0.154296875,0.9963397015652642,97.672795,0.0,0,0
 base_to_current,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,OBSERVED,63.253832121652785,0.030026737258012255,0.0054538284199817325,0.0546875,0.9995493411628146,93.094155,2.72e-06,0,366
 base_to_current,v0 · SmolLM2-Base,v2 · Merged-AB,Model Merging,OBSERVED,151.2651427161833,0.07180590557579458,0.01304227912565809,0.12890625,0.9974296877703509,97.672795,7.3e-06,0,982
-base_to_current,v0 · SmolLM2-Base,v3 · Quantized-LowBit,Quantization,OBSERVED,293.20594318564014,0.13918552478513205,0.025280601225518444,0.144805908203125,0.9904327496350145,98.961905,0.19243184,0,25884971
-base_to_current,v0 · SmolLM2-Base,v4 · Pruned-MLP,Pruning,OBSERVED,293.20594318564014,0.13918552478513205,0.025280601225518444,0.144805908203125,0.9904327496350145,98.961905,0.19243184,0,25884971
+base_to_current,v0 · SmolLM2-Base,v3 · Quantized-LowBit,Quantization,OBSERVED,213.17214579754506,0.1011933000403694,0.018379982178204867,0.129180908203125,0.9949039556120696,98.405641,0.11713237,0,15756062
+base_to_current,v0 · SmolLM2-Base,v4 · Pruned-MLP,Pruning,OBSERVED,264.21698572753587,0.12542440107480707,0.022781135268316304,0.1494140625,0.9921402637259892,98.450942,0.20841393,0,28034802
 
 [BEHAVIORAL_EVOLUTION_TIMELINE]
 checkpoint_id,version_label,transformation_type,sample_size,pass_rate,wilson_ci95_low,wilson_ci95_high,mean_score,factual_contradiction_rate
@@ -32,8 +32,8 @@ ckpt-smol-00-base,v0 · SmolLM2-Base,Base Model,24,0.208333,0.092448,0.404705,0.
 ckpt-smol-01a-instruct,v1a · Instruct-SFT,Instruction Tuning,24,0.333333,0.179722,0.532937,0.595342,0.0
 ckpt-smol-01b-branch,v1b · SFT-Conservative,SFT,24,0.208333,0.092448,0.404705,0.333992,0.0
 ckpt-smol-02-merged,v2 · Merged-AB,Model Merging,24,0.375,0.211594,0.5729,0.559379,0.0
-ckpt-smol-03-quant,v3 · Quantized-LowBit,Quantization,24,0.125,0.043443,0.310039,0.255821,0.0
-ckpt-smol-04-pruned,v4 · Pruned-MLP,Pruning,24,0.125,0.043443,0.310039,0.255821,0.0
+ckpt-smol-03-quant,v3 · Quantized-LowBit,Quantization,24,0.333333,0.179722,0.532937,0.425347,0.0
+ckpt-smol-04-pruned,v4 · Pruned-MLP,Pruning,24,0.166667,0.066787,0.358531,0.355605,0.0
 
 [REPRESENTATION_CKA_MATRIX]
 checkpoint_id,version_label,mean_cka_to_base,representation_drift,layer_0_cka,layer_1_cka,layer_2_cka,layer_3_cka,layer_4_cka,layer_5_cka,layer_6_cka,layer_7_cka,layer_8_cka,layer_9_cka,layer_10_cka,layer_11_cka,layer_12_cka,layer_13_cka,layer_14_cka,layer_15_cka,layer_16_cka,layer_17_cka,layer_18_cka,layer_19_cka,layer_20_cka,layer_21_cka,layer_22_cka,layer_23_cka,layer_24_cka,layer_25_cka,layer_26_cka,layer_27_cka,layer_28_cka,layer_29_cka
@@ -41,20 +41,21 @@ ckpt-smol-00-base,v0 · SmolLM2-Base,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
 ckpt-smol-01a-instruct,v1a · Instruct-SFT,0.85223,0.14777,0.973226,0.695448,0.607286,0.607154,0.603587,0.605058,0.607042,0.599028,0.585509,0.625722,0.979379,0.998522,0.998522,0.998519,0.998516,0.998515,0.998512,0.99851,0.998508,0.998503,0.9985,0.998496,0.998488,0.998478,0.998467,0.998462,0.998457,0.998443,0.991163,0.112871
 ckpt-smol-01b-branch,v1b · SFT-Conservative,0.872809,0.127191,0.994325,0.870542,0.954205,0.953791,0.952983,0.952252,0.951068,0.9491,0.930514,0.750459,0.965018,0.897955,0.898074,0.897869,0.89795,0.89781,0.897693,0.897568,0.897207,0.897517,0.897465,0.897996,0.898058,0.898172,0.898533,0.898533,0.898292,0.899563,0.558338,0.135416
 ckpt-smol-02-merged,v2 · Merged-AB,0.851728,0.148272,0.979828,0.677782,0.608998,0.608199,0.604707,0.606082,0.606983,0.599841,0.585987,0.631895,0.973967,0.997276,0.997275,0.99727,0.997266,0.997262,0.997257,0.997254,0.99725,0.997243,0.997239,0.997234,0.997223,0.99721,0.997202,0.997195,0.99719,0.997158,0.984279,0.130281
-ckpt-smol-03-quant,v3 · Quantized-LowBit,0.844649,0.155351,0.959704,0.61562,0.590202,0.589786,0.587154,0.586441,0.5859,0.58074,0.565143,0.594434,0.926314,0.999408,0.999409,0.999407,0.999406,0.999406,0.999404,0.999403,0.999401,0.999396,0.999395,0.999393,0.999388,0.999381,0.999365,0.999357,0.999353,0.999355,0.994705,0.17369
-ckpt-smol-04-pruned,v4 · Pruned-MLP,0.844649,0.155351,0.959704,0.61562,0.590202,0.589786,0.587154,0.586441,0.5859,0.58074,0.565143,0.594434,0.926314,0.999408,0.999409,0.999407,0.999406,0.999406,0.999404,0.999403,0.999401,0.999396,0.999395,0.999393,0.999388,0.999381,0.999365,0.999357,0.999353,0.999355,0.994705,0.17369
+ckpt-smol-03-quant,v3 · Quantized-LowBit,0.855345,0.144655,0.976667,0.652708,0.610219,0.609484,0.606459,0.60764,0.608508,0.600782,0.586987,0.640319,0.975245,0.999662,0.999662,0.999662,0.999661,0.99966,0.99966,0.999659,0.999657,0.999656,0.999655,0.999653,0.99965,0.999643,0.999637,0.999633,0.999629,0.999625,0.995963,0.195313
+ckpt-smol-04-pruned,v4 · Pruned-MLP,0.84808,0.15192,0.976667,0.652708,0.610219,0.609484,0.606459,0.60764,0.608362,0.601308,0.585219,0.61568,0.904326,0.999411,0.999411,0.999411,0.999409,0.999409,0.999408,0.999406,0.999405,0.999402,0.999401,0.999397,0.999394,0.999383,0.999373,0.999367,0.999362,0.999366,0.995387,0.079222
 
 [REGRESSION_ORIGIN_EVENTS]
 event_id,previous_label,first_affected_label,transformation_type,affected_category,pass_rate_before,pass_rate_after,score_drop,failed_cases,epistemic_status,causal_verification_exists
-reg-orig-8aad5006,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,code_preservation,0.666667,0.0,0.666667,code-01;code-03,CAUSALLY VERIFIED,True
-reg-orig-93366e8d,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,conciseness,0.333333,0.0,0.485642,conc-03,CAUSALLY VERIFIED,True
-reg-orig-5147054c,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,factual_accuracy,0.666667,0.333333,0.333334,fact-01,CAUSALLY VERIFIED,True
-reg-orig-557e65df,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,refusal_behavior,0.666667,0.333333,0.333334,ref-02,CAUSALLY VERIFIED,True
-reg-orig-6a9c2338,v0 · SmolLM2-Base,v1a · Instruct-SFT,Instruction Tuning,conciseness,0.333333,0.0,0.333333,conc-03,CAUSALLY VERIFIED,True
-reg-orig-1cd9234a,v1b · SFT-Conservative,v2 · Merged-AB,Model Merging,math_reasoning,0.333333,0.0,0.333333,math-02,CAUSALLY VERIFIED,True
-reg-orig-38268c5f,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,overall,0.375,0.125,0.303558,code-01;code-03;json-01;json-03;inst-01;ref-02;fact-01,CAUSALLY VERIFIED,True
-reg-orig-f336ab52,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,json_reliability,0.0,0.0,0.283334,,CAUSALLY VERIFIED,True
-reg-orig-586ff8f3,v1a · Instruct-SFT,v2 · Merged-AB,Model Merging,json_reliability,0.666667,0.666667,0.283333,,CAUSALLY VERIFIED,True
-reg-orig-106e4b3c,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,vietnamese,0.0,0.0,0.166667,,CAUSALLY VERIFIED,True
-reg-orig-b7518e5f,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,code_preservation,0.0,0.0,0.133333,,CAUSALLY VERIFIED,True
-reg-orig-553cb073,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,instruction_following,0.333333,0.333333,0.111111,inst-01,CAUSALLY VERIFIED,True
+reg-orig-28b37519,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,conciseness,0.333333,0.0,0.485642,conc-03,CAUSAL SUPPORT,False
+reg-orig-73711c0e,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,code_preservation,0.666667,0.333333,0.333334,code-01,CAUSAL SUPPORT,False
+reg-orig-5b6c783d,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,factual_accuracy,0.666667,0.333333,0.333334,fact-01,CAUSAL SUPPORT,False
+reg-orig-f6b57c73,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,refusal_behavior,0.666667,0.333333,0.333334,ref-02,CAUSAL SUPPORT,False
+reg-orig-fbd2c06a,v0 · SmolLM2-Base,v1a · Instruct-SFT,Instruction Tuning,conciseness,0.333333,0.0,0.333333,conc-03,CAUSAL SUPPORT,False
+reg-orig-98c5312c,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,instruction_following,0.333333,0.0,0.333333,inst-02,CAUSAL SUPPORT,False
+reg-orig-91a060de,v1b · SFT-Conservative,v2 · Merged-AB,Model Merging,math_reasoning,0.333333,0.0,0.333333,math-02,CAUSAL SUPPORT,False
+reg-orig-b11353a2,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,json_reliability,0.0,0.0,0.283334,,CAUSAL SUPPORT,False
+reg-orig-ccae2ddc,v1a · Instruct-SFT,v2 · Merged-AB,Model Merging,json_reliability,0.666667,0.666667,0.283333,,CAUSAL SUPPORT,False
+reg-orig-16193e4a,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,vietnamese,0.0,0.0,0.166667,,CAUSAL SUPPORT,False
+reg-orig-779929f1,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,overall,0.375,0.333333,0.134032,code-01;json-01;json-03;inst-01,CAUSAL SUPPORT,False
+reg-orig-6272afa0,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,vietnamese,0.0,0.0,0.133333,,CAUSAL SUPPORT,False
+reg-orig-4ba8617c,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,code_preservation,0.0,0.0,0.133333,,CAUSAL SUPPORT,False

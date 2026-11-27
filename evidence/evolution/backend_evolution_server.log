@@ -1,109 +1,109 @@
-INFO:     Started server process [6348]
+INFO:     Started server process [29868]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:54853 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54870 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54874 - "GET /api/comparisons HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54875 - "GET /api/comparisons HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54876 - "GET /api/baselines HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54872 - "GET /api/models/discover HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54871 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54877 - "GET /api/baselines HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54873 - "GET /api/models/discover HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54879 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54878 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54882 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54881 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54884 - "GET /api/evolution/projects/evo-87e68eb9e7 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54888 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54887 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54890 - "GET /api/evolution/projects/evo-87e68eb9e7 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54892 - "POST /api/models/validate HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:54893 - "POST /api/evolution/projects HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54897 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54896 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54899 - "GET /api/evolution/projects/evo-46f6710967 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54903 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54902 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54905 - "GET /api/evolution/projects/evo-46f6710967 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54907 - "POST /api/evolution/projects/evo-46f6710967/checkpoints HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54911 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54910 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54913 - "GET /api/evolution/projects/evo-46f6710967 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54915 - "POST /api/models/validate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54917 - "POST /api/evolution/projects/evo-46f6710967/checkpoints HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54920 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54921 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54923 - "GET /api/evolution/projects/evo-46f6710967 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54925 - "POST /api/comparisons/run HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54929 - "GET /api/comparisons/ndiff-ce3bfe369e HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54936 - "GET /api/comparisons HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54939 - "GET /api/comparisons/ndiff-ce3bfe369e/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54937 - "GET /api/baselines HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54932 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54935 - "GET /api/models/discover HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54941 - "GET /api/comparisons/ndiff-ce3bfe369e/export/html HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54943 - "GET /api/settings HTTP/1.1" 200 OK
-W1127 15:08:52.808000 6348 .venv\Lib\site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
-Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 21001.52it/s]
+INFO:     127.0.0.1:53153 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53176 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53174 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53177 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53172 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53178 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53175 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53179 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53173 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53181 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53183 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53184 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53186 - "GET /api/evolution/projects/evo-ac79e066ed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53189 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53190 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53192 - "GET /api/evolution/projects/evo-ac79e066ed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53194 - "POST /api/evolution/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53196 - "POST /api/models/validate HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:53198 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53199 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53201 - "GET /api/evolution/projects/evo-b9003532b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53204 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53205 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53207 - "GET /api/evolution/projects/evo-b9003532b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53209 - "POST /api/evolution/projects/evo-b9003532b6/checkpoints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53213 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53212 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53215 - "GET /api/evolution/projects/evo-b9003532b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53217 - "POST /api/models/validate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53219 - "POST /api/evolution/projects/evo-b9003532b6/checkpoints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53223 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53222 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53225 - "GET /api/evolution/projects/evo-b9003532b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53229 - "POST /api/comparisons/run HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53231 - "GET /api/comparisons/ndiff-296494de22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53239 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53241 - "GET /api/comparisons/ndiff-296494de22/tensors?sort_by=relative_l2&limit=250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53234 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53237 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53243 - "GET /api/comparisons/ndiff-296494de22/export/html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53245 - "GET /api/settings HTTP/1.1" 200 OK
+W1127 16:02:10.033000 29868 .venv\Lib\site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 8360.74it/s]
 [transformers] [1mQwen2ForCausalLM LOAD REPORT[0m from: D:\LLM\data\demo_fixtures\synth_model_a
 Key                                       | Status  | 
 ------------------------------------------+---------+-
-model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.q_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.v_proj.bias | MISSING | 
+model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 
 Notes:
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
-Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 8375.05it/s]
+Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 10459.61it/s]
 [transformers] [1mQwen2ForCausalLM LOAD REPORT[0m from: D:\LLM\data\demo_fixtures\synth_model_b
 Key                                       | Status  | 
 ------------------------------------------+---------+-
-model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.q_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.v_proj.bias | MISSING | 
+model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 
 Notes:
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
-Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 10196.85it/s]
+Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 8556.48it/s]
 [transformers] [1mQwen2ForCausalLM LOAD REPORT[0m from: D:\LLM\data\demo_fixtures\synth_model_a
 Key                                       | Status  | 
 ------------------------------------------+---------+-
-model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.q_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.v_proj.bias | MISSING | 
+model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 
 Notes:
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
-Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 10502.01it/s]
+Loading weights:   0%|          | 0/21 [00:00<?, ?it/s]Loading weights: 100%|██████████| 21/21 [00:00<00:00, 21026.59it/s]
 [transformers] [1mQwen2ForCausalLM LOAD REPORT[0m from: D:\LLM\data\demo_fixtures\synth_model_b
 Key                                       | Status  | 
 ------------------------------------------+---------+-
-model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.q_proj.bias | MISSING | 
 model.layers.{0, 1}.self_attn.v_proj.bias | MISSING | 
+model.layers.{0, 1}.self_attn.k_proj.bias | MISSING | 
 
 Notes:
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
-INFO:     127.0.0.1:54927 - "POST /api/evolution/projects/evo-46f6710967/analyze HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54946 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54947 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54949 - "GET /api/evolution/projects/evo-46f6710967 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54951 - "POST /api/evolution/projects/evo-46f6710967/compare HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54953 - "GET /api/evolution/runs/evorun-1d9239b16b/export/html HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54955 - "GET /api/evolution/runs/evorun-1d9239b16b/export/csv HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54967 - "GET /api/baselines HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54966 - "GET /api/comparisons HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54965 - "GET /api/models/discover HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54964 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54968 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54970 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54971 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54973 - "GET /api/evolution/projects/evo-smollm2-dag HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54977 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54976 - "GET /api/evolution/overview HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54979 - "GET /api/evolution/projects/evo-smollm2-dag HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54981 - "GET /api/evolution/projects/evo-smollm2-dag HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54984 - "POST /api/evolution/projects/evo-smollm2-dag/compare HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54993 - "GET /api/evolution/runs/evorun-real-smollm2/export/html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53227 - "POST /api/evolution/projects/evo-b9003532b6/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53251 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53250 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53253 - "GET /api/evolution/projects/evo-b9003532b6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53255 - "POST /api/evolution/projects/evo-b9003532b6/compare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53257 - "GET /api/evolution/runs/evorun-f4dbd68483/export/html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53259 - "GET /api/evolution/runs/evorun-f4dbd68483/export/csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53271 - "GET /api/baselines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53270 - "GET /api/comparisons HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53269 - "GET /api/models/discover HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53268 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53272 - "GET /api/comparisons/ndiff-real-qwen25-05b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53274 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53275 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53281 - "GET /api/evolution/projects?limit=50&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53280 - "GET /api/evolution/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53277 - "GET /api/evolution/projects/evo-smollm2-dag HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53283 - "GET /api/evolution/projects/evo-smollm2-dag HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53285 - "GET /api/evolution/projects/evo-smollm2-dag HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53287 - "POST /api/evolution/projects/evo-smollm2-dag/compare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53295 - "GET /api/evolution/runs/evorun-real-smollm2/export/html HTTP/1.1" 200 OK

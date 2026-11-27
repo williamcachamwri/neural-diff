@@ -19,11 +19,12 @@ class VerificationStatus(StrEnum):
 
 
 class EpistemicStatus(StrEnum):
-    """Epistemic classification distinguishing direct measurement from inference or causation."""
+    """Epistemic classification distinguishing direct measurement from correlation, support, or causation."""
 
     OBSERVED = "OBSERVED"
     INFERRED = "INFERRED"
     CORRELATED = "CORRELATED"
+    CAUSAL_SUPPORT = "CAUSAL SUPPORT"
     CAUSALLY_VERIFIED = "CAUSALLY VERIFIED"
     NOT_VERIFIED = "NOT VERIFIED"
 

@@ -1,170 +1,885 @@
 {
   "experiment_type": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
   "run_id": "evorun-real-smollm2",
-  "wall_clock_seconds": 442.816,
+  "cache_key": "4559df78467d3d57b19923b50757c2fab67c6488216c560dfb3d7a1a8b6f50c2",
+  "wall_clock_seconds": 473.802,
+  "transformation_recipes": {
+    "v0": {
+      "source": "HuggingFaceTB/SmolLM2-135M",
+      "stage": "Base Model"
+    },
+    "v1a": {
+      "source": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "stage": "Instruction Tuning"
+    },
+    "v1b": {
+      "formula": "0.65 * W_v0 + 0.35 * W_v1a",
+      "dtype": "bfloat16",
+      "stage": "SFT"
+    },
+    "v2": {
+      "formula": "0.75 * W_v1a + 0.25 * W_v1b",
+      "dtype": "bfloat16",
+      "stage": "Model Merging"
+    },
+    "v3": {
+      "formula": "round(W_v2 / 0.045) * 0.045 (norms exempt)",
+      "dtype": "bfloat16",
+      "stage": "Quantization"
+    },
+    "v4": {
+      "formula": "W_v3 * (|W_v3| >= 0.060) on layers.6..29.mlp.*",
+      "dtype": "bfloat16",
+      "stage": "Pruning"
+    }
+  },
   "overview": {
     "total_checkpoints": 6,
     "healthy_checkpoints": 6,
     "total_transformations": 6,
     "branch_count": 2,
-    "detected_regressions": 12,
+    "analyzed_branch_count": 2,
+    "branches_truncated": false,
+    "detected_regressions": 13,
+    "statistically_significant_regressions": 0,
+    "exploratory_regressions": 12,
     "most_modified_layers": [
       0,
-      2,
+      25,
       1
     ],
     "least_modified_layers": [
-      19,
-      12,
-      11
+      5,
+      4,
+      3
     ],
-    "peak_cumulative_l2": 293.20594318564014,
-    "min_base_cosine_similarity": 0.9904327496350145
+    "peak_cumulative_l2": 264.21698572753587,
+    "min_base_cosine_similarity": 0.9921402637259892
   },
-  "regression_events_count": 12,
-  "regression_origins": [
+  "checkpoints": [
     {
-      "previous_label": "v2 \u00b7 Merged-AB",
-      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
-      "transformation_type": "Quantization",
-      "affected_category": "code_preservation",
-      "pass_rate_before": 0.666667,
-      "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "checkpoint_id": "ckpt-smol-00-base",
+      "version_label": "v0 \u00b7 SmolLM2-Base",
+      "transformation_type": "Base Model",
+      "parameter_count": 134515008,
+      "file_size_bytes": 272437465,
+      "sha256_fingerprint": "cff3853ede6018c9b73f867aac70df17ba9d4e94969b750863867bfedc90675e",
+      "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
+      "component_fingerprints": {
+        "weights_sha256": "720a76cbc5580aed4787ea52e25b3a4bce046b7b2d213c762180ef9693963090",
+        "architecture_config_sha256": "5b130dc60de0d842a3c2e0317c1738d7f2f495ff1fca850d316e07a3ec402d91",
+        "tokenizer_sha256": "28374742b2397be65510eaafee4188aa4b208e46566412db8a7d66c2f6b37982",
+        "adapter_sha256": null,
+        "metadata_sha256": "b885263c1043ddc752841c0f95254a93c95a129cf6af2b4b3e6fe341bb8e0bf4"
+      }
     },
+    {
+      "checkpoint_id": "ckpt-smol-01a-instruct",
+      "version_label": "v1a \u00b7 Instruct-SFT",
+      "transformation_type": "Instruction Tuning",
+      "parameter_count": 134515008,
+      "file_size_bytes": 272444093,
+      "sha256_fingerprint": "48511b85401c213adffc58a8ca8b195866e89f50f7e10ad03e22a72a81c6c3a2",
+      "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
+      "component_fingerprints": {
+        "weights_sha256": "ee5875a9f07e3e5eeb1a01e762bd84f48e8448ead427c15152805d6a494d216d",
+        "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
+        "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
+        "adapter_sha256": null,
+        "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-01b-branch",
+      "version_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "parameter_count": 134515008,
+      "file_size_bytes": 272437541,
+      "sha256_fingerprint": "077d0e450295a09979245f4706ce441982c3c1cead2f27efdd8b2f7276774386",
+      "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
+      "component_fingerprints": {
+        "weights_sha256": "549a611f37138b774252fc67fc3d906793985a479c96a1a557eb7b080d6d20a1",
+        "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
+        "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
+        "adapter_sha256": null,
+        "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-02-merged",
+      "version_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "parameter_count": 134515008,
+      "file_size_bytes": 272437541,
+      "sha256_fingerprint": "93376a898fcf240906f533baae02a4e6a54fc84056a807bda9ec42f92029a8b3",
+      "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
+      "component_fingerprints": {
+        "weights_sha256": "2ebdf174b35744d588dd9650a45475f0e6134c50243faa23b2671c38db379064",
+        "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
+        "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
+        "adapter_sha256": null,
+        "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-03-quant",
+      "version_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "parameter_count": 134515008,
+      "file_size_bytes": 272437678,
+      "sha256_fingerprint": "4d80198e87abfa4887deb371c6bf051f6b61a3634c2414e85e7fe6e47cfdbf34",
+      "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
+      "component_fingerprints": {
+        "weights_sha256": "3b5f02006281719c461161763c87503df04f611410bf7a6a7ffcc2aeb867e24c",
+        "architecture_config_sha256": "f829e86e202b5d79e340807973811c6118c5b7890630a3b241636455cadf4c60",
+        "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
+        "adapter_sha256": null,
+        "metadata_sha256": "21ce92b585ff704586a0bcfe662fac312b647ab554cc5abb79d11f6941a4e5e1"
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-04-pruned",
+      "version_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
+      "parameter_count": 134515008,
+      "file_size_bytes": 272437541,
+      "sha256_fingerprint": "e8cab17c9e414fb4c8129506e5e2dd78d1e9923e28d3ca1c0f4a499921361d50",
+      "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
+      "component_fingerprints": {
+        "weights_sha256": "05a6e1c90c735775ad08a2b01ab2bea07e62e62b72edec3ea22d46c1cabc0ac4",
+        "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
+        "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
+        "adapter_sha256": null,
+        "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+      }
+    }
+  ],
+  "tensor_transitions": [
+    {
+      "scope": "consecutive",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v1a \u00b7 Instruct-SFT",
+      "transformation_type": "Instruction Tuning",
+      "l2_distance": 180.6457852395814,
+      "relative_l2_distance": 0.08575296307303772,
+      "sum_of_step_l2_along_path": null,
+      "path_cancellation_ratio": null,
+      "global_cosine_similarity": 0.9963397015652642,
+      "modified_parameters": 131384568,
+      "modified_parameter_pct": 97.672795,
+      "nonzero_to_zero_transitions": 0,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 0.0,
+      "sparsity_delta": 0.0
+    },
+    {
+      "scope": "consecutive",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "l2_distance": 63.253832121652785,
+      "relative_l2_distance": 0.030026737258012255,
+      "sum_of_step_l2_along_path": null,
+      "path_cancellation_ratio": null,
+      "global_cosine_similarity": 0.9995493411628146,
+      "modified_parameters": 125225610,
+      "modified_parameter_pct": 93.094155,
+      "nonzero_to_zero_transitions": 366,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 2.72e-06,
+      "sparsity_delta": 2.72e-06
+    },
+    {
+      "scope": "consecutive",
+      "source_label": "v1b \u00b7 SFT-Conservative",
+      "target_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "l2_distance": 88.17913895012134,
+      "relative_l2_distance": 0.04184839125222579,
+      "sum_of_step_l2_along_path": null,
+      "path_cancellation_ratio": null,
+      "global_cosine_similarity": 0.9991277562127305,
+      "modified_parameters": 131384556,
+      "modified_parameter_pct": 97.672786,
+      "nonzero_to_zero_transitions": 982,
+      "zero_to_nonzero_transitions": 366,
+      "sparsity_ratio_source": 2.72e-06,
+      "sparsity_ratio_target": 7.3e-06,
+      "sparsity_delta": 4.58e-06
+    },
+    {
+      "scope": "consecutive",
+      "source_label": "v1a \u00b7 Instruct-SFT",
+      "target_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "l2_distance": 29.64896203632234,
+      "relative_l2_distance": 0.01403024294406391,
+      "sum_of_step_l2_along_path": null,
+      "path_cancellation_ratio": null,
+      "global_cosine_similarity": 0.9999019950774711,
+      "modified_parameters": 116443678,
+      "modified_parameter_pct": 86.565566,
+      "nonzero_to_zero_transitions": 982,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 7.3e-06,
+      "sparsity_delta": 7.3e-06
+    },
+    {
+      "scope": "consecutive",
+      "source_label": "v2 \u00b7 Merged-AB",
+      "target_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "l2_distance": 150.4053524128317,
+      "relative_l2_distance": 0.07124617975804315,
+      "sum_of_step_l2_along_path": null,
+      "path_cancellation_ratio": null,
+      "global_cosine_similarity": 0.9974664150153639,
+      "modified_parameters": 131783385,
+      "modified_parameter_pct": 97.96928,
+      "nonzero_to_zero_transitions": 15755080,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 7.3e-06,
+      "sparsity_ratio_target": 0.11713237,
+      "sparsity_delta": 0.11712507
+    },
+    {
+      "scope": "consecutive",
+      "source_label": "v3 \u00b7 Quantized-LowBit",
+      "target_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
+      "l2_distance": 157.41089083305656,
+      "relative_l2_distance": 0.0744623722045008,
+      "sum_of_step_l2_along_path": null,
+      "path_cancellation_ratio": null,
+      "global_cosine_similarity": 0.9972238239862095,
+      "modified_parameters": 12278740,
+      "modified_parameter_pct": 9.128156,
+      "nonzero_to_zero_transitions": 12278740,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.11713237,
+      "sparsity_ratio_target": 0.20841393,
+      "sparsity_delta": 0.09128156
+    },
+    {
+      "scope": "base_to_current",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v0 \u00b7 SmolLM2-Base",
+      "transformation_type": "Base Model",
+      "l2_distance": 0.0,
+      "relative_l2_distance": 0.0,
+      "sum_of_step_l2_along_path": 0.0,
+      "path_cancellation_ratio": 1.0,
+      "global_cosine_similarity": 1.0,
+      "modified_parameters": 0,
+      "modified_parameter_pct": 0.0,
+      "nonzero_to_zero_transitions": 0,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": null,
+      "sparsity_ratio_target": null,
+      "sparsity_delta": 0.0
+    },
+    {
+      "scope": "base_to_current",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v1a \u00b7 Instruct-SFT",
+      "transformation_type": "Instruction Tuning",
+      "l2_distance": 180.6457852395814,
+      "relative_l2_distance": 0.08575296307303772,
+      "sum_of_step_l2_along_path": 180.6457852395814,
+      "path_cancellation_ratio": 1.0,
+      "global_cosine_similarity": 0.9963397015652642,
+      "modified_parameters": 131384568,
+      "modified_parameter_pct": 97.672795,
+      "nonzero_to_zero_transitions": 0,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 0.0,
+      "sparsity_delta": 0.0
+    },
+    {
+      "scope": "base_to_current",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "l2_distance": 63.253832121652785,
+      "relative_l2_distance": 0.030026737258012255,
+      "sum_of_step_l2_along_path": 63.253832121652785,
+      "path_cancellation_ratio": 1.0,
+      "global_cosine_similarity": 0.9995493411628146,
+      "modified_parameters": 125225610,
+      "modified_parameter_pct": 93.094155,
+      "nonzero_to_zero_transitions": 366,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 2.72e-06,
+      "sparsity_delta": 2.72e-06
+    },
+    {
+      "scope": "base_to_current",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "l2_distance": 151.2651427161833,
+      "relative_l2_distance": 0.07180590557579458,
+      "sum_of_step_l2_along_path": 210.29474727590372,
+      "path_cancellation_ratio": 0.719301,
+      "global_cosine_similarity": 0.9974296877703509,
+      "modified_parameters": 131384568,
+      "modified_parameter_pct": 97.672795,
+      "nonzero_to_zero_transitions": 982,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 7.3e-06,
+      "sparsity_delta": 7.3e-06
+    },
+    {
+      "scope": "base_to_current",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "l2_distance": 213.17214579754506,
+      "relative_l2_distance": 0.1011933000403694,
+      "sum_of_step_l2_along_path": 360.7000996887354,
+      "path_cancellation_ratio": 0.590996,
+      "global_cosine_similarity": 0.9949039556120696,
+      "modified_parameters": 132370356,
+      "modified_parameter_pct": 98.405641,
+      "nonzero_to_zero_transitions": 15756062,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 0.11713237,
+      "sparsity_delta": 0.11713237
+    },
+    {
+      "scope": "base_to_current",
+      "source_label": "v0 \u00b7 SmolLM2-Base",
+      "target_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
+      "l2_distance": 264.21698572753587,
+      "relative_l2_distance": 0.12542440107480707,
+      "sum_of_step_l2_along_path": 518.110990521792,
+      "path_cancellation_ratio": 0.509962,
+      "global_cosine_similarity": 0.9921402637259892,
+      "modified_parameters": 132431293,
+      "modified_parameter_pct": 98.450942,
+      "nonzero_to_zero_transitions": 28034802,
+      "zero_to_nonzero_transitions": 0,
+      "sparsity_ratio_source": 0.0,
+      "sparsity_ratio_target": 0.20841393,
+      "sparsity_delta": 0.20841393
+    }
+  ],
+  "behavioral_timeline": [
+    {
+      "checkpoint_id": "ckpt-smol-00-base",
+      "version_label": "v0 \u00b7 SmolLM2-Base",
+      "transformation_type": "Base Model",
+      "sample_size": 24,
+      "pass_rate": 0.208333,
+      "pass_rate_wilson_ci95": [
+        0.092448,
+        0.404705
+      ],
+      "mean_score": 0.405114,
+      "factual_contradiction_rate": 0.0,
+      "category_scores": {
+        "vietnamese": 0.316667,
+        "code_preservation": 0.2,
+        "json_reliability": 0.316667,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.333333,
+        "conciseness": 0.607576,
+        "refusal_behavior": 0.8,
+        "factual_accuracy": 0.666667
+      },
+      "category_pass_rates": {
+        "vietnamese": 0.0,
+        "code_preservation": 0.0,
+        "json_reliability": 0.0,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.0,
+        "conciseness": 0.333333,
+        "refusal_behavior": 0.666667,
+        "factual_accuracy": 0.666667
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-01a-instruct",
+      "version_label": "v1a \u00b7 Instruct-SFT",
+      "transformation_type": "Instruction Tuning",
+      "sample_size": 24,
+      "pass_rate": 0.333333,
+      "pass_rate_wilson_ci95": [
+        0.179722,
+        0.532937
+      ],
+      "mean_score": 0.595342,
+      "factual_contradiction_rate": 0.0,
+      "category_scores": {
+        "vietnamese": 0.283333,
+        "code_preservation": 0.7,
+        "json_reliability": 0.925,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.611111,
+        "conciseness": 0.776623,
+        "refusal_behavior": 0.8,
+        "factual_accuracy": 0.666667
+      },
+      "category_pass_rates": {
+        "vietnamese": 0.0,
+        "code_preservation": 0.666667,
+        "json_reliability": 0.666667,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.0,
+        "conciseness": 0.0,
+        "refusal_behavior": 0.666667,
+        "factual_accuracy": 0.666667
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-01b-branch",
+      "version_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "sample_size": 24,
+      "pass_rate": 0.208333,
+      "pass_rate_wilson_ci95": [
+        0.092448,
+        0.404705
+      ],
+      "mean_score": 0.333992,
+      "factual_contradiction_rate": 0.0,
+      "category_scores": {
+        "vietnamese": 0.15,
+        "code_preservation": 0.066667,
+        "json_reliability": 0.033333,
+        "math_reasoning": 0.333333,
+        "instruction_following": 0.5,
+        "conciseness": 0.121934,
+        "refusal_behavior": 0.8,
+        "factual_accuracy": 0.666667
+      },
+      "category_pass_rates": {
+        "vietnamese": 0.0,
+        "code_preservation": 0.0,
+        "json_reliability": 0.0,
+        "math_reasoning": 0.333333,
+        "instruction_following": 0.0,
+        "conciseness": 0.0,
+        "refusal_behavior": 0.666667,
+        "factual_accuracy": 0.666667
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-02-merged",
+      "version_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "sample_size": 24,
+      "pass_rate": 0.375,
+      "pass_rate_wilson_ci95": [
+        0.211594,
+        0.5729
+      ],
+      "mean_score": 0.559379,
+      "factual_contradiction_rate": 0.0,
+      "category_scores": {
+        "vietnamese": 0.283333,
+        "code_preservation": 0.7,
+        "json_reliability": 0.641667,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.555555,
+        "conciseness": 0.827814,
+        "refusal_behavior": 0.8,
+        "factual_accuracy": 0.666667
+      },
+      "category_pass_rates": {
+        "vietnamese": 0.0,
+        "code_preservation": 0.666667,
+        "json_reliability": 0.666667,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.333333,
+        "conciseness": 0.0,
+        "refusal_behavior": 0.666667,
+        "factual_accuracy": 0.666667
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-03-quant",
+      "version_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "sample_size": 24,
+      "pass_rate": 0.333333,
+      "pass_rate_wilson_ci95": [
+        0.179722,
+        0.532937
+      ],
+      "mean_score": 0.425347,
+      "factual_contradiction_rate": 0.0,
+      "category_scores": {
+        "vietnamese": 0.15,
+        "code_preservation": 0.466667,
+        "json_reliability": 0.341667,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.611111,
+        "conciseness": 0.366667,
+        "refusal_behavior": 0.8,
+        "factual_accuracy": 0.666667
+      },
+      "category_pass_rates": {
+        "vietnamese": 0.0,
+        "code_preservation": 0.333333,
+        "json_reliability": 0.333333,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.333333,
+        "conciseness": 0.333333,
+        "refusal_behavior": 0.666667,
+        "factual_accuracy": 0.666667
+      }
+    },
+    {
+      "checkpoint_id": "ckpt-smol-04-pruned",
+      "version_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
+      "sample_size": 24,
+      "pass_rate": 0.166667,
+      "pass_rate_wilson_ci95": [
+        0.066787,
+        0.358531
+      ],
+      "mean_score": 0.355605,
+      "factual_contradiction_rate": 0.0,
+      "category_scores": {
+        "vietnamese": 0.5,
+        "code_preservation": 0.466667,
+        "json_reliability": 0.541667,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.388889,
+        "conciseness": 0.080952,
+        "refusal_behavior": 0.533333,
+        "factual_accuracy": 0.333333
+      },
+      "category_pass_rates": {
+        "vietnamese": 0.0,
+        "code_preservation": 0.333333,
+        "json_reliability": 0.333333,
+        "math_reasoning": 0.0,
+        "instruction_following": 0.0,
+        "conciseness": 0.0,
+        "refusal_behavior": 0.333333,
+        "factual_accuracy": 0.333333
+      }
+    }
+  ],
+  "representation_matrix_summary": [
+    {
+      "version_label": "v0 \u00b7 SmolLM2-Base",
+      "mean_cka_to_base": 1.0,
+      "representation_drift": 0.0,
+      "mean_logit_js_to_base": 0.0
+    },
+    {
+      "version_label": "v1a \u00b7 Instruct-SFT",
+      "mean_cka_to_base": 0.85223,
+      "representation_drift": 0.14777,
+      "mean_logit_js_to_base": 0.243335
+    },
+    {
+      "version_label": "v1b \u00b7 SFT-Conservative",
+      "mean_cka_to_base": 0.872809,
+      "representation_drift": 0.127191,
+      "mean_logit_js_to_base": 0.395907
+    },
+    {
+      "version_label": "v2 \u00b7 Merged-AB",
+      "mean_cka_to_base": 0.851728,
+      "representation_drift": 0.148272,
+      "mean_logit_js_to_base": 0.086408
+    },
+    {
+      "version_label": "v3 \u00b7 Quantized-LowBit",
+      "mean_cka_to_base": 0.855345,
+      "representation_drift": 0.144655,
+      "mean_logit_js_to_base": 0.121219
+    },
+    {
+      "version_label": "v4 \u00b7 Pruned-MLP",
+      "mean_cka_to_base": 0.84808,
+      "representation_drift": 0.15192,
+      "mean_logit_js_to_base": 0.11209
+    }
+  ],
+  "regression_events_count": 13,
+  "regression_origins": [
     {
       "previous_label": "v0 \u00b7 SmolLM2-Base",
       "first_affected_label": "v1b \u00b7 SFT-Conservative",
       "transformation_type": "SFT",
       "affected_category": "conciseness",
+      "regression_kind": "pass_rate_and_score",
       "pass_rate_before": 0.333333,
       "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.607576,
+      "score_after": 0.121934,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v2 \u00b7 Merged-AB",
       "first_affected_label": "v3 \u00b7 Quantized-LowBit",
       "transformation_type": "Quantization",
+      "affected_category": "code_preservation",
+      "regression_kind": "pass_rate_and_score",
+      "pass_rate_before": 0.666667,
+      "pass_rate_after": 0.333333,
+      "score_before": 0.7,
+      "score_after": 0.466667,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
+    },
+    {
+      "previous_label": "v3 \u00b7 Quantized-LowBit",
+      "first_affected_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
       "affected_category": "factual_accuracy",
+      "regression_kind": "pass_rate_and_score",
       "pass_rate_before": 0.666667,
       "pass_rate_after": 0.333333,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.666667,
+      "score_after": 0.333333,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
-      "previous_label": "v2 \u00b7 Merged-AB",
-      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
-      "transformation_type": "Quantization",
+      "previous_label": "v3 \u00b7 Quantized-LowBit",
+      "first_affected_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
       "affected_category": "refusal_behavior",
+      "regression_kind": "pass_rate_and_score",
       "pass_rate_before": 0.666667,
       "pass_rate_after": 0.333333,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.8,
+      "score_after": 0.533333,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v0 \u00b7 SmolLM2-Base",
       "first_affected_label": "v1a \u00b7 Instruct-SFT",
       "transformation_type": "Instruction Tuning",
       "affected_category": "conciseness",
+      "regression_kind": "pass_rate_only",
       "pass_rate_before": 0.333333,
       "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.607576,
+      "score_after": 0.776623,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
+    },
+    {
+      "previous_label": "v3 \u00b7 Quantized-LowBit",
+      "first_affected_label": "v4 \u00b7 Pruned-MLP",
+      "transformation_type": "Pruning",
+      "affected_category": "instruction_following",
+      "regression_kind": "pass_rate_and_score",
+      "pass_rate_before": 0.333333,
+      "pass_rate_after": 0.0,
+      "score_before": 0.611111,
+      "score_after": 0.388889,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v1b \u00b7 SFT-Conservative",
       "first_affected_label": "v2 \u00b7 Merged-AB",
       "transformation_type": "Model Merging",
       "affected_category": "math_reasoning",
+      "regression_kind": "pass_rate_and_score",
       "pass_rate_before": 0.333333,
       "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
-    },
-    {
-      "previous_label": "v2 \u00b7 Merged-AB",
-      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
-      "transformation_type": "Quantization",
-      "affected_category": "overall",
-      "pass_rate_before": 0.375,
-      "pass_rate_after": 0.125,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.333333,
+      "score_after": 0.0,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v0 \u00b7 SmolLM2-Base",
       "first_affected_label": "v1b \u00b7 SFT-Conservative",
       "transformation_type": "SFT",
       "affected_category": "json_reliability",
+      "regression_kind": "score_only",
       "pass_rate_before": 0.0,
       "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.316667,
+      "score_after": 0.033333,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v1a \u00b7 Instruct-SFT",
       "first_affected_label": "v2 \u00b7 Merged-AB",
       "transformation_type": "Model Merging",
       "affected_category": "json_reliability",
+      "regression_kind": "score_only",
       "pass_rate_before": 0.666667,
       "pass_rate_after": 0.666667,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.925,
+      "score_after": 0.641667,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v0 \u00b7 SmolLM2-Base",
       "first_affected_label": "v1b \u00b7 SFT-Conservative",
       "transformation_type": "SFT",
       "affected_category": "vietnamese",
+      "regression_kind": "score_only",
       "pass_rate_before": 0.0,
       "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.316667,
+      "score_after": 0.15,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
+    },
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "overall",
+      "regression_kind": "score_only",
+      "pass_rate_before": 0.375,
+      "pass_rate_after": 0.333333,
+      "score_before": 0.559379,
+      "score_after": 0.425347,
+      "sample_size": 24,
+      "is_exploratory": false,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
+    },
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "vietnamese",
+      "regression_kind": "score_only",
+      "pass_rate_before": 0.0,
+      "pass_rate_after": 0.0,
+      "score_before": 0.283333,
+      "score_after": 0.15,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     },
     {
       "previous_label": "v0 \u00b7 SmolLM2-Base",
       "first_affected_label": "v1b \u00b7 SFT-Conservative",
       "transformation_type": "SFT",
       "affected_category": "code_preservation",
+      "regression_kind": "score_only",
       "pass_rate_before": 0.0,
       "pass_rate_after": 0.0,
-      "epistemic_status": "CAUSALLY VERIFIED"
-    },
-    {
-      "previous_label": "v2 \u00b7 Merged-AB",
-      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
-      "transformation_type": "Quantization",
-      "affected_category": "instruction_following",
-      "pass_rate_before": 0.333333,
-      "pass_rate_after": 0.333333,
-      "epistemic_status": "CAUSALLY VERIFIED"
+      "score_before": 0.2,
+      "score_after": 0.066667,
+      "sample_size": 3,
+      "is_exploratory": true,
+      "statistically_significant": false,
+      "holm_bonferroni_p_value": 1.0,
+      "epistemic_status": "CAUSAL SUPPORT",
+      "causal_support_exists": true,
+      "causal_verification_exists": false
     }
   ],
   "insights": [
     {
       "insight_id": "insight-peak-weight-shift",
       "domain": "weight_evolution",
-      "statement": "Quantization (v2 \u00b7 Merged-AB \u2192 v3 \u00b7 Quantized-LowBit) introduced the largest observed weight perturbation (Relative L2 = 0.119012, RMSE = 0.021662, 98.71% parameters modified).",
+      "statement": "Instruction Tuning (v0 \u00b7 SmolLM2-Base \u2192 v1a \u00b7 Instruct-SFT) introduced the largest observed weight perturbation (Relative L2 = 0.085753, RMSE = 0.015576, 97.67% parameters modified).",
       "epistemic_status": "OBSERVED",
       "checkpoints": [
-        "ckpt-smol-02-merged",
-        "ckpt-smol-03-quant"
+        "ckpt-smol-00-base",
+        "ckpt-smol-01a-instruct"
       ],
       "evaluation_cases": [],
       "supporting_measurements": {
-        "relative_l2_distance": 0.11901182925437641,
-        "l2_distance": 251.2417673633857,
-        "rmse": 0.021662394912257348,
-        "max_abs_diff": 0.0390625,
-        "modified_parameter_pct": 98.711479
+        "relative_l2_distance": 0.08575296307303772,
+        "l2_distance": 180.6457852395814,
+        "rmse": 0.01557551668323811,
+        "max_abs_diff": 0.154296875,
+        "modified_parameter_pct": 97.672795
       }
     },
     {
       "insight_id": "insight-cumulative-geometry",
       "domain": "weight_evolution",
-      "statement": "Direct cumulative L2 distance from v0 \u00b7 SmolLM2-Base to v3 \u00b7 Quantized-LowBit is 293.205943 versus 461.536515 summed across individual transitions (direct/sum ratio = 0.6353), reflecting non-collinear multi-stage parameter updates.",
+      "statement": "Direct cumulative L2 distance from v0 \u00b7 SmolLM2-Base to v4 \u00b7 Pruned-MLP is 264.216986 versus 518.110991 summed across individual transitions (direct/sum ratio = 0.5100), reflecting non-collinear multi-stage parameter updates.",
       "epistemic_status": "OBSERVED",
       "checkpoints": [
         "ckpt-smol-00-base",
-        "ckpt-smol-03-quant"
+        "ckpt-smol-04-pruned"
       ],
       "evaluation_cases": [],
       "supporting_measurements": {
-        "direct_base_to_target_l2": 293.20594318564014,
-        "sum_of_consecutive_step_l2": 461.5365146392894,
-        "path_cancellation_ratio": 0.635282
+        "direct_base_to_target_l2": 264.21698572753587,
+        "sum_of_consecutive_step_l2": 518.110990521792,
+        "path_cancellation_ratio": 0.509962
       }
     },
     {
@@ -186,7 +901,7 @@
     {
       "insight_id": "insight-trajectory-reversal-instruction_following",
       "domain": "behavioral_evolution",
-      "statement": "Category 'instruction_following' improved after Instruction Tuning (v0 \u00b7 SmolLM2-Base \u2192 v1a \u00b7 Instruct-SFT, \u0394=+0.278) but declined downstream after Model Merging (v1a \u00b7 Instruct-SFT \u2192 v2 \u00b7 Merged-AB, \u0394=-0.056, n=3).",
+      "statement": "Rubric 'instruction_following' mean score increased after Instruction Tuning (v0 \u00b7 SmolLM2-Base \u2192 v1a \u00b7 Instruct-SFT, \u0394=+0.278) and decreased downstream after Model Merging (v1a \u00b7 Instruct-SFT \u2192 v2 \u00b7 Merged-AB, \u0394=-0.056, n=3 (exploratory small sample)).",
       "epistemic_status": "OBSERVED",
       "checkpoints": [
         "ckpt-smol-00-base",
@@ -197,42 +912,51 @@
       "supporting_measurements": {
         "category": "instruction_following",
         "sample_size": 3,
+        "is_exploratory": true,
         "initial_gain_delta": 0.277778,
         "subsequent_drop_delta": -0.055556
       }
     },
     {
-      "insight_id": "insight-regression-origin-reg-orig-8aad5006",
+      "insight_id": "insight-regression-origin-reg-orig-779929f1",
       "domain": "regression_origin",
-      "statement": "Quantization (v2 \u00b7 Merged-AB \u2192 v3 \u00b7 Quantized-LowBit) is the first observed transition associated with regression in 'code_preservation' (pass rate 66.7% \u2192 0.0%, failed cases: code-01, code-03).",
-      "epistemic_status": "CAUSALLY VERIFIED",
+      "statement": "Quantization (v2 \u00b7 Merged-AB \u2192 v3 \u00b7 Quantized-LowBit) is the first observed transition associated with regression in 'overall' (pass rate 37.5% \u2192 33.3%, score 0.559 \u2192 0.425, n=24, Holm p=1.000, failed cases: code-01, json-01, json-03, inst-01).",
+      "epistemic_status": "CAUSAL SUPPORT",
       "checkpoints": [
         "ckpt-smol-02-merged",
         "ckpt-smol-03-quant"
       ],
       "evaluation_cases": [
         "code-01",
-        "code-03"
+        "json-01",
+        "json-03",
+        "inst-01"
       ],
       "supporting_measurements": {
-        "pass_rate_before": 0.666667,
-        "pass_rate_after": 0.0,
-        "score_drop": 0.666667,
-        "confidence_level": "exploratory_small_sample",
-        "causal_verification_exists": true
+        "regression_kind": "score_only",
+        "pass_rate_before": 0.375,
+        "pass_rate_after": 0.333333,
+        "score_drop": 0.134032,
+        "sample_size": 24,
+        "is_exploratory": false,
+        "statistically_significant": false,
+        "holm_bonferroni_p_value": 1.0,
+        "confidence_level": "moderate_observed_effect",
+        "causal_verification_exists": false,
+        "causal_support_exists": true
       }
     },
     {
       "insight_id": "insight-anomalous-layer-shift",
       "domain": "layer_evolution",
-      "statement": "Layer 0 exhibited an unusually concentrated weight modification (peak Relative L2 = 0.140196, z-score = +5.21).",
+      "statement": "Layer 0 exhibited an unusually concentrated weight modification (peak Relative L2 = 0.138055, z-score = +5.03).",
       "epistemic_status": "OBSERVED",
       "checkpoints": [],
       "evaluation_cases": [],
       "supporting_measurements": {
         "layer_index": 0,
-        "peak_relative_l2": 0.1401963,
-        "z_score": 5.211,
+        "peak_relative_l2": 0.13805507,
+        "z_score": 5.028,
         "epistemic_status": "OBSERVED"
       }
     }

@@ -248,6 +248,39 @@ def test_evolution_rest_api_and_cli_end_to_end(tmp_path: Path) -> None:
     assert r_cmp.json()["comparison"]["scope"] == "branch_to_branch"
     assert r_cmp.json()["lowest_common_ancestor_id"] == c_a["checkpoint_id"]
 
+    # Register v2-dpo and v3-quant on SFT-A branch and verify `ancestor_to_descendant` scope on SFT-A -> Quant
+    c_dpo = client.post(
+        f"/api/evolution/projects/{pid}/checkpoints",
+        json={
+            "source": str(ckpts["c"]),
+            "version_label": "v2-dpo-a",
+            "parent_checkpoint_ids": [c_b["checkpoint_id"]],
+            "transformation_type": "DPO",
+            "local_files_only": True,
+        },
+    ).json()
+    c_quant = client.post(
+        f"/api/evolution/projects/{pid}/checkpoints",
+        json={
+            "source": str(ckpts["d"]),
+            "version_label": "v3-quant-a",
+            "parent_checkpoint_ids": [c_dpo["checkpoint_id"]],
+            "transformation_type": "Quantization",
+            "local_files_only": True,
+        },
+    ).json()
+    r_anc = client.post(
+        f"/api/evolution/projects/{pid}/compare",
+        json={
+            "checkpoint_a_id": c_b["checkpoint_id"],
+            "checkpoint_b_id": c_quant["checkpoint_id"],
+            "local_files_only": True,
+        },
+    )
+    assert r_anc.status_code == 200
+    assert r_anc.json()["comparison"]["scope"] == "ancestor_to_descendant"
+    assert r_anc.json()["lowest_common_ancestor_id"] == c_b["checkpoint_id"]
+
     # Run synchronous evolution analysis
     r_run = client.post(
         f"/api/evolution/projects/{pid}/analyze",

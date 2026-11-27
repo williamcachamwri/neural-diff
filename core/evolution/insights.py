@@ -171,15 +171,17 @@ def generate_evolution_insights(
                         drop_delta = float(cd["mean_score_delta"])
                         if cat in first_gains and drop_delta <= -0.05:
                             gain_val = first_gains[cat]
+                            n_sub = int(cd["sample_size"])
+                            expl_tag = " (exploratory small sample)" if n_sub < 8 else ""
                             insights.append(
                                 {
                                     "insight_id": f"insight-trajectory-reversal-{cat}",
                                     "domain": "behavioral_evolution",
                                     "statement": (
-                                        f"Category '{cat}' improved after {first_edge['transformation_type']} "
+                                        f"Rubric '{cat}' mean score increased after {first_edge['transformation_type']} "
                                         f"({first_edge['source_label']} → {first_edge['target_label']}, Δ={gain_val:+.3f}) "
-                                        f"but declined downstream after {later_edge['transformation_type']} "
-                                        f"({later_edge['source_label']} → {later_edge['target_label']}, Δ={drop_delta:+.3f}, n={cd['sample_size']})."
+                                        f"and decreased downstream after {later_edge['transformation_type']} "
+                                        f"({later_edge['source_label']} → {later_edge['target_label']}, Δ={drop_delta:+.3f}, n={n_sub}{expl_tag})."
                                     ),
                                     "epistemic_status": EpistemicStatus.OBSERVED.value,
                                     "checkpoints": [
@@ -192,7 +194,8 @@ def generate_evolution_insights(
                                     ),
                                     "supporting_measurements": {
                                         "category": cat,
-                                        "sample_size": cd["sample_size"],
+                                        "sample_size": n_sub,
+                                        "is_exploratory": n_sub < 8,
                                         "initial_gain_delta": gain_val,
                                         "subsequent_drop_delta": drop_delta,
                                     },
@@ -204,6 +207,17 @@ def generate_evolution_insights(
     # 5. Primary regression origin finding
     if regression_events:
         top_reg = regression_events[0]
+        stat_conf = top_reg["statistical_confidence"]
+        n_reg = int(stat_conf.get("sample_size", 0))
+        is_expl = bool(stat_conf.get("is_exploratory", n_reg < 8))
+        holm_p = stat_conf.get("holm_bonferroni_p_value", stat_conf.get("mcnemar_p_value"))
+        qual = (
+            f"exploratory n={n_reg}, Holm p={float(holm_p):.3f}"
+            if is_expl and holm_p is not None
+            else f"n={n_reg}, Holm p={float(holm_p):.3f}"
+            if holm_p is not None
+            else f"n={n_reg}"
+        )
         insights.append(
             {
                 "insight_id": f"insight-regression-origin-{top_reg['event_id']}",
@@ -212,6 +226,7 @@ def generate_evolution_insights(
                     f"{top_reg['transformation_type']} ({top_reg['previous_label']} → {top_reg['first_affected_label']}) "
                     f"is the first observed transition associated with regression in '{top_reg['affected_category']}' "
                     f"(pass rate {float(top_reg['pass_rate_before']) * 100:.1f}% → {float(top_reg['pass_rate_after']) * 100:.1f}%, "
+                    f"score {float(top_reg['score_before']):.3f} → {float(top_reg['score_after']):.3f}, {qual}, "
                     f"failed cases: {', '.join(top_reg['failed_test_case_ids']) or 'score drop'})."
                 ),
                 "epistemic_status": top_reg["epistemic_status"],
@@ -221,11 +236,21 @@ def generate_evolution_insights(
                 ],
                 "evaluation_cases": list(top_reg["failed_test_case_ids"]),
                 "supporting_measurements": {
+                    "regression_kind": top_reg.get("regression_kind"),
                     "pass_rate_before": top_reg["pass_rate_before"],
                     "pass_rate_after": top_reg["pass_rate_after"],
                     "score_drop": top_reg["score_drop"],
-                    "confidence_level": top_reg["statistical_confidence"]["confidence_level"],
-                    "causal_verification_exists": top_reg["causal_verification"]["causal_verification_exists"],
+                    "sample_size": n_reg,
+                    "is_exploratory": is_expl,
+                    "statistically_significant": stat_conf.get("statistically_significant", False),
+                    "holm_bonferroni_p_value": holm_p,
+                    "confidence_level": stat_conf["confidence_level"],
+                    "causal_verification_exists": top_reg["causal_verification"][
+                        "causal_verification_exists"
+                    ],
+                    "causal_support_exists": top_reg["causal_verification"].get(
+                        "causal_support_exists", False
+                    ),
                 },
             }
         )

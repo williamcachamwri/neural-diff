@@ -850,8 +850,9 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
               <div>
                 <h3 className="panel-title">Evolution Branch Lineages &amp; Generation Timeline</h3>
                 <div className="panel-subtitle">
-                  {detail.graph.branch_count} root-to-leaf branch paths across{" "}
-                  {detail.graph.nodes.length} checkpoints
+                  {detail.graph.branches_truncated
+                    ? `Showing ${detail.graph.analyzed_branch_count ?? detail.graph.branches.length} of ${detail.graph.branch_count} total DAG branches (truncated at max_branches=${detail.graph.max_branches_limit ?? 256})`
+                    : `${detail.graph.branch_count} root-to-leaf branch paths across ${detail.graph.nodes.length} checkpoints`}
                 </div>
               </div>
             </div>
@@ -1115,11 +1116,42 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                       </td>
                     </tr>
                     <tr>
-                      <th>SHA-256 Fingerprint</th>
+                      <th>SHA-256 Composite</th>
                       <td className="mono">{selectedCheckpoint.sha256_fingerprint}</td>
                       <th>Tensor Structure Hash</th>
                       <td className="mono">{selectedCheckpoint.tensor_metadata_hash}</td>
                     </tr>
+                    {selectedCheckpoint.component_fingerprints &&
+                      Object.keys(selectedCheckpoint.component_fingerprints).length > 0 && (
+                        <tr>
+                          <th>Weights / Config SHA</th>
+                          <td className="mono">
+                            W:{" "}
+                            {selectedCheckpoint.component_fingerprints.weights_sha256?.slice(
+                              0,
+                              14
+                            ) ?? "—"}{" "}
+                            · Cfg:{" "}
+                            {selectedCheckpoint.component_fingerprints.architecture_config_sha256?.slice(
+                              0,
+                              14
+                            ) ?? "—"}
+                          </td>
+                          <th>Tokenizer / Adapter SHA</th>
+                          <td className="mono">
+                            Tok:{" "}
+                            {selectedCheckpoint.component_fingerprints.tokenizer_sha256?.slice(
+                              0,
+                              14
+                            ) ?? "None"}{" "}
+                            · Adp:{" "}
+                            {selectedCheckpoint.component_fingerprints.adapter_sha256?.slice(
+                              0,
+                              14
+                            ) ?? "None"}
+                          </td>
+                        </tr>
+                      )}
                     <tr>
                       <th>Parameters / Tensors</th>
                       <td className="mono">

@@ -202,15 +202,21 @@ def run_cross_checkpoint_layer_patching(
     top_causal = sorted(
         layer_effects, key=lambda x: abs(float(x["recovery_fraction"])), reverse=True
     )
+    peak_rec = float(top_causal[0]["recovery_fraction"]) if top_causal else 0.0
+    non_top_abs = [abs(float(x["recovery_fraction"])) for x in top_causal[1:]]
+    min_control_abs = min(non_top_abs) if non_top_abs else 0.0
     return {
-        "epistemic_status": EpistemicStatus.CAUSALLY_VERIFIED.value,
-        "scope": "cross-checkpoint single-layer residual stream intervention on diagnostic prompt",
+        "epistemic_status": EpistemicStatus.CAUSAL_SUPPORT.value,
+        "prompt_level_causal_verification": abs(peak_rec) >= 0.20 and abs(denom) > 1e-6,
+        "intervention_target": "diagnostic_prompt",
+        "scope": "cross-checkpoint single-layer residual stream intervention on generic diagnostic prompt (supports transition hypothesis; does not causally verify unpatched behavioral rubric cases)",
         "target_token_id": target_tok,
         "foil_token_id": foil_tok,
         "clean_logit_diff": round(clean_diff, 6),
         "corrupted_logit_diff": round(corrupted_diff, 6),
         "most_causal_layer": top_causal[0]["layer_index"] if top_causal else None,
-        "peak_recovery_fraction": top_causal[0]["recovery_fraction"] if top_causal else 0.0,
+        "peak_recovery_fraction": peak_rec,
+        "min_control_layer_abs_recovery": round(min_control_abs, 6),
         "layer_effects": layer_effects,
     }
 

@@ -761,7 +761,9 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
 
             <div className="kpi-grid" style={{ marginBottom: 12 }}>
               <div className="kpi-card">
-                <div className="kpi-label">Pass Rate Shift</div>
+                <div className="kpi-label">
+                  {ev.regression_kind ? humanizeEnum(ev.regression_kind) : "Pass Rate Shift"}
+                </div>
                 <div className="kpi-value mono" style={{ color: "var(--danger)", fontSize: 18 }}>
                   {fmtPct(ev.pass_rate_before)} → {fmtPct(ev.pass_rate_after)}
                 </div>
@@ -772,28 +774,33 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
               <div className="kpi-card">
                 <div className="kpi-label">Failed Test Cases</div>
                 <div className="kpi-value mono" style={{ fontSize: 15 }}>
-                  {ev.failed_test_case_ids.join(", ") || "Score degradation"}
+                  {ev.failed_test_case_ids.join(", ") || "Rubric score drop"}
                 </div>
                 <div className="kpi-sub">
                   Survives to leaf: {ev.survives_to_leaf ? "Yes" : "Recovered downstream"}
                 </div>
               </div>
               <div className="kpi-card">
-                <div className="kpi-label">Statistical Confidence</div>
+                <div className="kpi-label">Statistical Power (Holm-Bonferroni)</div>
                 <div className="kpi-value mono" style={{ fontSize: 15 }}>
                   n={ev.statistical_confidence.sample_size} · p=
-                  {ev.statistical_confidence.mcnemar_p_value.toFixed(4)}
+                  {(
+                    ev.statistical_confidence.holm_bonferroni_p_value ??
+                    ev.statistical_confidence.mcnemar_p_value
+                  ).toFixed(3)}
                 </div>
                 <div className="kpi-sub">
                   {humanizeEnum(ev.statistical_confidence.confidence_level)}
                 </div>
               </div>
               <div className="kpi-card">
-                <div className="kpi-label">Causal Verification</div>
+                <div className="kpi-label">Mechanistic Attribution</div>
                 <div className="kpi-value mono" style={{ fontSize: 15 }}>
                   {ev.causal_verification.causal_verification_exists
                     ? `Verified (L${ev.causal_verification.most_causal_layer})`
-                    : "Correlational Only"}
+                    : ev.causal_verification.causal_support_exists
+                      ? `Causal Support (L${ev.causal_verification.most_causal_layer})`
+                      : "Correlational Only"}
                 </div>
                 <div className="kpi-sub">
                   Weight Rel L2: {fmtFloat(ev.weight_changes.relative_l2_distance, 5)} · CKA:{" "}

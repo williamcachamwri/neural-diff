@@ -52,7 +52,15 @@ project = evo_store.create_project(
 
 ## 2. Registering Checkpoints & Supported Transformations
 
-Every registered checkpoint is validated through `ModelLoader` and `SecurityPolicy` (`trust_remote_code=False`, Safetensors binary header verification, and `weights_only=True` + `pickletools` opcode whitelist for `.pt`/`.bin` archives). Registration computes a streaming **SHA-256 content fingerprint** (4 MiB chunks) and a **tensor metadata structure hash**, automatically flagging exact duplicate checkpoints (`DUPLICATE_CONTENT`) and PEFT LoRA adapter directories (`ADAPTER_ONLY`).
+Every registered checkpoint is validated through `ModelLoader` and `SecurityPolicy` (`trust_remote_code=False`, Safetensors binary header verification, and `weights_only=True` + `pickletools` opcode whitelist for `.pt`/`.bin` archives). Registration computes a **5-domain SHA-256 fingerprint hierarchy** (4 MiB streaming chunks):
+
+- `weights_sha256`: Primary tensor shards (`.safetensors`, `.pt`, `.pth`, `.bin`).
+- `architecture_config_sha256`: `config.json`, `generation_config.json`, shard index manifests, and `quantize_config.json`.
+- `tokenizer_sha256`: `tokenizer.json`, `tokenizer.model`, `spiece.model`, `tokenizer_config.json`, `special_tokens_map.json`, `vocab.json`, `merges.txt`, `added_tokens.json`, and `chat_template.jinja`.
+- `adapter_sha256`: `adapter_config.json`, `adapter_model.safetensors`, and `adapter_model.bin`.
+- `metadata_sha256`: Canonical hash over sorted tensor `(name, shape, dtype)` descriptors and extracted config metadata.
+
+All five domains feed into the composite `sha256_fingerprint` and behavioral evaluation cache keys, guaranteeing that mutating tokenizer files while keeping weights identical invalidates stale behavioral caches and records `identical_weights_to` provenance. Exact composite duplicates are flagged as `DUPLICATE_CONTENT` and PEFT adapter directories as `ADAPTER_ONLY`.
 
 Supported transformation types (`TransformationType`):
 `Base Model`, `Fine-Tuning`, `Instruction Tuning`, `SFT`, `DPO`, `RLHF`, `LoRA`, `QLoRA`, `Model Merging`, `Quantization`, `Pruning`, `Distillation`, `Weight Modification`, and `Unknown Transformation`.
@@ -83,6 +91,7 @@ neural-diff evolution register \
 - **Branching:** Register two or more child checkpoints referencing the same parent checkpoint ID (`parent_checkpoint_ids: ["ckpt-base"]`).
 - **Model Merging:** Supply multiple parent IDs (`parent_checkpoint_ids: ["ckpt-dpo-a", "ckpt-sft-b"]`) with optional `merge_weights` (`{"ckpt-dpo-a": 0.75, "ckpt-sft-b": 0.25}`).
 - **Cycle Prevention:** `EvolutionDAG` runs 3-color depth-first cycle detection before persisting any checkpoint or edge mutation. Self-loops (`A -> A`) and ancestor cycles (`A -> B -> C -> A`) are rejected with `CYCLIC_DEPENDENCY_ERROR` (`HTTP 422`) and the exact offending cycle path.
+- **Exact Branch Counting, Lazy Traversal & Truncation Transparency:** `EvolutionDAG.count_total_branches()` computes the exact total root-to-leaf path count in $O(V + E)$ reverse-topological dynamic programming, while `iter_branches(max_paths=...)` lazily yields paths without unbounded memory growth. Whenever `total_branch_count > max_branches`, the graph payload and run bundle explicitly set `branches_truncated = true` (`analyzed_branch_count` vs `branch_count`) and `RegressionOriginEngine` executes a complete topological edge fallback so zero DAG transitions are ever skipped.
 
 ---
 
@@ -122,7 +131,7 @@ Long-running jobs support background execution (`async_job: true`), live step te
 2. **`base_to_current` (`Base -> Current`):** Measures **true cumulative weight distance** by comparing the current checkpoint's tensors **directly** against the original root checkpoint (`W_current - W_base`).
    > [!IMPORTANT]
    > Cumulative Euclidean distance is **never** computed by summing consecutive step distances. Because sequential training updates (e.g., SFT followed by DPO or quantization) are non-collinear and often partially revert earlier parameter directions, $\|W_k - W_0\|_2 \le \sum_{i=1}^{k} \|W_i - W_{i-1}\|_2$ by the triangle inequality. NEURAL DIFF reports both the direct `l2_distance` and `path_cancellation_ratio = direct_l2 / sum_of_step_l2`.
-3. **`branch_to_branch` (`Branch A <-> Branch B`):** Measures direct divergence between leaf checkpoints or any arbitrary pair (`POST /api/evolution/projects/{project_id}/compare`), reporting their Lowest Common Ancestor (LCA).
+3. **Arbitrary Pair Comparison (`POST /api/evolution/projects/{project_id}/compare`):** Classifies any checkpoint pair into its exact 7-way topological relation via `EvolutionDAG.classify_pair_scope()` — `identical`, `consecutive`, `base_to_current`, `ancestor_to_descendant` (multi-hop non-base ancestor such as `SFT -> Quantized`), `descendant_to_ancestor`, `branch_to_branch` (diverging branches sharing a Lowest Common Ancestor), or `unrelated` (disjoint roots).
 
 ---
 
@@ -142,17 +151,20 @@ Long-running jobs support background execution (`async_job: true`), live step te
 When evaluating a lineage such as `Base (92%) -> SFT (95%) -> DPO (91%) -> Quantized (78%) -> Pruned (76%)`, `RegressionOriginEngine` walks each root-to-leaf branch and pinpoints **the first transition** (`DPO -> Quantized`) where pass-rate or category score degradation breached policy thresholds, while tracking whether downstream stages (`Pruned`) inherited or recovered from those failures.
 
 > [!WARNING]
-> **Strict Epistemic Boundary (`CORRELATED` vs. `CAUSALLY VERIFIED`):**
-> - Behavioral pass-rate drops and tensor L2 norms are **directly `OBSERVED`**.
-> - Layers exhibiting large weight `Relative L2` or CKA drops on the same transition are labeled **`CORRELATED`**. Weight modification or CKA drift alone **never** proves that a specific layer caused a behavioral failure.
-> - A layer site is labeled **`CAUSALLY VERIFIED`** *only* when interventional cross-checkpoint residual-stream patching (`run_cross_checkpoint_layer_patching`, substituting the clean parent layer's output into the regressed child model) restores `>= 20%` of the clean target-vs-foil logit margin — and even then, strictly scoped to that tested prompt and residual site.
+> **Strict 4-Tier Epistemic Hierarchy (`OBSERVED` · `CORRELATED` · `CAUSAL SUPPORT` · `CAUSALLY VERIFIED`):**
+> - **`OBSERVED`:** Behavioral pass-rate/score drops measured directly on deterministic rubrics with no aligned weight or activation covariates.
+> - **`CORRELATED`:** Behavioral regression co-occurring with measured layer weight `Relative L2` or Linear CKA shifts on the same transition. Weight modification or CKA drift alone **never** proves causation.
+> - **`CAUSAL SUPPORT`:** Transition-level cross-checkpoint residual-stream patching on a generic diagnostic prompt restores `>= 20%` of the clean target-vs-foil logit margin. This supports a mechanistic transition locus **without** claiming causal verification for unpatched category rubric cases.
+> - **`CAUSALLY VERIFIED`:** Reserved **exclusively** for case-targeted counterfactual interventions executed directly on the failed behavioral case prompt(s), with verified target/foil logit margin and negative-control checks — and strictly scoped to those tested prompts and intervention layer sites.
 
 ---
 
-## 8. Statistical Limitations
+## 8. Statistical Rigor & Small-Sample Safeguards
 
-- **Sample Size & Confidence Intervals:** Every behavioral pass rate reports sample size `n` alongside an exact **95% Wilson binomial confidence interval**, and every transition reports **95% paired bootstrap confidence intervals** plus an **exact two-sided McNemar p-value**.
-- **Anti-Overclaiming:** Observed score increases on finite deterministic benchmark suites (`default_suite_v1`, `n=24` across 8 categories) reflect performance on those specific programmatic rubrics and must **not** be interpreted as unrestricted general capability acquisition without larger domain-specific evaluation suites.
+- **Sample Size Floors & Exploratory Flagging:** Every regression event records `sample_size`, `min_required_sample_size` (`default = 8` per category, `20` overall), `is_exploratory`, and `statistically_significant`. Whenever `n < min_required_sample_size` (for example `n = 3` per category in `default_suite_v1`), `is_exploratory` is forced to `true` and `statistically_significant` is strictly `false` regardless of raw $p$-values.
+- **Holm-Bonferroni Multiple-Comparison Adjustment:** Within each transition, raw per-category and overall two-sided McNemar $p$-values undergo step-down Holm-Bonferroni family-wise error adjustment (`holm_bonferroni_p_value`).
+- **Score vs. Pass-Rate Separation:** Every regression event classifies `regression_kind` into `pass_rate_and_score`, `pass_rate_only`, or `score_only`, preventing continuous rubric score shifts from being conflated with binary pass-rate collapses.
+- **Extended Evaluation Suites:** Pass `benchmark_suite_path` in `EvolutionAnalysisConfig` / `POST /analyze` to evaluate checkpoints against larger custom deterministic suites (`n >= 30` per category).
 
 ---
 

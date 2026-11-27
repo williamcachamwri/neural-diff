@@ -56,11 +56,16 @@ class EvolutionAnalysisConfig:
     top_k_tensors: int = 10
     behavioral_categories: list[str] | None = None
     behavioral_max_cases: int | None = None
+    benchmark_suite_path: str | None = None
     max_new_tokens: int = 64
     seed: int = 42
     prompt_mode: str = "chat_if_available"
     overall_pass_rate_drop_threshold: float = 0.05
     category_score_drop_threshold: float = 0.10
+    min_category_sample_size: int = 8
+    min_overall_sample_size: int = 20
+    significance_alpha: float = 0.05
+    max_branches: int = 256
     local_files_only: bool = False
     allow_cache: bool = True
     force_rerun: bool = False
@@ -78,11 +83,16 @@ class EvolutionAnalysisConfig:
             "top_k_tensors": self.top_k_tensors,
             "behavioral_categories": self.behavioral_categories,
             "behavioral_max_cases": self.behavioral_max_cases,
+            "benchmark_suite_path": self.benchmark_suite_path,
             "max_new_tokens": self.max_new_tokens,
             "seed": self.seed,
             "prompt_mode": self.prompt_mode,
             "overall_pass_rate_drop_threshold": self.overall_pass_rate_drop_threshold,
             "category_score_drop_threshold": self.category_score_drop_threshold,
+            "min_category_sample_size": self.min_category_sample_size,
+            "min_overall_sample_size": self.min_overall_sample_size,
+            "significance_alpha": self.significance_alpha,
+            "max_branches": self.max_branches,
             "local_files_only": self.local_files_only,
             "allow_cache": self.allow_cache,
             "force_rerun": self.force_rerun,
@@ -129,6 +139,7 @@ class EvolutionOrchestrator:
                 {
                     "id": c.checkpoint_id,
                     "sha256": c.sha256_fingerprint,
+                    "component_fingerprints": dict(c.component_fingerprints or {}),
                     "tensor_meta_hash": c.tensor_metadata_hash,
                     "transformation": c.transformation_type.value,
                 }
@@ -173,7 +184,9 @@ class EvolutionOrchestrator:
         suite_fp: str | None = None
         if cfg.include_behavioral_evolution:
             active_suite = suite or load_benchmark_suite(
-                categories=cfg.behavioral_categories, policy=self.policy
+                cfg.benchmark_suite_path,
+                categories=cfg.behavioral_categories,
+                policy=self.policy,
             )
             if cfg.behavioral_max_cases is not None and cfg.behavioral_max_cases > 0:
                 active_suite = BenchmarkSuite(
@@ -217,6 +230,7 @@ class EvolutionOrchestrator:
                     "version_label": c.version_label,
                     "sha256": c.sha256_fingerprint,
                     "tensor_metadata_hash": c.tensor_metadata_hash,
+                    "component_fingerprints": dict(c.component_fingerprints or {}),
                 }
                 for c in ckpts
             },
@@ -342,6 +356,10 @@ class EvolutionOrchestrator:
             reg_engine = RegressionOriginEngine(
                 overall_pass_rate_drop_threshold=cfg.overall_pass_rate_drop_threshold,
                 category_score_drop_threshold=cfg.category_score_drop_threshold,
+                min_category_sample_size=cfg.min_category_sample_size,
+                min_overall_sample_size=cfg.min_overall_sample_size,
+                significance_alpha=cfg.significance_alpha,
+                max_branches=cfg.max_branches,
             )
             regression_events = reg_engine.detect(
                 dag=dag,
@@ -349,6 +367,14 @@ class EvolutionOrchestrator:
                 tensor_transitions=tensor_transitions,
                 representation_evolution=rep_payload,
             )
+
+            branch_enum = dag.enumerate_branches_with_meta(max_paths=cfg.max_branches)
+            if branch_enum.truncated:
+                warnings.append(
+                    f"DAG root-to-leaf lineage enumeration truncated at {branch_enum.analyzed_branch_count} "
+                    f"of {branch_enum.total_branch_count} total branches (max_branches={cfg.max_branches}); "
+                    "direct topological edge fallback executed so zero DAG transitions were skipped."
+                )
 
             ckpt_labels = {c.checkpoint_id: c.version_label for c in ckpts}
             layer_payload = (
@@ -374,13 +400,24 @@ class EvolutionOrchestrator:
         completed_utc = dt.datetime.now(dt.UTC).isoformat()
         provenance["completed_at_utc"] = completed_utc
 
-        branches = dag.enumerate_branches()
         overview = {
             "total_checkpoints": len(ckpts),
             "healthy_checkpoints": len(healthy_ids),
             "total_transformations": len(dag.relationships),
-            "branch_count": len(branches),
+            "branch_count": branch_enum.total_branch_count,
+            "analyzed_branch_count": branch_enum.analyzed_branch_count,
+            "branches_truncated": branch_enum.truncated,
             "detected_regressions": len(regression_events),
+            "statistically_significant_regressions": sum(
+                1
+                for r in regression_events
+                if r.get("statistical_confidence", {}).get("statistically_significant", False)
+            ),
+            "exploratory_regressions": sum(
+                1
+                for r in regression_events
+                if r.get("statistical_confidence", {}).get("is_exploratory", False)
+            ),
             "most_modified_layers": layer_payload.get("most_modified_layers", []),
             "least_modified_layers": layer_payload.get("least_modified_layers", []),
             "peak_cumulative_l2": max(

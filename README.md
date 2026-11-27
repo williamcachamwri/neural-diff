@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](LICENSE)
 
 ---
@@ -349,17 +349,17 @@ Executed on **Windows 11 (`10.0.26320`, 16 logical CPUs, `15.71 GB` RAM, `NVIDIA
 
 Archived in [`evidence/evolution/evolution_benchmark.json`](evidence/evolution/evolution_benchmark.json) with 5-format exports under [`evidence/evolution/exports/`](evidence/evolution/exports/):
 
-| Checkpoint | Stage | Parents | Direct Base $L_2$ | Step Sum $L_2$ | Mean CKA vs Base | Pass Rate (`95%` Wilson CI) | Mean Score |
-| :--- | :--- | :--- | ---: | ---: | ---: | :--- | ---: |
-| `v0 · SmolLM2-Base` | `Base Model` | — | `0.0000` | `0.0000` | `1.0000` | `20.8%` (`[9%, 40%]`) | `0.405` |
-| `v1a · Instruct-SFT` | `Instruction Tuning` | `v0` | `180.6458` | `180.6458` | `0.8522` | `33.3%` (`[18%, 53%]`) | `0.595` |
-| `v1b · SFT-Conservative` | `SFT` | `v0` | `63.2538` | `63.2538` | `0.8728` | `20.8%` (`[9%, 40%]`) | `0.334` |
-| `v2 · Merged-AB` | `Model Merging` | `0.75 v1a + 0.25 v1b` | `151.2651` | `209.6877` | `0.8517` | **`37.5%`** (`[21%, 57%]`) | `0.559` |
-| `v3 · Quantized-LowBit` | `Quantization` | `v2` | `293.2059` | `461.5365` | `0.8446` | **`12.5%`** (`[4%, 31%]`) | `0.256` |
-| `v4 · Pruned-MLP` | `Pruning` | `v3` | `293.2059` | `461.5365` | `0.8446` | `12.5%` (`[4%, 31%]`) | `0.256` |
+| Checkpoint | Stage | Parents | Sparsity | Direct Base $L_2$ | Step Sum $L_2$ | Mean CKA vs Base | Pass Rate (`95%` Wilson CI) | Mean Score |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | :--- | ---: |
+| `v0 · SmolLM2-Base` | `Base Model` | — | `0.00%` | `0.0000` | `0.0000` | `1.0000` | `20.8%` (`[9%, 40%]`) | `0.405` |
+| `v1a · Instruct-SFT` | `Instruction Tuning` | `v0` | `0.00%` | `180.6458` | `180.6458` | `0.8522` | `33.3%` (`[18%, 53%]`) | `0.595` |
+| `v1b · SFT-Conservative` | `SFT` | `v0` | `0.00%` | `63.2538` | `63.2538` | `0.8728` | `20.8%` (`[9%, 40%]`) | `0.334` |
+| `v2 · Merged-AB` | `Model Merging` | `0.75 v1a + 0.25 v1b` | `0.00%` | `151.2651` | `210.2947` | `0.8517` | **`37.5%`** (`[21%, 57%]`) | `0.559` |
+| `v3 · Quantized-LowBit` | `Quantization` (`step=0.045`) | `v2` | `11.71%` | `213.1721` | `360.7001` | `0.8553` | `33.3%` (`[18%, 53%]`) | `0.425` |
+| `v4 · Pruned-MLP` | `Pruning` (`|w|<0.06`, `L6..29`) | `v3` | **`20.84%`** | **`264.2170`** | **`518.1110`** | **`0.8481`** | **`16.7%`** (`[7%, 36%]`) | **`0.356`** |
 
-* **Non-Collinear Path Cancellation (`OBSERVED`):** Direct `Base -> Quantized-LowBit` distance is **`293.2059`** vs **`461.5365`** summed across individual steps (`path_cancellation_ratio = 0.6353`).
-* **Regression Origin Pinpointing:** Automatically identifies `v2 · Merged-AB -> v3 · Quantized-LowBit` (`Quantization`) as the origin of the overall pass-rate drop (`37.5% -> 12.5%`) and `code_preservation` drop (`66.7% -> 0.0%`), separating `CORRELATED` layer shifts from `CAUSALLY VERIFIED` residual patching.
+* **Non-Collinear Path Cancellation (`OBSERVED`):** Direct `Base -> Pruned-MLP` distance is **`264.2170`** vs **`518.1110`** summed across individual steps (`path_cancellation_ratio = 0.5100`), while `v3 -> v4` prunes **`12,278,740`** additional non-zero MLP parameters (`11.71% -> 20.84%` sparsity) with verified distinct 5-domain SHA-256 component hashes.
+* **4-Tier Epistemic & Statistical Rigor:** Regression Origin Detection enforces a strict 4-tier hierarchy (`OBSERVED` $\to$ `CORRELATED` $\to$ `CAUSAL SUPPORT` for diagnostic-prompt transition patching $\to$ `CAUSALLY VERIFIED` reserved strictly for case-targeted counterfactual patching with control checks), step-down **Holm-Bonferroni** family-wise adjustment, and exploratory gating (`is_exploratory = true` when $n < 8$).
 
 ---
 

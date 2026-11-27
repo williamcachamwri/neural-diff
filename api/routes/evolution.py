@@ -92,12 +92,17 @@ class RunEvolutionAnalysisRequest(StrictModel):
     chunk_elements: int = Field(default=1_048_576, ge=4096, le=16_777_216)
     top_k_tensors: int = Field(default=10, ge=1, le=64)
     behavioral_categories: list[str] | None = Field(default=None, max_length=12)
-    behavioral_max_cases: int | None = Field(default=None, ge=1, le=200)
+    behavioral_max_cases: int | None = Field(default=None, ge=1, le=500)
+    benchmark_suite_path: str | None = Field(default=None, max_length=512)
     max_new_tokens: int = Field(default=64, ge=8, le=512)
     seed: int = Field(default=42, ge=0, le=2_147_483_647)
     prompt_mode: Literal["chat_if_available", "identical_raw", "qa_framed"] = "chat_if_available"
     overall_pass_rate_drop_threshold: float = Field(default=0.05, ge=0.0, le=1.0)
     category_score_drop_threshold: float = Field(default=0.10, ge=0.0, le=1.0)
+    min_category_sample_size: int = Field(default=8, ge=1, le=500)
+    min_overall_sample_size: int = Field(default=20, ge=1, le=2000)
+    significance_alpha: float = Field(default=0.05, gt=0.0, lt=1.0)
+    max_branches: int = Field(default=256, ge=1, le=5000)
     local_files_only: bool = False
     allow_cache: bool = True
     force_rerun: bool = False
@@ -276,13 +281,16 @@ def build_evolution_router(
         return {"deleted": True, "relationship_id": relationship_id}
 
     @router.get("/projects/{project_id}/graph")
-    def get_project_graph(project_id: str) -> dict[str, Any]:
+    def get_project_graph(
+        project_id: str,
+        max_branches: int = Query(default=256, ge=1, le=5000),
+    ) -> dict[str, Any]:
         proj = evo_store.get_project(project_id)
         dag = evo_store.get_dag(project_id)
-        return dag.to_graph_payload(proj.base_checkpoint_id)
+        return dag.to_graph_payload(proj.base_checkpoint_id, max_branches=max_branches)
 
     # ------------------------------------------------------------------
-    # Arbitrary / Consecutive / Branch-to-Branch Pair Comparison
+    # Arbitrary / Consecutive / Ancestor / Branch-to-Branch Pair Comparison
     # ------------------------------------------------------------------
     @router.post("/projects/{project_id}/compare")
     def compare_arbitrary_versions(
@@ -294,12 +302,11 @@ def build_evolution_router(
         ca = evo_store.get_checkpoint(project_id, req.checkpoint_a_id)
         cb = evo_store.get_checkpoint(project_id, req.checkpoint_b_id)
 
-        if (ca.checkpoint_id, cb.checkpoint_id) in dag.edge_by_pair:
-            scope = "consecutive"
-        elif ca.checkpoint_id == proj.base_checkpoint_id:
-            scope = "base_to_current"
-        else:
-            scope = "branch_to_branch"
+        scope = dag.classify_pair_scope(
+            ca.checkpoint_id,
+            cb.checkpoint_id,
+            base_checkpoint_id=proj.base_checkpoint_id,
+        )
 
         lca_id = dag.lowest_common_ancestor(ca.checkpoint_id, cb.checkpoint_id)
         engine = MultiGenTensorEvolutionEngine(
@@ -343,11 +350,16 @@ def build_evolution_router(
             top_k_tensors=req.top_k_tensors,
             behavioral_categories=req.behavioral_categories,
             behavioral_max_cases=req.behavioral_max_cases,
+            benchmark_suite_path=req.benchmark_suite_path,
             max_new_tokens=req.max_new_tokens,
             seed=req.seed,
             prompt_mode=req.prompt_mode,
             overall_pass_rate_drop_threshold=req.overall_pass_rate_drop_threshold,
             category_score_drop_threshold=req.category_score_drop_threshold,
+            min_category_sample_size=req.min_category_sample_size,
+            min_overall_sample_size=req.min_overall_sample_size,
+            significance_alpha=req.significance_alpha,
+            max_branches=req.max_branches,
             local_files_only=req.local_files_only,
             allow_cache=req.allow_cache,
             force_rerun=req.force_rerun,

@@ -113,7 +113,7 @@ def build_real_smollm2_branched_checkpoints(policy: SecurityPolicy) -> dict[str,
                     t_m[name] = (0.75 * wi + 0.25 * wbr).to(torch.bfloat16)
                 save_file(t_m, str(dir_merged / "model.safetensors"))
 
-        # 3. Simulated Coarse Low-Bit Quantization (step = 0.075 -> measurable capability regression)
+        # 3. Simulated Coarse Low-Bit Quantization (step = 0.045 -> non-zero grid ±0.045, ±0.090, ...)
         dir_quant = DERIVED_DIR / "smollm2_quantized_lowbit"
         if not (dir_quant / "model.safetensors").is_file():
             _copy_tokenizer_and_config(
@@ -122,7 +122,7 @@ def build_real_smollm2_branched_checkpoints(policy: SecurityPolicy) -> dict[str,
                 extra_config={
                     "quantization_config": {
                         "quant_method": "uniform_grid_lowbit",
-                        "step_size": 0.075,
+                        "step_size": 0.045,
                     }
                 },
             )
@@ -133,10 +133,11 @@ def build_real_smollm2_branched_checkpoints(policy: SecurityPolicy) -> dict[str,
                     if "norm" in name:
                         t_q[name] = wm.to(torch.bfloat16)
                     else:
-                        t_q[name] = (torch.round(wm / 0.075) * 0.075).to(torch.bfloat16)
+                        t_q[name] = (torch.round(wm / 0.045) * 0.045).to(torch.bfloat16)
                 save_file(t_q, str(dir_quant / "model.safetensors"))
 
-        # 4. Magnitude Pruned Stage (zero |w| < 0.045 in MLP projections of layers 10..29)
+        # 4. Magnitude Pruned Stage (zero |w| < 0.060 across MLP projections of layers 6..29,
+        # genuinely pruning the entire ±0.045 non-zero quantization band in 24 MLP blocks!)
         dir_pruned = DERIVED_DIR / "smollm2_pruned_mlp"
         if not (dir_pruned / "model.safetensors").is_file():
             _copy_tokenizer_and_config(inst_dir, dir_pruned)
@@ -144,8 +145,8 @@ def build_real_smollm2_branched_checkpoints(policy: SecurityPolicy) -> dict[str,
                 t_p: dict[str, torch.Tensor] = {}
                 for name in h_q.tensor_names():
                     wq = h_q.get_tensor(name)
-                    if ".mlp." in name and any(f"layers.{idx}." in name for idx in range(10, 30)):
-                        mask = wq.abs() >= 0.045
+                    if ".mlp." in name and any(f"layers.{idx}." in name for idx in range(6, 30)):
+                        mask = wq.abs() >= 0.060
                         t_p[name] = wq * mask.to(wq.dtype)
                     else:
                         t_p[name] = wq
@@ -249,7 +250,8 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
             version_label="v3 · Quantized-LowBit",
             parent_checkpoint_ids=[c_merged.checkpoint_id],
             transformation_type="Quantization",
-            experiment_notes="Aggressive uniform step=0.075 weight quantization.",
+            transformation_metadata={"quant_method": "uniform_grid_lowbit", "step_size": 0.045, "norm_exempt": True},
+            experiment_notes="Uniform grid step=0.045 weight quantization (norms preserved in bfloat16).",
             existing_project_checkpoints=evo_store.list_checkpoints(proj.project_id),
             policy=policy,
             local_files_only=True,
@@ -263,7 +265,8 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
             version_label="v4 · Pruned-MLP",
             parent_checkpoint_ids=[c_quant.checkpoint_id],
             transformation_type="Pruning",
-            experiment_notes="Magnitude pruning (|w| < 0.045) across MLP blocks L10..L29.",
+            transformation_metadata={"prune_method": "unstructured_magnitude", "threshold": 0.060, "target_layers": "6..29", "target_submodules": "mlp"},
+            experiment_notes="Magnitude pruning (|w| < 0.060) across MLP blocks L6..L29.",
             existing_project_checkpoints=evo_store.list_checkpoints(proj.project_id),
             policy=policy,
             local_files_only=True,
@@ -303,8 +306,61 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
     bench_summary = {
         "experiment_type": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
         "run_id": bundle["run_id"],
+        "cache_key": bundle["cache_key"],
         "wall_clock_seconds": elapsed_s,
+        "transformation_recipes": {
+            "v0": {"source": "HuggingFaceTB/SmolLM2-135M", "stage": "Base Model"},
+            "v1a": {"source": "HuggingFaceTB/SmolLM2-135M-Instruct", "stage": "Instruction Tuning"},
+            "v1b": {"formula": "0.65 * W_v0 + 0.35 * W_v1a", "dtype": "bfloat16", "stage": "SFT"},
+            "v2": {"formula": "0.75 * W_v1a + 0.25 * W_v1b", "dtype": "bfloat16", "stage": "Model Merging"},
+            "v3": {"formula": "round(W_v2 / 0.045) * 0.045 (norms exempt)", "dtype": "bfloat16", "stage": "Quantization"},
+            "v4": {"formula": "W_v3 * (|W_v3| >= 0.060) on layers.6..29.mlp.*", "dtype": "bfloat16", "stage": "Pruning"},
+        },
         "overview": bundle["overview"],
+        "checkpoints": [
+            {
+                "checkpoint_id": c["checkpoint_id"],
+                "version_label": c["version_label"],
+                "transformation_type": c["transformation_type"],
+                "parameter_count": c["parameter_count"],
+                "file_size_bytes": c["file_size_bytes"],
+                "sha256_fingerprint": c["sha256_fingerprint"],
+                "tensor_metadata_hash": c["tensor_metadata_hash"],
+                "component_fingerprints": c.get("component_fingerprints", {}),
+            }
+            for c in bundle["checkpoints"]
+        ],
+        "tensor_transitions": [
+            {
+                "scope": t["scope"],
+                "source_label": t["source_label"],
+                "target_label": t["target_label"],
+                "transformation_type": t["transformation_type"],
+                "l2_distance": t["l2_distance"],
+                "relative_l2_distance": t["relative_l2_distance"],
+                "sum_of_step_l2_along_path": t.get("sum_of_step_l2_along_path"),
+                "path_cancellation_ratio": t.get("path_cancellation_ratio"),
+                "global_cosine_similarity": t["global_cosine_similarity"],
+                "modified_parameters": t["modified_parameters"],
+                "modified_parameter_pct": t["modified_parameter_pct"],
+                "nonzero_to_zero_transitions": t["nonzero_to_zero_transitions"],
+                "zero_to_nonzero_transitions": t["zero_to_nonzero_transitions"],
+                "sparsity_ratio_source": t["sparsity_ratio_source"],
+                "sparsity_ratio_target": t["sparsity_ratio_target"],
+                "sparsity_delta": t["sparsity_delta"],
+            }
+            for t in bundle["tensor_transitions"]
+        ],
+        "behavioral_timeline": (bundle.get("behavioral_evolution") or {}).get("timeline", []),
+        "representation_matrix_summary": [
+            {
+                "version_label": r["version_label"],
+                "mean_cka_to_base": r["mean_cka_to_base"],
+                "representation_drift": r["representation_drift"],
+                "mean_logit_js_to_base": r["mean_logit_js_to_base"],
+            }
+            for r in ((bundle.get("representation_evolution") or {}).get("evolution_matrix") or {}).get("rows", [])
+        ],
         "regression_events_count": len(bundle["regression_events"]),
         "regression_origins": [
             {
@@ -312,9 +368,18 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
                 "first_affected_label": r["first_affected_label"],
                 "transformation_type": r["transformation_type"],
                 "affected_category": r["affected_category"],
+                "regression_kind": r.get("regression_kind"),
                 "pass_rate_before": r["pass_rate_before"],
                 "pass_rate_after": r["pass_rate_after"],
+                "score_before": r["score_before"],
+                "score_after": r["score_after"],
+                "sample_size": r["statistical_confidence"]["sample_size"],
+                "is_exploratory": r["statistical_confidence"].get("is_exploratory"),
+                "statistically_significant": r["statistical_confidence"].get("statistically_significant"),
+                "holm_bonferroni_p_value": r["statistical_confidence"].get("holm_bonferroni_p_value"),
                 "epistemic_status": r["epistemic_status"],
+                "causal_support_exists": r["causal_verification"].get("causal_support_exists"),
+                "causal_verification_exists": r["causal_verification"]["causal_verification_exists"],
             }
             for r in bundle["regression_events"]
         ],

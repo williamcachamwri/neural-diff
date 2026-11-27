@@ -61,6 +61,40 @@ def wilson_ci_95(successes: int, total: int) -> tuple[float, float]:
     return (round(max(0.0, center - half), 6), round(min(1.0, center + half), 6))
 
 
+def holm_bonferroni_adjust(p_values: list[float]) -> list[float]:
+    """Apply Holm-Bonferroni step-down family-wise error correction to a list of raw p-values."""
+    m = len(p_values)
+    if m == 0:
+        return []
+    indexed = sorted(enumerate(p_values), key=lambda kv: float(kv[1]))
+    adjusted = [1.0] * m
+    running_max = 0.0
+    for rank, (orig_idx, raw_p) in enumerate(indexed):
+        scaled = min(1.0, max(0.0, float(raw_p)) * (m - rank))
+        running_max = max(running_max, scaled)
+        adjusted[orig_idx] = round(running_max, 6)
+    return adjusted
+
+
+def build_behavioral_checkpoint_cache_key(ckpt: RegisteredCheckpoint) -> str:
+    """Build cache key spanning weights, architecture config, tokenizer artifacts, and adapter hashes."""
+    comp = ckpt.component_fingerprints or {}
+    if comp:
+        payload = json.dumps(
+            {
+                "composite": ckpt.sha256_fingerprint,
+                "weights_sha256": comp.get("weights_sha256"),
+                "architecture_config_sha256": comp.get("architecture_config_sha256"),
+                "tokenizer_sha256": comp.get("tokenizer_sha256"),
+                "adapter_sha256": comp.get("adapter_sha256"),
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+    return ckpt.sha256_fingerprint
+
+
 class BehavioralEvolutionEngine:
     """Executes deterministic multi-checkpoint behavioral evaluation and lineage comparison."""
 
@@ -109,9 +143,10 @@ class BehavioralEvolutionEngine:
             json.dumps(inf_cfg, sort_keys=True, separators=(",", ":")).encode("utf-8")
         ).hexdigest()
 
+        eval_cache_fp = build_behavioral_checkpoint_cache_key(ckpt)
         if self.use_cache and self.store is not None and custom_generator is None:
             cached = self.store.get_cached_checkpoint_eval(
-                ckpt.sha256_fingerprint, suite_fingerprint, inf_hash
+                eval_cache_fp, suite_fingerprint, inf_hash
             )
             if cached is not None:
                 return {**cached, "from_cache": True}
@@ -208,6 +243,7 @@ class BehavioralEvolutionEngine:
             "version_label": ckpt.version_label,
             "transformation_type": ckpt.transformation_type.value,
             "checkpoint_sha256": ckpt.sha256_fingerprint,
+            "component_fingerprints": dict(ckpt.component_fingerprints or {}),
             "suite_id": suite.suite_id,
             "suite_version": suite.version,
             "suite_fingerprint": suite_fingerprint,
@@ -235,7 +271,7 @@ class BehavioralEvolutionEngine:
 
         if self.use_cache and self.store is not None and custom_generator is None:
             self.store.save_cached_checkpoint_eval(
-                ckpt.sha256_fingerprint, suite_fingerprint, inf_hash, payload
+                eval_cache_fp, suite_fingerprint, inf_hash, payload
             )
         return payload
 
@@ -286,14 +322,29 @@ class BehavioralEvolutionEngine:
         newly_observed_pass_cats: list[dict[str, Any]] = []
 
         all_cats = sorted(set(eval_a["categories"]) | set(eval_b["categories"]))
+        raw_cat_ps: list[float] = []
         for cat in all_cats:
             ca = eval_a["categories"].get(cat)
             cb = eval_b["categories"].get(cat)
             if not ca or not cb:
                 continue
+            cat_ids = [
+                cid
+                for cid in ordered_ids
+                if cases_a[cid]["category"] == cat and cases_b[cid]["category"] == cat
+            ]
+            c_scores_a = [float(cases_a[cid]["score"]) for cid in cat_ids]
+            c_scores_b = [float(cases_b[cid]["score"]) for cid in cat_ids]
+            c_passed_a = [bool(cases_a[cid]["passed"]) for cid in cat_ids]
+            c_passed_b = [bool(cases_b[cid]["passed"]) for cid in cat_ids]
+            cat_sig = compute_paired_significance(
+                c_scores_a, c_scores_b, c_passed_a, c_passed_b, seed=self.seed
+            )
+
             s_delta = round(cb["mean_score"] - ca["mean_score"], 6)
             pr_delta = round(cb["pass_rate"] - ca["pass_rate"], 6)
             n_cat = int(cb["sample_size"])
+            raw_cat_ps.append(cat_sig.mcnemar_p_value)
             entry = {
                 "category": cat,
                 "sample_size": n_cat,
@@ -304,10 +355,17 @@ class BehavioralEvolutionEngine:
                 "pass_rate_after": cb["pass_rate"],
                 "pass_rate_delta": pr_delta,
                 "wilson_ci95_after": cb["pass_rate_wilson_ci95"],
+                "mcnemar_p_value": cat_sig.mcnemar_p_value,
+                "bootstrap_ci95": [cat_sig.bootstrap_ci95_low, cat_sig.bootstrap_ci95_high],
+                "is_exploratory": n_cat < 8,
                 "statistical_note": (
-                    f"Observed on n={n_cat} deterministic test cases; small sample sizes do not establish broad capability acquisition without expanded evaluation."
-                    if n_cat < 30
-                    else f"Observed on n={n_cat} test cases."
+                    f"Exploratory sample (n={n_cat} < 8); insufficient power for standalone capability claims without an expanded suite."
+                    if n_cat < 8
+                    else (
+                        f"Observed on n={n_cat} deterministic test cases; moderate sample size."
+                        if n_cat < 30
+                        else f"Observed on n={n_cat} test cases."
+                    )
                 ),
             }
             cat_deltas.append(entry)
@@ -317,6 +375,10 @@ class BehavioralEvolutionEngine:
                 improved_cats.append(entry)
             elif s_delta < -0.02 or pr_delta < 0.0:
                 degraded_cats.append(entry)
+
+        holm_ps = holm_bonferroni_adjust(raw_cat_ps)
+        for entry, adj_p in zip(cat_deltas, holm_ps, strict=True):
+            entry["holm_bonferroni_p_value"] = adj_p
 
         return {
             "scope": scope,

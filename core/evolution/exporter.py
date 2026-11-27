@@ -520,9 +520,11 @@ class EvolutionReportExporter:
                 return "#f87171"
             if status_str == "CAUSALLY VERIFIED":
                 return "#4ade80"
+            if status_str == "CAUSAL SUPPORT":
+                return "#d6c5a9"
             if status_str == "OBSERVED":
                 return "#e4e4e7"
-            return "#d6c5a9"
+            return "#a1a1aa"
 
         def _ins_scope(ins: dict[str, Any]) -> str:
             cases = ins.get("evaluation_cases", [])
@@ -570,9 +572,10 @@ class EvolutionReportExporter:
             f"<tr>"
             f"<td class='mono'>{esc(ev['previous_label'])} → {esc(ev['first_affected_label'])}</td>"
             f"<td>{esc(ev['transformation_type'])}</td>"
-            f"<td>{esc(human_label(ev['affected_category']))}</td>"
-            f"<td class='num mono' style='color:#f87171'>{_fmt_pct(ev['pass_rate_before'])} → {_fmt_pct(ev['pass_rate_after'])}</td>"
-            f"<td class='mono muted'>{esc(', '.join(ev.get('failed_test_case_ids', [])[:5]) or '—')}</td>"
+            f"<td>{esc(human_label(ev['affected_category']))} <span class='muted'>({esc(human_label(ev.get('regression_kind', 'pass_rate_and_score')))})</span></td>"
+            f"<td class='num mono' style='color:#f87171'>{_fmt_pct(ev['pass_rate_before'])} → {_fmt_pct(ev['pass_rate_after'])} · {float(ev['score_before']):.2f}→{float(ev['score_after']):.2f}</td>"
+            f"<td class='mono muted'>n={ev.get('statistical_confidence', {}).get('sample_size', '—')} · Holm p={_fmt_num(ev.get('statistical_confidence', {}).get('holm_bonferroni_p_value', ev.get('statistical_confidence', {}).get('mcnemar_p_value')), 3)}"
+            f"{' (exploratory)' if ev.get('statistical_confidence', {}).get('is_exploratory') else ''}</td>"
             f"<td class='nowrap'><span class='dot' style='background:{_dot_col(ev['epistemic_status'])}'></span>{esc(human_label(ev['epistemic_status']))}</td>"
             f"</tr>"
             for ev in regs

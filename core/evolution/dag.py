@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
 
@@ -29,6 +30,26 @@ class BranchLineage:
             "checkpoint_ids": list(self.checkpoint_ids),
             "version_labels": list(self.version_labels),
             "contains_merge": self.contains_merge,
+        }
+
+
+@dataclass(frozen=True)
+class BranchEnumerationResult:
+    """Bounded branch enumeration accompanied by exact DP path count and truncation flag."""
+
+    branches: list[BranchLineage]
+    total_branch_count: int
+    analyzed_branch_count: int
+    truncated: bool
+    max_paths_limit: int | None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "branches": [b.to_dict() for b in self.branches],
+            "total_branch_count": self.total_branch_count,
+            "analyzed_branch_count": self.analyzed_branch_count,
+            "truncated": self.truncated,
+            "max_paths_limit": self.max_paths_limit,
         }
 
 
@@ -125,7 +146,6 @@ class EvolutionDAG:
                 http_status=409,
             )
 
-        # Adding parent -> child creates a cycle iff `parent_id` is reachable from `child_id`
         anc_path = self.shortest_directed_path(child_id, parent_id)
         if anc_path is not None:
             cycle = [*anc_path, child_id]
@@ -158,7 +178,6 @@ class EvolutionDAG:
                 queue.append(ch)
 
         if len(ordered) != len(self.checkpoints_by_id):
-            # Defensive fallback; validate_acyclic() already raises exact cycle
             self.validate_acyclic()
         return ordered
 
@@ -225,45 +244,111 @@ class EvolutionDAG:
         depths = self.generation_depths()
         return max(shared, key=lambda cid: (depths.get(cid, 0), cid))
 
-    def enumerate_branches(self, max_paths: int = 128) -> list[BranchLineage]:
-        """Enumerate distinct root-to-leaf evolution lineages through the DAG."""
-        lineages: list[BranchLineage] = []
-        roots = self.roots()
+    def classify_pair_scope(
+        self,
+        source_id: str,
+        target_id: str,
+        base_checkpoint_id: str | None = None,
+    ) -> str:
+        """Classify topological relationship between any two checkpoints in the DAG.
 
-        def _walk(current: str, path: list[str]) -> None:
-            if len(lineages) >= max_paths:
-                return
-            children = self.children_of.get(current, [])
-            if not children:
-                has_merge = any(len(self.parents_of[cid]) > 1 for cid in path)
-                labels = [self.checkpoints_by_id[cid].version_label for cid in path]
-                idx = len(lineages) + 1
-                lineages.append(
-                    BranchLineage(
-                        branch_id=f"branch-{idx:02d}",
+        Distinguishes:
+        * `identical`: `source_id == target_id`
+        * `consecutive`: direct `source_id -> target_id` edge exists
+        * `base_to_current`: `source_id` is the designated base root and an ancestor of `target_id`
+        * `ancestor_to_descendant`: `source_id` is a non-consecutive, non-base ancestor of `target_id`
+        * `descendant_to_ancestor`: reverse lineage comparison (`target_id` is an ancestor of `source_id`)
+        * `branch_to_branch`: diverging branches sharing a common ancestor
+        * `unrelated`: disjoint roots with no shared ancestor
+        """
+        if source_id == target_id:
+            return "identical"
+        effective_base = base_checkpoint_id or (self.roots()[0] if self.roots() else None)
+        target_ancestors = self.ancestors_of(target_id)
+        if (source_id, target_id) in self.edge_by_pair:
+            return "consecutive"
+        if source_id in target_ancestors:
+            if effective_base is not None and source_id == effective_base:
+                return "base_to_current"
+            return "ancestor_to_descendant"
+        if target_id in self.ancestors_of(source_id):
+            return "descendant_to_ancestor"
+        if self.lowest_common_ancestor(source_id, target_id) is not None:
+            return "branch_to_branch"
+        return "unrelated"
+
+    def count_total_branches(self) -> int:
+        """Compute exact total root-to-leaf path count in O(V + E) dynamic programming."""
+        topo = self.topological_order()
+        if not topo:
+            return 0
+        ways: dict[str, int] = {}
+        for cid in reversed(topo):
+            children = self.children_of.get(cid, [])
+            ways[cid] = 1 if not children else sum(ways[ch] for ch in children)
+        return sum(ways[r] for r in self.roots())
+
+    def iter_branches(self, max_paths: int | None = None) -> Iterator[BranchLineage]:
+        """Lazily yield root-to-leaf evolution lineages without unbounded memory allocation."""
+        if max_paths is not None and max_paths <= 0:
+            return
+
+        roots = self.roots()
+        emitted = 0
+
+        for r in roots:
+            # Explicit DFS stack `(node_id, path)` for non-recursive lazy iteration
+            stack: list[tuple[str, list[str]]] = [(r, [r])]
+            while stack:
+                current, path = stack.pop()
+                children = self.children_of.get(current, [])
+                if not children:
+                    emitted += 1
+                    has_merge = any(len(self.parents_of[cid]) > 1 for cid in path)
+                    labels = [self.checkpoints_by_id[cid].version_label for cid in path]
+                    yield BranchLineage(
+                        branch_id=f"branch-{emitted:02d}",
                         root_checkpoint_id=path[0],
                         leaf_checkpoint_id=path[-1],
                         checkpoint_ids=list(path),
                         version_labels=labels,
                         contains_merge=has_merge,
                     )
-                )
-                return
-            for ch in children:
-                _walk(ch, [*path, ch])
+                    if max_paths is not None and emitted >= max_paths:
+                        return
+                else:
+                    # Push in reverse order so left-to-right child order matches recursive walk
+                    for ch in reversed(children):
+                        stack.append((ch, [*path, ch]))
 
-        for r in roots:
-            _walk(r, [r])
-        return lineages
+    def enumerate_branches_with_meta(self, max_paths: int | None = 128) -> BranchEnumerationResult:
+        """Enumerate up to `max_paths` branches alongside exact total count and truncation status."""
+        total = self.count_total_branches()
+        branches = list(self.iter_branches(max_paths=max_paths))
+        return BranchEnumerationResult(
+            branches=branches,
+            total_branch_count=total,
+            analyzed_branch_count=len(branches),
+            truncated=len(branches) < total,
+            max_paths_limit=max_paths,
+        )
 
-    def to_graph_payload(self, base_checkpoint_id: str | None = None) -> dict[str, Any]:
-        """Serialize complete topological graph, node coordinates/depths, edges, and branches."""
+    def enumerate_branches(self, max_paths: int = 128) -> list[BranchLineage]:
+        """Enumerate up to `max_paths` distinct root-to-leaf evolution lineages."""
+        return list(self.iter_branches(max_paths=max_paths))
+
+    def to_graph_payload(
+        self,
+        base_checkpoint_id: str | None = None,
+        *,
+        max_branches: int = 256,
+    ) -> dict[str, Any]:
+        """Serialize complete topological graph, node coordinates/depths, edges, and branch metadata."""
         topo = self.topological_order()
         depths = self.generation_depths()
-        branches = self.enumerate_branches()
+        branch_enum = self.enumerate_branches_with_meta(max_paths=max_branches)
         effective_base = base_checkpoint_id or (self.roots()[0] if self.roots() else None)
 
-        # Assign lane index per depth level for clean horizontal/vertical DAG layout
         by_depth: dict[int, list[str]] = {}
         for cid in topo:
             by_depth.setdefault(depths[cid], []).append(cid)
@@ -307,8 +392,11 @@ class EvolutionDAG:
             "topological_order": topo,
             "root_checkpoint_ids": self.roots(),
             "leaf_checkpoint_ids": self.leaves(),
-            "branch_count": len(branches),
-            "branches": [b.to_dict() for b in branches],
+            "branch_count": branch_enum.total_branch_count,
+            "analyzed_branch_count": branch_enum.analyzed_branch_count,
+            "branches_truncated": branch_enum.truncated,
+            "max_branches_limit": max_branches,
+            "branches": [b.to_dict() for b in branch_enum.branches],
             "nodes": nodes,
             "edges": edges,
         }

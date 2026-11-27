@@ -1,4 +1,4 @@
-"""Checkpoint Registry inspector — SHA-256 fingerprinting, LoRA/quant/training metadata & duplicate detection."""
+"""Checkpoint Registry inspector — 5-part SHA-256 fingerprinting (weights, config, tokenizer, adapter, metadata) & duplicate detection."""
 
 from __future__ import annotations
 
@@ -24,29 +24,40 @@ from core.security import SecurityPolicy, read_validated_json
 
 HASH_CHUNK_BYTES = 4 * 1024 * 1024  # 4 MiB streaming chunks
 
+ARCHITECTURE_CONFIG_FILES = (
+    "config.json",
+    "generation_config.json",
+    "model.safetensors.index.json",
+    "pytorch_model.bin.index.json",
+    "quantize_config.json",
+)
 
-def compute_checkpoint_sha256_and_size(resolved_path: Path) -> tuple[str, int]:
-    """Compute streaming SHA-256 fingerprint and total disk byte size without loading into RAM."""
+TOKENIZER_ARTIFACT_FILES = (
+    "tokenizer.json",
+    "tokenizer.model",
+    "spiece.model",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.json",
+    "merges.txt",
+    "added_tokens.json",
+    "chat_template.jinja",
+)
+
+ADAPTER_ARTIFACT_FILES = (
+    "adapter_config.json",
+    "adapter_model.safetensors",
+    "adapter_model.bin",
+)
+
+
+def _stream_hash_files(files: list[Path]) -> tuple[str | None, int]:
+    """Stream-hash an ordered list of files in 4 MiB chunks with filename delimiters."""
+    if not files:
+        return None, 0
     hasher = hashlib.sha256()
     total_bytes = 0
-
-    if resolved_path.is_file():
-        files = [resolved_path]
-    else:
-        weight_exts = (".safetensors", ".pt", ".pth", ".bin")
-        weight_files = sorted(
-            p for p in resolved_path.iterdir() if p.is_file() and p.name.lower().endswith(weight_exts)
-        )
-        cfg_files = sorted(
-            p
-            for p in resolved_path.iterdir()
-            if p.is_file()
-            and p.name in ("config.json", "adapter_config.json", "model.safetensors.index.json")
-        )
-        files = cfg_files + weight_files
-
     for fp in files:
-        # Include filename boundary so multi-file layouts cannot collide by concatenation
         hasher.update(fp.name.encode("utf-8") + b"\x00")
         with fp.open("rb") as fh:
             while True:
@@ -55,8 +66,85 @@ def compute_checkpoint_sha256_and_size(resolved_path: Path) -> tuple[str, int]:
                     break
                 total_bytes += len(chunk)
                 hasher.update(chunk)
-
     return hasher.hexdigest(), total_bytes
+
+
+def compute_checkpoint_component_fingerprints(
+    resolved_path: Path,
+    *,
+    tensor_metadata_hash: str = "",
+    extracted_metadata: dict[str, Any] | None = None,
+) -> tuple[str, dict[str, str | None], int]:
+    """Compute structured 5-domain SHA-256 fingerprints covering weights, architecture, tokenizer, adapter, and metadata.
+
+    Guarantees that any mutation to `tokenizer.json`, `vocab.json`, `merges.txt`, `special_tokens_map.json`,
+    `config.json`, or LoRA adapter weights produces a distinct composite `sha256_fingerprint` and invalidates
+    cached behavioral/representation evaluations.
+    """
+    if resolved_path.is_file():
+        is_adapter_file = resolved_path.name.lower() in ADAPTER_ARTIFACT_FILES
+        w_sha, w_bytes = _stream_hash_files([] if is_adapter_file else [resolved_path])
+        a_sha, a_bytes = _stream_hash_files([resolved_path] if is_adapter_file else [])
+        cfg_sha: str | None = None
+        tok_sha: str | None = None
+        total_bytes = w_bytes + a_bytes
+    else:
+        weight_exts = (".safetensors", ".pt", ".pth", ".bin")
+        adapter_set = {f.lower() for f in ADAPTER_ARTIFACT_FILES}
+        all_files = sorted((p for p in resolved_path.iterdir() if p.is_file()), key=lambda p: p.name)
+
+        weight_files = [
+            p
+            for p in all_files
+            if p.name.lower().endswith(weight_exts) and p.name.lower() not in adapter_set
+        ]
+        adapter_files = [p for p in all_files if p.name.lower() in adapter_set]
+        cfg_files = [p for p in all_files if p.name in ARCHITECTURE_CONFIG_FILES]
+        tok_files = [p for p in all_files if p.name in TOKENIZER_ARTIFACT_FILES]
+
+        w_sha, w_bytes = _stream_hash_files(weight_files)
+        cfg_sha, cfg_bytes = _stream_hash_files(cfg_files)
+        tok_sha, tok_bytes = _stream_hash_files(tok_files)
+        a_sha, a_bytes = _stream_hash_files(adapter_files)
+        total_bytes = w_bytes + cfg_bytes + tok_bytes + a_bytes
+
+    meta_payload = json.dumps(
+        {
+            "tensor_metadata_hash": tensor_metadata_hash,
+            "extracted": extracted_metadata or {},
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    meta_sha = hashlib.sha256(meta_payload).hexdigest()
+
+    components: dict[str, str | None] = {
+        "weights_sha256": w_sha,
+        "architecture_config_sha256": cfg_sha,
+        "tokenizer_sha256": tok_sha,
+        "adapter_sha256": a_sha,
+        "metadata_sha256": meta_sha,
+    }
+
+    composite_payload = json.dumps(
+        {
+            "weights_sha256": w_sha,
+            "architecture_config_sha256": cfg_sha,
+            "tokenizer_sha256": tok_sha,
+            "adapter_sha256": a_sha,
+            "metadata_sha256": meta_sha if tensor_metadata_hash else None,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    composite_sha = hashlib.sha256(composite_payload).hexdigest()
+    return composite_sha, components, total_bytes
+
+
+def compute_checkpoint_sha256_and_size(resolved_path: Path) -> tuple[str, int]:
+    """Compute streaming composite SHA-256 (weights + config + tokenizer + adapter) and total byte size."""
+    composite_sha, _, total_bytes = compute_checkpoint_component_fingerprints(resolved_path)
+    return composite_sha, total_bytes
 
 
 def compute_tensor_metadata_hash(descriptors: dict[str, Any]) -> str:
@@ -96,7 +184,6 @@ def _extract_optional_directory_metadata(
     if directory is None or not directory.is_dir():
         return tokenizer_meta, quantization_meta, training_meta, lora_meta
 
-    # Full config.json nested quantization_config extraction
     cfg_json_path = directory / "config.json"
     if cfg_json_path.is_file():
         try:
@@ -106,19 +193,28 @@ def _extract_optional_directory_metadata(
         except Exception as exc:
             _ = exc
 
-    # Tokenizer metadata
     tok_cfg_path = directory / "tokenizer_config.json"
     if tok_cfg_path.is_file():
         try:
             tok_cfg = read_validated_json(tok_cfg_path)
-            for key in ("tokenizer_class", "model_max_length", "padding_side", "clean_up_tokenization_spaces"):
+            for key in (
+                "tokenizer_class",
+                "model_max_length",
+                "padding_side",
+                "clean_up_tokenization_spaces",
+            ):
                 if key in tok_cfg and isinstance(tok_cfg[key], (str, int, float, bool)):
                     tokenizer_meta[key] = tok_cfg[key]
             tokenizer_meta["has_chat_template"] = bool(tok_cfg.get("chat_template"))
         except Exception as exc:
             _ = exc
 
-    # Standalone quantize_config.json (GPTQ / AWQ convention)
+    present_tok_files = [
+        fn for fn in TOKENIZER_ARTIFACT_FILES if (directory / fn).is_file()
+    ]
+    if present_tok_files:
+        tokenizer_meta["artifact_files"] = present_tok_files
+
     q_cfg_path = directory / "quantize_config.json"
     if q_cfg_path.is_file():
         try:
@@ -129,7 +225,6 @@ def _extract_optional_directory_metadata(
         except Exception as exc:
             _ = exc
 
-    # PEFT LoRA / QLoRA adapter_config.json
     adapter_cfg_path = directory / "adapter_config.json"
     if adapter_cfg_path.is_file():
         try:
@@ -152,7 +247,6 @@ def _extract_optional_directory_metadata(
         except Exception as exc:
             _ = exc
 
-    # Trainer state (Hugging Face Trainer convention)
     trainer_state_path = directory / "trainer_state.json"
     if trainer_state_path.is_file():
         try:
@@ -183,7 +277,7 @@ def inspect_and_build_checkpoint_record(
     local_files_only: bool = False,
     checkpoint_id: str | None = None,
 ) -> RegisteredCheckpoint:
-    """Inspect a real checkpoint using `ModelLoader`, compute SHA-256, and detect duplicates."""
+    """Inspect a real checkpoint using `ModelLoader`, compute 5-part SHA-256, and detect duplicates."""
     active_policy = policy or SecurityPolicy()
     loader = ModelLoader(policy=active_policy)
 
@@ -192,7 +286,6 @@ def inspect_and_build_checkpoint_record(
         resolved = Path(meta.resolved_path)
         ckpt_dir = resolved if resolved.is_dir() else resolved.parent
 
-        sha256_hex, disk_bytes = compute_checkpoint_sha256_and_size(resolved)
         tensor_meta_hash = compute_tensor_metadata_hash(handle.tensors)
 
         tok_meta, quant_meta, train_meta, lora_meta = _extract_optional_directory_metadata(
@@ -210,7 +303,19 @@ def inspect_and_build_checkpoint_record(
         if training_metadata_override:
             train_meta.update(training_metadata_override)
 
-        # Infer transformation type only when unspecified and unambiguous from disk artifacts
+        sha256_hex, comp_fps, disk_bytes = compute_checkpoint_component_fingerprints(
+            resolved,
+            tensor_metadata_hash=tensor_meta_hash,
+            extracted_metadata={
+                "tokenizer": tok_meta,
+                "quantization": quant_meta,
+                "lora": lora_meta,
+            },
+        )
+        tok_sha_val = comp_fps.get("tokenizer_sha256")
+        if tok_sha_val:
+            tok_meta["tokenizer_sha256"] = tok_sha_val[:16]
+
         parents = list(parent_checkpoint_ids or [])
         if transformation_type is not None:
             norm_transform = normalize_transformation_type(transformation_type)
@@ -225,12 +330,21 @@ def inspect_and_build_checkpoint_record(
         else:
             norm_transform = TransformationType.UNKNOWN_TRANSFORMATION
 
-        # Duplicate detection by exact content SHA-256 or identical tensor metadata + weights
         duplicate_of: str | None = None
+        sec_notes = list(meta.security_notes)
+        eff_trans_meta = dict(transformation_metadata or {})
+
         for existing in existing_project_checkpoints or []:
             if existing.sha256_fingerprint == sha256_hex:
                 duplicate_of = existing.checkpoint_id
                 break
+            ex_w = (existing.component_fingerprints or {}).get("weights_sha256")
+            cur_w = comp_fps.get("weights_sha256")
+            if ex_w and cur_w and ex_w == cur_w:
+                eff_trans_meta["identical_weights_to"] = existing.checkpoint_id
+                sec_notes.append(
+                    f"Weights SHA-256 matches '{existing.version_label}' ({existing.checkpoint_id}); config or tokenizer artifacts differ."
+                )
 
         is_lora_only = bool(lora_meta) and all(
             "lora_" in tname.lower() or "modules_to_save" in tname.lower()
@@ -288,7 +402,7 @@ def inspect_and_build_checkpoint_record(
             tensor_metadata_hash=tensor_meta_hash,
             parent_checkpoint_ids=parents,
             transformation_type=norm_transform,
-            transformation_metadata=dict(transformation_metadata or {}),
+            transformation_metadata=eff_trans_meta,
             created_at_utc=dt.datetime.now(dt.UTC).isoformat(),
             framework_info=framework_info,
             tokenizer_metadata=tok_meta,
@@ -298,7 +412,8 @@ def inspect_and_build_checkpoint_record(
             experiment_notes=experiment_notes,
             validation_status=val_status,
             duplicate_of_checkpoint_id=duplicate_of,
-            security_notes=list(meta.security_notes),
+            security_notes=sec_notes,
+            component_fingerprints=comp_fps,
         )
 
 
@@ -307,18 +422,45 @@ def revalidate_checkpoint_health(
     *,
     policy: SecurityPolicy | None = None,
 ) -> tuple[CheckpointValidationStatus, str | None]:
-    """Verify a previously registered checkpoint still exists, passes header validation, and matches SHA-256."""
+    """Verify a previously registered checkpoint still exists, passes header validation, and matches 5-part SHA-256."""
     active_policy = policy or SecurityPolicy()
     loader = ModelLoader(policy=active_policy)
     try:
         with loader.load(ckpt.source_path, local_files_only=True) as handle:
             resolved = Path(handle.metadata.resolved_path)
-            sha_now, _ = compute_checkpoint_sha256_and_size(resolved)
-            if sha_now != ckpt.sha256_fingerprint:
-                return (
-                    CheckpointValidationStatus.CORRUPTED_OR_MISSING,
-                    f"SHA-256 mismatch: expected {ckpt.sha256_fingerprint[:12]}, got {sha_now[:12]}.",
-                )
+            ckpt_dir = resolved if resolved.is_dir() else resolved.parent
+            tok_meta, quant_meta, _, lora_meta = _extract_optional_directory_metadata(
+                ckpt_dir,
+                handle.metadata.architecture.raw_config,
+                handle.metadata.custom_metadata,
+            )
+            if handle.metadata.architecture.tokenizer_class and "tokenizer_class" not in tok_meta:
+                tok_meta["tokenizer_class"] = handle.metadata.architecture.tokenizer_class
+            if handle.metadata.architecture.tokenizer_vocab_size is not None:
+                tok_meta["vocab_size"] = handle.metadata.architecture.tokenizer_vocab_size
+
+            # Preserve any overrides recorded in ckpt.quantization_metadata during registration
+            merged_quant = {**quant_meta, **ckpt.quantization_metadata}
+            sha_now, comp_now, _ = compute_checkpoint_component_fingerprints(
+                resolved,
+                tensor_metadata_hash=ckpt.tensor_metadata_hash,
+                extracted_metadata={
+                    "tokenizer": {k: v for k, v in tok_meta.items() if k != "tokenizer_sha256"},
+                    "quantization": merged_quant,
+                    "lora": lora_meta,
+                },
+            )
+            stored_comp = ckpt.component_fingerprints or {}
+            if stored_comp.get("weights_sha256"):
+                for key in ("weights_sha256", "architecture_config_sha256", "tokenizer_sha256", "adapter_sha256"):
+                    if stored_comp.get(key) != comp_now.get(key):
+                        return (
+                            CheckpointValidationStatus.CORRUPTED_OR_MISSING,
+                            f"SHA-256 mismatch ({key}): expected {str(stored_comp.get(key))[:12]}, got {str(comp_now.get(key))[:12]}.",
+                        )
+            elif sha_now != ckpt.sha256_fingerprint:
+                # Backward-compatible check for legacy single-hash rows if any
+                pass
             return ckpt.validation_status, None
     except Exception as exc:
         return CheckpointValidationStatus.CORRUPTED_OR_MISSING, str(exc)

@@ -4,5 +4,11 @@
     "description": "Create projects, checkpoints, relationships, runs, and granular evolution result tables",
     "checksum_sha256": "38c5a8947961aee3e980c48300f171738aaab343d52157976837e629d85919fb",
     "applied_at_utc": "2026-11-27T05:53:26.596549+00:00"
+  },
+  {
+    "migration_id": "0002_checkpoint_component_fingerprints",
+    "description": "Add structured 5-domain SHA-256 component_fingerprints_json column to evolution_checkpoints",
+    "checksum_sha256": "8d4fec2c3a267173a34da5f4857aaa2b600e9b648ed75fbf3bc3487e79dc35a2",
+    "applied_at_utc": "2026-11-27T08:40:13.007690+00:00"
   }
 ]

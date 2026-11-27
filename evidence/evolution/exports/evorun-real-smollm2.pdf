@@ -19,11 +19,11 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
 endobj
 7 0 obj
-<< /Length 12799 >>
+<< /Length 12801 >>
 stream
 0.08 0.08 0.10 rg 44.0 698.0 524.0 46.0 re f
 BT /F2 14 Tf 0.96 0.96 0.97 rg 56.0 724.0 Td (NEURAL DIFF  |  SmolLM2-135M Post-Training & Compression DAG) Tj ET
-BT /F1 8.5 Tf 0.72 0.72 0.76 rg 56.0 709.0 Td (Run evorun-real-smollm2  |  Checkpoints: 6  |  Branches: 2  |  Regressions: 12) Tj ET
+BT /F1 8.5 Tf 0.72 0.72 0.76 rg 56.0 709.0 Td (Run evorun-real-smollm2  |  Checkpoints: 6  |  Branches: 2  |  Regressions: 13) Tj ET
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 670.0 Td (Empirical Findings) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 666.0 m 568.0 666.0 l S
 0.92 0.92 0.94 rg 44.0 643.0 524.0 15.0 re f
@@ -32,20 +32,20 @@ BT /F2 8.0 Tf 0.12 0.12 0.15 rg 138.3 647.2 Td (Evidence) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 228.7 647.2 Td (Observation) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 632.2 Td (Weight evolution) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 138.3 632.2 Td (Observed) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 632.2 Td (Quantization \(v2 - Merged-AB -> v3 - Quantized-LowBit\) introduced the lar..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 632.2 Td (Instruction Tuning \(v0 - SmolLM2-Base -> v1a - Instruct-SFT\) introduced t..) Tj ET
 0.97 0.97 0.98 rg 44.0 613.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 617.2 Td (Weight evolution) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 138.3 617.2 Td (Observed) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 617.2 Td (Direct cumulative L2 distance from v0 - SmolLM2-Base to v3 - Quantized-L..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 617.2 Td (Direct cumulative L2 distance from v0 - SmolLM2-Base to v4 - Pruned-MLP ..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 602.2 Td (Representation e..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 138.3 602.2 Td (Observed) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 602.2 Td (Most representation drift occurred between v1b - SFT-Conservative and v2..) Tj ET
 0.97 0.97 0.98 rg 44.0 583.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 587.2 Td (Behavioral evolu..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 138.3 587.2 Td (Observed) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 587.2 Td (Category 'instruction_following' improved after Instruction Tuning \(v0 -..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 587.2 Td (Rubric 'instruction_following' mean score increased after Instruction Tu..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 572.2 Td (Regression origin) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 138.3 572.2 Td (Causally verified) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 138.3 572.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 228.7 572.2 Td (Quantization \(v2 - Merged-AB -> v3 - Quantized-LowBit\) is the first obser..) Tj ET
 0.97 0.97 0.98 rg 44.0 553.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 557.2 Td (Layer evolution) Tj ET
@@ -64,40 +64,40 @@ BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 493.2 Td (v0 - SmolLM2-Base) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 493.2 Td (Base Model) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 493.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 493.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 493.2 Td (63ab1871ad3c75) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 493.2 Td (cff3853ede6018) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 493.2 Td (Verified) Tj ET
 0.97 0.97 0.98 rg 44.0 474.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 478.2 Td (v1a - Instruct-SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 478.2 Td (Instruction Tuning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 478.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 478.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 478.2 Td (f3f4354aca65b6) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 478.2 Td (48511b85401c21) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 478.2 Td (Verified) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 463.2 Td (v1b - SFT-Conservative) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 463.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 463.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 463.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 463.2 Td (9c08df59e186d1) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 463.2 Td (077d0e450295a0) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 463.2 Td (Verified) Tj ET
 0.97 0.97 0.98 rg 44.0 444.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 448.2 Td (v2 - Merged-AB) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 448.2 Td (Model Merging) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 448.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 448.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 448.2 Td (47d3304b11ee1e) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 448.2 Td (93376a898fcf24) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 448.2 Td (Verified) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 433.2 Td (v3 - Quantized-LowBit) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 433.2 Td (Quantization) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 433.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 433.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 433.2 Td (a7bc6af1db3af8) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 433.2 Td (4d80198e87abfa) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 433.2 Td (Verified) Tj ET
 0.97 0.97 0.98 rg 44.0 414.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 418.2 Td (v4 - Pruned-MLP) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 418.2 Td (Pruning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 418.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 418.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 418.2 Td (1843abcb58ed98) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 418.2 Td (e8cab17c9e414f) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 418.2 Td (Verified) Tj ET
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 392.0 Td (Direct Cumulative Weight Distance & Transitions) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 388.0 m 568.0 388.0 l S
@@ -108,24 +108,24 @@ BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 356.0 Td (v0 - SmolLM2-Base) Tj ET
 BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 356.0 Td (L2=0.0000) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 340.0 Td (v1a - Instruct-SFT) Tj ET
 0.93 0.93 0.95 rg 184.0 339.0 304.0 8.5 re f
-0.22 0.24 0.30 rg 184.0 339.0 187.3 8.5 re f
+0.22 0.24 0.30 rg 184.0 339.0 207.8 8.5 re f
 BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 340.0 Td (L2=180.6458) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 324.0 Td (v1b - SFT-Conservative) Tj ET
 0.93 0.93 0.95 rg 184.0 323.0 304.0 8.5 re f
-0.22 0.24 0.30 rg 184.0 323.0 65.6 8.5 re f
+0.22 0.24 0.30 rg 184.0 323.0 72.8 8.5 re f
 BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 324.0 Td (L2=63.2538) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 308.0 Td (v2 - Merged-AB) Tj ET
 0.93 0.93 0.95 rg 184.0 307.0 304.0 8.5 re f
-0.22 0.24 0.30 rg 184.0 307.0 156.8 8.5 re f
+0.22 0.24 0.30 rg 184.0 307.0 174.0 8.5 re f
 BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 308.0 Td (L2=151.2651) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 292.0 Td (v3 - Quantized-LowBit) Tj ET
 0.93 0.93 0.95 rg 184.0 291.0 304.0 8.5 re f
-0.22 0.24 0.30 rg 184.0 291.0 304.0 8.5 re f
-BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 292.0 Td (L2=293.2059) Tj ET
+0.22 0.24 0.30 rg 184.0 291.0 245.3 8.5 re f
+BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 292.0 Td (L2=213.1721) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 276.0 Td (v4 - Pruned-MLP) Tj ET
 0.93 0.93 0.95 rg 184.0 275.0 304.0 8.5 re f
 0.22 0.24 0.30 rg 184.0 275.0 304.0 8.5 re f
-BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 276.0 Td (L2=293.2059) Tj ET
+BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 276.0 Td (L2=264.2170) Tj ET
 0.92 0.92 0.94 rg 44.0 251.0 524.0 15.0 re f
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 48.0 255.2 Td (Scope) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 132.8 255.2 Td (Transition) Tj ET
@@ -133,84 +133,84 @@ BT /F2 8.0 Tf 0.12 0.12 0.15 rg 286.9 255.2 Td (Rel L2) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 363.9 255.2 Td (Cosine) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 441.0 255.2 Td (Mod %) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 502.6 255.2 Td (Sparsity D) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 240.2 Td (consecutive) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 240.2 Td (Step -> Step) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 240.2 Td (v0 - SmolLM2-Base->v1a - Instr..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 240.2 Td (0.08575) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 240.2 Td (0.99634) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 240.2 Td (97.7%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 240.2 Td (0.0000) Tj ET
 0.97 0.97 0.98 rg 44.0 221.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 225.2 Td (consecutive) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 225.2 Td (Step -> Step) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 225.2 Td (v0 - SmolLM2-Base->v1b - SFT-C..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 225.2 Td (0.03003) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 225.2 Td (0.99955) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 225.2 Td (93.1%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 225.2 Td (0.0000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 210.2 Td (consecutive) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 210.2 Td (v1a - Instruct-SFT->v2 - Merge..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 210.2 Td (0.01403) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 210.2 Td (0.99990) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 210.2 Td (86.6%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 210.2 Td (Step -> Step) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 210.2 Td (v1b - SFT-Conservative->v2 - M..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 210.2 Td (0.04185) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 210.2 Td (0.99913) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 210.2 Td (97.7%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 210.2 Td (0.0000) Tj ET
 0.97 0.97 0.98 rg 44.0 191.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 195.2 Td (consecutive) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 195.2 Td (v1b - SFT-Conservative->v2 - M..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 195.2 Td (0.04185) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 195.2 Td (0.99913) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 195.2 Td (97.7%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 195.2 Td (Step -> Step) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 195.2 Td (v1a - Instruct-SFT->v2 - Merge..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 195.2 Td (0.01403) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 195.2 Td (0.99990) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 195.2 Td (86.6%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 195.2 Td (0.0000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 180.2 Td (consecutive) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 180.2 Td (Step -> Step) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 180.2 Td (v2 - Merged-AB->v3 - Quantized..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 180.2 Td (0.11901) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 180.2 Td (0.99298) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 180.2 Td (98.7%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 180.2 Td (0.1924) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 180.2 Td (0.07125) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 180.2 Td (0.99747) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 180.2 Td (98.0%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 180.2 Td (0.1171) Tj ET
 0.97 0.97 0.98 rg 44.0 161.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 165.2 Td (consecutive) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 165.2 Td (Step -> Step) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 165.2 Td (v3 - Quantized-LowBit->v4 - Pr..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 165.2 Td (0.00000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 165.2 Td (1.00000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 165.2 Td (0.0%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 165.2 Td (0.0000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 150.2 Td (Base to current) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 165.2 Td (0.07446) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 165.2 Td (0.99722) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 165.2 Td (9.1%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 165.2 Td (0.0913) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 150.2 Td (Base -> Current) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 150.2 Td (v0 - SmolLM2-Base->v0 - SmolLM..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 150.2 Td (0.00000) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 150.2 Td (1.00000) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 150.2 Td (0.0%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 150.2 Td (0.0000) Tj ET
 0.97 0.97 0.98 rg 44.0 131.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 135.2 Td (Base to current) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 135.2 Td (Base -> Current) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 135.2 Td (v0 - SmolLM2-Base->v1a - Instr..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 135.2 Td (0.08575) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 135.2 Td (0.99634) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 135.2 Td (97.7%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 135.2 Td (0.0000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 120.2 Td (Base to current) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 120.2 Td (Base -> Current) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 120.2 Td (v0 - SmolLM2-Base->v1b - SFT-C..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 120.2 Td (0.03003) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 120.2 Td (0.99955) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 120.2 Td (93.1%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 120.2 Td (0.0000) Tj ET
 0.97 0.97 0.98 rg 44.0 101.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 105.2 Td (Base to current) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 105.2 Td (Base -> Current) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 105.2 Td (v0 - SmolLM2-Base->v2 - Merged..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 105.2 Td (0.07181) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 105.2 Td (0.99743) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 105.2 Td (97.7%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 105.2 Td (0.0000) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 90.2 Td (Base to current) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 90.2 Td (Base -> Current) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 90.2 Td (v0 - SmolLM2-Base->v3 - Quanti..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 90.2 Td (0.13919) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 90.2 Td (0.99043) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 90.2 Td (99.0%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 90.2 Td (0.1924) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 90.2 Td (0.10119) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 90.2 Td (0.99490) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 90.2 Td (98.4%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 90.2 Td (0.1171) Tj ET
 0.97 0.97 0.98 rg 44.0 71.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 75.2 Td (Base to current) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 75.2 Td (Base -> Current) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 132.8 75.2 Td (v0 - SmolLM2-Base->v4 - Pruned..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 75.2 Td (0.13919) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 75.2 Td (0.99043) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 75.2 Td (99.0%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 75.2 Td (0.1924) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 286.9 75.2 Td (0.12542) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 363.9 75.2 Td (0.99214) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 441.0 75.2 Td (98.5%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 502.6 75.2 Td (0.2084) Tj ET
 BT /F1 7.5 Tf 0.45 0.45 0.50 rg 44.0 24.0 Td (NEURAL DIFF Evolution - SmolLM2-135M Post-Training & Compression DAG  |  Page 1 of 2) Tj ET
 endstream
 endobj
@@ -218,14 +218,14 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
 endobj
 9 0 obj
-<< /Length 13070 >>
+<< /Length 13427 >>
 stream
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 728.0 Td (Behavioral Capability Trajectory) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 724.0 m 568.0 724.0 l S
 BT /F2 8.8 Tf 0.14 0.14 0.18 rg 44.0 707.0 Td (Pass-Rate Trajectory \(neural-diff-core-v1@1.0.0, n=24\)) Tj ET
 0.86 0.86 0.89 RG 0.5 w 72.0 634.0 484.0 68.0 re S
 0.91 0.91 0.93 RG 0.4 w 72.0 668.0 m 556.0 668.0 l S
-0.15 0.16 0.20 RG 1.3 w 72.0 650.5 m 168.8 658.0 l 265.6 650.5 l 362.4 660.5 l 459.2 645.5 l 556.0 645.5 l S
+0.15 0.16 0.20 RG 1.3 w 72.0 650.5 m 168.8 658.0 l 265.6 650.5 l 362.4 660.5 l 459.2 658.0 l 556.0 648.0 l S
 0.12 0.12 0.16 rg 70.2 648.7 3.6 3.6 re f
 BT /F3 6.8 Tf 0.35 0.35 0.40 rg 56.0 624.0 Td (v0 - SmolLM2) Tj ET
 0.12 0.12 0.16 rg 167.0 656.2 3.6 3.6 re f
@@ -234,9 +234,9 @@ BT /F3 6.8 Tf 0.35 0.35 0.40 rg 152.8 624.0 Td (v1a - Instru) Tj ET
 BT /F3 6.8 Tf 0.35 0.35 0.40 rg 249.6 624.0 Td (v1b - SFT-Co) Tj ET
 0.12 0.12 0.16 rg 360.6 658.7 3.6 3.6 re f
 BT /F3 6.8 Tf 0.35 0.35 0.40 rg 346.4 624.0 Td (v2 - Merged-) Tj ET
-0.12 0.12 0.16 rg 457.4 643.7 3.6 3.6 re f
+0.12 0.12 0.16 rg 457.4 656.2 3.6 3.6 re f
 BT /F3 6.8 Tf 0.35 0.35 0.40 rg 443.2 624.0 Td (v3 - Quantiz) Tj ET
-0.12 0.12 0.16 rg 554.2 643.7 3.6 3.6 re f
+0.12 0.12 0.16 rg 554.2 646.2 3.6 3.6 re f
 BT /F3 6.8 Tf 0.35 0.35 0.40 rg 540.0 624.0 Td (v4 - Pruned-) Tj ET
 BT /F2 8.8 Tf 0.18 0.18 0.22 rg 44.0 607.0 Td (Pass Rate by Checkpoint) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 592.0 Td (v0 - SmolLM2-Base) Tj ET
@@ -257,12 +257,12 @@ BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 544.0 Td (v2 - Merged-AB) Tj ET
 BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 544.0 Td (37.5%) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 528.0 Td (v3 - Quantized-LowBit) Tj ET
 0.93 0.93 0.95 rg 184.0 527.0 304.0 8.5 re f
-0.22 0.24 0.30 rg 184.0 527.0 38.0 8.5 re f
-BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 528.0 Td (12.5%) Tj ET
+0.22 0.24 0.30 rg 184.0 527.0 101.3 8.5 re f
+BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 528.0 Td (33.3%) Tj ET
 BT /F3 7.6 Tf 0.20 0.20 0.24 rg 44.0 512.0 Td (v4 - Pruned-MLP) Tj ET
 0.93 0.93 0.95 rg 184.0 511.0 304.0 8.5 re f
-0.22 0.24 0.30 rg 184.0 511.0 38.0 8.5 re f
-BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 512.0 Td (12.5%) Tj ET
+0.22 0.24 0.30 rg 184.0 511.0 50.7 8.5 re f
+BT /F3 7.6 Tf 0.15 0.15 0.18 rg 496.0 512.0 Td (16.7%) Tj ET
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 486.0 Td (Representation Alignment \(Centered Linear CKA vs Base\)) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 482.0 m 568.0 482.0 l S
 0.92 0.92 0.94 rg 44.0 459.0 524.0 15.0 re f
@@ -314,24 +314,24 @@ BT /F3 7.6 Tf 0.18 0.18 0.22 rg 397.3 403.2 Td (0.608) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 455.6 403.2 Td (0.605) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 513.8 403.2 Td (0.606) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 388.2 Td (v3 - Quan..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 106.2 388.2 Td (0.8446) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 164.4 388.2 Td (0.1554) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 222.7 388.2 Td (0.960) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 280.9 388.2 Td (0.616) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 339.1 388.2 Td (0.590) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 397.3 388.2 Td (0.590) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 455.6 388.2 Td (0.587) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 513.8 388.2 Td (0.586) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 106.2 388.2 Td (0.8553) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 164.4 388.2 Td (0.1447) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 222.7 388.2 Td (0.977) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 280.9 388.2 Td (0.653) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 339.1 388.2 Td (0.610) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 397.3 388.2 Td (0.609) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 455.6 388.2 Td (0.606) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 513.8 388.2 Td (0.608) Tj ET
 0.97 0.97 0.98 rg 44.0 369.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 373.2 Td (v4 - Prun..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 106.2 373.2 Td (0.8446) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 164.4 373.2 Td (0.1554) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 222.7 373.2 Td (0.960) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 280.9 373.2 Td (0.616) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 339.1 373.2 Td (0.590) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 397.3 373.2 Td (0.590) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 455.6 373.2 Td (0.587) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 513.8 373.2 Td (0.586) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 106.2 373.2 Td (0.8481) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 164.4 373.2 Td (0.1519) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 222.7 373.2 Td (0.977) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 280.9 373.2 Td (0.653) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 339.1 373.2 Td (0.610) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 397.3 373.2 Td (0.609) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 455.6 373.2 Td (0.606) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 513.8 373.2 Td (0.608) Tj ET
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 347.0 Td (Regression Origin Pinpointing) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 343.0 m 568.0 343.0 l S
 0.92 0.92 0.94 rg 44.0 320.0 524.0 15.0 re f
@@ -341,88 +341,94 @@ BT /F2 8.0 Tf 0.12 0.12 0.15 rg 265.1 324.2 Td (Category) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 347.4 324.2 Td (Drop) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 399.8 324.2 Td (Evidence) Tj ET
 BT /F2 8.0 Tf 0.12 0.12 0.15 rg 482.2 324.2 Td (Cases) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 309.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 309.2 Td (Quantization) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 309.2 Td (Code preservat..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 309.2 Td (66.7%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 309.2 Td (Causally verif..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 309.2 Td (code-01,code-03) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 309.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 309.2 Td (SFT) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 309.2 Td (conciseness) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 309.2 Td (48.6%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 309.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 309.2 Td (conc-03) Tj ET
 0.97 0.97 0.98 rg 44.0 290.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 294.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 294.2 Td (SFT) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 294.2 Td (conciseness) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 294.2 Td (48.6%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 294.2 Td (Causally verif..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 294.2 Td (conc-03) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 279.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 279.2 Td (Quantization) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 294.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 294.2 Td (Quantization) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 294.2 Td (Code preservat..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 294.2 Td (33.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 294.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 294.2 Td (code-01) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 279.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 279.2 Td (Pruning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 279.2 Td (Factual accuracy) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 279.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 279.2 Td (Causally verif..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 279.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 279.2 Td (fact-01) Tj ET
 0.97 0.97 0.98 rg 44.0 260.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 264.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 264.2 Td (Quantization) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 264.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 264.2 Td (Pruning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 264.2 Td (Refusal behavior) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 264.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 264.2 Td (Causally verif..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 264.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 264.2 Td (ref-02) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 249.2 Td (v0 - SmolLM2-Base->v1a - I..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 249.2 Td (Instruction Tu..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 249.2 Td (conciseness) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 249.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 249.2 Td (Causally verif..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 249.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 249.2 Td (conc-03) Tj ET
 0.97 0.97 0.98 rg 44.0 230.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 234.2 Td (v1b - SFT-Conservative->v2..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 234.2 Td (Model Merging) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 234.2 Td (Math reasoning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 234.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 234.2 Td (Pruning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 234.2 Td (Instruction fo..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 234.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 234.2 Td (Causally verif..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 234.2 Td (math-02) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 219.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 219.2 Td (Quantization) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 219.2 Td (overall) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 219.2 Td (30.4%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 219.2 Td (Causally verif..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 219.2 Td (code-01,code-03,..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 234.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 234.2 Td (inst-02) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 219.2 Td (v1b - SFT-Conservative->v2..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 219.2 Td (Model Merging) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 219.2 Td (Math reasoning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 219.2 Td (33.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 219.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 219.2 Td (math-02) Tj ET
 0.97 0.97 0.98 rg 44.0 200.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 204.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 204.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 204.2 Td (Json reliability) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 204.2 Td (28.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 204.2 Td (Causally verif..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 204.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 204.2 Td (-) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 189.2 Td (v1a - Instruct-SFT->v2 - M..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 189.2 Td (Model Merging) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 189.2 Td (Json reliability) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 189.2 Td (28.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 189.2 Td (Causally verif..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 189.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 189.2 Td (-) Tj ET
 0.97 0.97 0.98 rg 44.0 170.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 174.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 174.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 174.2 Td (vietnamese) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 174.2 Td (16.7%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 174.2 Td (Causally verif..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 174.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 174.2 Td (-) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 159.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 159.2 Td (SFT) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 159.2 Td (Code preservat..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 159.2 Td (13.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 159.2 Td (Causally verif..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 159.2 Td (-) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 159.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 159.2 Td (Quantization) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 159.2 Td (overall) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 159.2 Td (13.4%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 159.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 159.2 Td (code-01,json-01,..) Tj ET
 0.97 0.97 0.98 rg 44.0 140.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 144.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 144.2 Td (Quantization) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 144.2 Td (Instruction fo..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 144.2 Td (11.1%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 144.2 Td (Causally verif..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 144.2 Td (inst-01) Tj ET
-BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 118.0 Td (Provenance) Tj ET
-0.78 0.78 0.82 RG 0.6 w 44.0 114.0 m 568.0 114.0 l S
-BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 98.0 Td (Cache Key: d984226c67dc9c7a2a474ec783bdbd503ecf960d4226a25a2ea904c1b080a9b8  |  Seed: 42  |  Device: cuda:0) Tj ET
-BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 86.5 Td (|  Dataset SHA-256: af4eb4452a640ee386ca8921) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 144.2 Td (vietnamese) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 144.2 Td (13.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 144.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 144.2 Td (-) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 129.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 129.2 Td (SFT) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 129.2 Td (Code preservat..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 129.2 Td (13.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 129.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 129.2 Td (-) Tj ET
+BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 103.0 Td (Provenance) Tj ET
+0.78 0.78 0.82 RG 0.6 w 44.0 99.0 m 568.0 99.0 l S
+BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 83.0 Td (Cache Key: 4559df78467d3d57b19923b50757c2fab67c6488216c560dfb3d7a1a8b6f50c2  |  Seed: 42  |  Device: cuda:0) Tj ET
+BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 71.5 Td (|  Dataset SHA-256: af4eb4452a640ee386ca8921) Tj ET
 BT /F1 7.5 Tf 0.45 0.45 0.50 rg 44.0 24.0 Td (NEURAL DIFF Evolution - SmolLM2-135M Post-Training & Compression DAG  |  Page 2 of 2) Tj ET
 endstream
 endobj
@@ -439,11 +445,11 @@ xref
 0000000328 00000 n 
 0000000423 00000 n 
 0000000569 00000 n 
-0000013420 00000 n 
-0000013566 00000 n 
-0000026688 00000 n 
+0000013422 00000 n 
+0000013568 00000 n 
+0000027047 00000 n 
 trailer
 << /Size 11 /Root 1 0 R /Info 10 0 R >>
 startxref
-26829
+27188
 %%EOF

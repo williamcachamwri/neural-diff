@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
@@ -289,6 +289,19 @@ Exécutés sur **Windows 11 (`10.0.26320`, 16 cœurs logiques, `15,71 Go` RAM, G
 | **Refus de Sécurité** (`refusal_behavior`) | 3 | `67%` | `100%` | `0.800` | `1.000` | `+0.200` | `+1 / -0` |
 | **Exactitude Factuelle** (`factual_accuracy`) | 3 | `100%` | `100%` | `1.000` | `1.000` | `0.000` | `+0 / -0` |
 | **Total (24 Cas Appariés)** | **24** | **`45.8%`** | **`70.8%`** | **`0.629`** | **`0.756`** | **`+0.1265`** | **`9W · 12T · 3L`** |
+
+### 6.3 Benchmark d'Évolution à 6 Checkpoints `SmolLM2-135M` (`evorun-real-smollm2`)
+
+Archivé dans [`evidence/evolution/evolution_benchmark.json`](../../evidence/evolution/evolution_benchmark.json) avec empreintes SHA-256 en 5 domaines :
+
+| Version | Étape | Parents | Parcimonie | $L_2$ Base Directe | Somme $L_2$ | CKA Moyen | Réussite (`95%` Wilson CI) | Score Moyen |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | :--- | ---: |
+| `v0 · SmolLM2-Base` | `Base Model` | — | `0.00%` | `0.0000` | `0.0000` | `1.0000` | `20.8%` (`[9%, 40%]`) | `0.405` |
+| `v1a · Instruct-SFT` | `Instruction Tuning` | `v0` | `0.00%` | `180.6458` | `180.6458` | `0.8522` | `33.3%` (`[18%, 53%]`) | `0.595` |
+| `v1b · SFT-Conservative` | `SFT` | `v0` | `0.00%` | `63.2538` | `63.2538` | `0.8728` | `20.8%` (`[9%, 40%]`) | `0.334` |
+| `v2 · Merged-AB` | `Model Merging` | `0.75 v1a + 0.25 v1b` | `0.00%` | `151.2651` | `210.2947` | `0.8517` | **`37.5%`** (`[21%, 57%]`) | `0.559` |
+| `v3 · Quantized-LowBit` | `Quantization` (`step=0.045`) | `v2` | `11.71%` | `213.1721` | `360.7001` | `0.8553` | `33.3%` (`[18%, 53%]`) | `0.425` |
+| `v4 · Pruned-MLP` | `Pruning` (`|w|<0.06`, `L6..29`) | `v3` | **`20.84%`** | **`264.2170`** | **`518.1110`** | **`0.8481`** | **`16.7%`** (`[7%, 36%]`) | **`0.356`** |
 
 ---
 

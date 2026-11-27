@@ -141,6 +141,7 @@ class RegisteredCheckpoint:
     validation_status: CheckpointValidationStatus
     duplicate_of_checkpoint_id: str | None = None
     security_notes: list[str] = field(default_factory=list)
+    component_fingerprints: dict[str, str | None] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)

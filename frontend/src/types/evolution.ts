@@ -72,6 +72,7 @@ export interface EvolutionCheckpoint {
   validation_status: string;
   duplicate_of_checkpoint_id: string | null;
   security_notes: string[];
+  component_fingerprints?: Record<string, string | null>;
 }
 
 export interface EvolutionGraphNode {
@@ -125,6 +126,9 @@ export interface EvolutionGraphPayload {
   root_checkpoint_ids: string[];
   leaf_checkpoint_ids: string[];
   branch_count: number;
+  analyzed_branch_count?: number;
+  branches_truncated?: boolean;
+  max_branches_limit?: number;
   branches: EvolutionBranchLineage[];
   nodes: EvolutionGraphNode[];
   edges: EvolutionGraphEdge[];
@@ -374,6 +378,7 @@ export interface RegressionOriginEvent {
   previous_label: string;
   transformation_type: string;
   affected_category: string;
+  regression_kind?: string;
   pass_rate_before: number;
   pass_rate_after: number;
   pass_rate_drop: number;
@@ -403,11 +408,17 @@ export interface RegressionOriginEvent {
   };
   statistical_confidence: {
     sample_size: number;
+    min_required_sample_size?: number;
+    is_exploratory?: boolean;
+    statistically_significant?: boolean;
     mcnemar_p_value: number;
+    holm_bonferroni_p_value?: number;
     confidence_level: string;
   };
   causal_verification: {
     causal_verification_exists: boolean;
+    causal_support_exists?: boolean;
+    verified_case_ids?: string[];
     epistemic_status: string;
     most_causal_layer: number | null;
     peak_recovery_fraction: number | null;
