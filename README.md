@@ -7,7 +7,7 @@
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B%20(3.12%20Verified)-18181b?style=flat-square)](pyproject.toml)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](frontend/package.json)
-[![Coverage 90%](https://img.shields.io/badge/Core%20Coverage-90%25%20(55%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(64%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](LICENSE)
 
 ---
@@ -34,7 +34,7 @@
 7. [Synthetic Streaming Throughput & Memory Benchmarks](#7-synthetic-streaming-throughput--memory-benchmarks)
 8. [Installation & Reproducible Quickstart](#8-installation--reproducible-quickstart)
 9. [CLI Reference (`neural-diff`)](#9-cli-reference-neural-diff)
-10. [REST API Reference (17 Endpoints)](#10-rest-api-reference-17-endpoints)
+10. [REST API Reference (37 Endpoints)](#10-rest-api-reference-37-endpoints)
 11. [Automated Testing, Coverage & Security Hardening](#11-automated-testing-coverage--security-hardening)
 12. [Evidence Integrity & Known Limitations](#12-evidence-integrity--known-limitations)
 13. [Repository Layout & Documentation Index](#13-repository-layout--documentation-index)
@@ -329,7 +329,7 @@ npm --prefix frontend run dev
 
 ---
 
-## 10. REST API Reference (17 Endpoints)
+## 10. REST API Reference (37 Endpoints)
 
 | Method | Endpoint | Layer / Function |
 | :--- | :--- | :--- |
@@ -353,7 +353,7 @@ npm --prefix frontend run dev
 | `POST/GET/PATCH/DELETE` | `/api/evolution/projects/{id}/checkpoints*` | Register SHA-256 fingerprinted checkpoints, detect duplicates/LoRA, rename, or remove |
 | `POST/DELETE` | `/api/evolution/projects/{id}/relationships*` | Add or delete parent-child / merge DAG edges with 3-color DFS cycle prevention |
 | `GET/POST` | `/api/evolution/projects/{id}/{graph,compare,analyze,runs,regressions}` | Query topological DAG, compare arbitrary pairs, run reproducible evolution analysis, or pinpoint regressions |
-| `GET/POST` | `/api/evolution/runs/{run_id}/export/{json,csv,html,pdf}` | Export multi-generation reports in RFC-8259 JSON, CSV, SVG-HTML, or multi-page `%PDF-1.4` |
+| `GET/POST` | `/api/evolution/runs/{run_id}/export/{json,csv,markdown,html,pdf}` | Export multi-generation reports in RFC-8259 JSON, CSV, Mermaid-Markdown, 5-SVG HTML, or multi-page `%PDF-1.4` |
 
 ---
 
@@ -383,8 +383,8 @@ Full documentation: [`docs/NEURAL_EVOLUTION_TRACKING.md`](docs/NEURAL_EVOLUTION_
 
 Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\python.exe scripts/run_security_audit.py`:
 
-* **Static Analysis:** `ruff check` (`exit 0`) and `mypy` across `85` Python source files (`exit 0`).
-* **Python Test Suites (`64 passed`):** Unit, DAG cycle, cumulative math, Hypothesis property-based invariant, multi-checkpoint & Evolution REST API integration, golden regression, and adversarial security suites—achieving **`89%` statement coverage** across `7,189` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
+* **Static Analysis:** `ruff check` (`exit 0`) and `mypy` across `86` Python source files (`exit 0`).
+* **Python Test Suites (`64 passed`):** Unit, DAG cycle, cumulative math, Hypothesis property-based invariant, multi-checkpoint & Evolution REST API integration, golden regression, and adversarial security suites—achieving **`89%` statement coverage** across `7,590` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
 * **Frontend & Live E2E:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 production build (`exit 0`), and live Playwright Chromium full-stack E2E (`2 passed`, `exit 0`).
 * **Vulnerability & Secret Audits:** `pip-audit` (`0` vulnerabilities), `npm audit` (`0` vulnerabilities), and secret scanner (`0` findings).
 

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from core.evolution.dag import EvolutionDAG
@@ -364,10 +365,20 @@ class MultiGenTensorEvolutionEngine:
             include_distributions=True,
         )
         eff_trans = transformation_type or ckpt_b.transformation_type.value
+        src_a = (
+            ckpt_a.resolved_path
+            if ckpt_a.resolved_path and Path(ckpt_a.resolved_path).exists()
+            else ckpt_a.source_path
+        )
+        src_b = (
+            ckpt_b.resolved_path
+            if ckpt_b.resolved_path and Path(ckpt_b.resolved_path).exists()
+            else ckpt_b.source_path
+        )
 
         with (
-            loader.load(ckpt_a.source_path, local_files_only=self.local_files_only) as ha,
-            loader.load(ckpt_b.source_path, local_files_only=self.local_files_only) as hb,
+            loader.load(src_a, local_files_only=self.local_files_only) as ha,
+            loader.load(src_b, local_files_only=self.local_files_only) as hb,
         ):
             compat = validate_compatibility(ha, hb)
             warnings = [

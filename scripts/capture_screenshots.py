@@ -310,7 +310,7 @@ def main() -> int:
 
             # View 11: Report export & interactive HTML preview
             page.get_by_test_id("nav-reports").click()
-            page.get_by_role("button", name="Preview Interactive HTML").click()
+            page.get_by_role("button", name="Visual Report").click()
             page.wait_for_timeout(500)
             _snap(
                 "11-report-export.png",

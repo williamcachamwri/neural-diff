@@ -117,12 +117,15 @@ def test_orchestrator_representation_compat_caching_cancellation_and_exports(tmp
     out_dir = tmp_path / "exports"
     p_json = exporter.export_file(res1, "json", out_dir)
     p_csv = exporter.export_file(res1, "csv", out_dir)
+    p_md = exporter.export_file(res1, "markdown", out_dir)
     p_html = exporter.export_file(res1, "html", out_dir)
     p_pdf = exporter.export_file(res1, "pdf", out_dir)
 
     parsed_json = json.loads(p_json.read_text(encoding="utf-8"))
     assert parsed_json["run_id"] == res1["run_id"]
     assert "[CHECKPOINT_REGISTRY]" in p_csv.read_text(encoding="utf-8")
+    md_txt = p_md.read_text(encoding="utf-8")
+    assert "```mermaid" in md_txt and "flowchart LR" in md_txt
     html_txt = p_html.read_text(encoding="utf-8")
     assert "<svg" in html_txt and "NEURAL DIFF" in html_txt
     pdf_bytes = p_pdf.read_bytes()

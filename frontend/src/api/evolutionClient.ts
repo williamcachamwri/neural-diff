@@ -196,10 +196,13 @@ export const evolutionApi = {
     );
   },
 
-  getExportUrl: (runId: string, fmt: "json" | "csv" | "html" | "pdf") =>
+  getExportUrl: (runId: string, fmt: "json" | "csv" | "markdown" | "html" | "pdf") =>
     `/api/evolution/runs/${encodeURIComponent(runId)}/export/${fmt}`,
 
-  fetchExportPreview: async (runId: string, fmt: "json" | "csv" | "html"): Promise<string> => {
+  fetchExportPreview: async (
+    runId: string,
+    fmt: "json" | "csv" | "markdown" | "html"
+  ): Promise<string> => {
     const resp = await fetch(`/api/evolution/runs/${encodeURIComponent(runId)}/export/${fmt}`);
     if (!resp.ok) {
       throw new ApiClientError(`EXPORT_${resp.status}`, `Failed to load ${fmt} export`, resp.status);

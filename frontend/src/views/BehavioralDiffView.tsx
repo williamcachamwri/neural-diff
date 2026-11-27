@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { DivergingDeltaBars, PolarRadarChart } from "../components/charts/StudioVisuals";
 import type { ComparisonBundle } from "../types/api";
 import { formatCategory, formatStatus } from "../utils/format";
 
@@ -80,6 +81,39 @@ export const BehavioralDiffView: React.FC<Props> = ({ activeBundle }) => {
           <div className="kpi-sub">Greedy decoding · seed 42</div>
         </div>
       </div>
+
+      {/* Capability Polygon & Suite Delta Visual Panel */}
+      {beh.category_summaries.length >= 3 && (
+        <div className="panel">
+          <div className="panel-header">
+            <h3 className="panel-title">Capability Geometry &amp; Suite Deltas</h3>
+            <span className="panel-subtitle mono">Model A vs Model B across {beh.category_summaries.length} suites</span>
+          </div>
+          <div className="grid-2" style={{ alignItems: "center" }}>
+            <PolarRadarChart
+              axes={beh.category_summaries.map((c) => formatCategory(c.category))}
+              series={[
+                {
+                  label: "Model A",
+                  values: beh.category_summaries.map((c) => c.mean_score_a),
+                  color: "#71717a",
+                },
+                {
+                  label: "Model B",
+                  values: beh.category_summaries.map((c) => c.mean_score_b),
+                  color: "#d6c5a9",
+                },
+              ]}
+            />
+            <DivergingDeltaBars
+              items={beh.category_summaries.map((c) => ({
+                label: formatCategory(c.category),
+                delta: c.mean_score_delta,
+              }))}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Domain Suite Breakdown with Visual Paired Bars */}
       <div className="panel">

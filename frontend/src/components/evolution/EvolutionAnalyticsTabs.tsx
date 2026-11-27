@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { evolutionApi } from "../../api/evolutionClient";
 import type { EvolutionRunBundle, TransitionTensorRecord } from "../../types/evolution";
+import {
+  DualTrajectoryChart,
+  PixelMatrixHeatmap,
+  PolarRadarChart,
+  humanizeEnum,
+} from "../charts/StudioVisuals";
 
 const fmtFloat = (v: number | null | undefined, digits = 6): string =>
   v == null || Number.isNaN(v) ? "—" : v.toFixed(digits);
@@ -42,11 +48,29 @@ export const WeightEvolutionSection: React.FC<{
         </div>
 
         {baseSeries.length > 0 ? (
-          <svg
-            viewBox={`0 0 920 ${Math.max(70, baseSeries.length * 32 + 24)}`}
-            width="100%"
-            style={{ display: "block", marginBottom: 14 }}
-          >
+          <>
+            <DualTrajectoryChart
+              xLabels={baseSeries.map((r) => r.target_label)}
+              primary={baseSeries.map((r) => r.l2_distance)}
+              primaryLabel="Direct ||W_current − W_base||_2"
+              secondary={baseSeries.map((r) => r.sum_of_step_l2_along_path ?? r.l2_distance)}
+              secondaryLabel="Sum of Step L2"
+              yMin={0}
+              yMax={
+                Math.max(
+                  1,
+                  ...baseSeries.map((r) =>
+                    Math.max(r.l2_distance ?? 0, r.sum_of_step_l2_along_path ?? 0)
+                  )
+                ) * 1.08
+              }
+              height={186}
+            />
+            <svg
+              viewBox={`0 0 920 ${Math.max(70, baseSeries.length * 32 + 24)}`}
+              width="100%"
+              style={{ display: "block", marginTop: 12, marginBottom: 14 }}
+            >
             {baseSeries.map((row, idx) => {
               const l2 = row.l2_distance ?? 0;
               const sumStep = row.sum_of_step_l2_along_path ?? l2;
@@ -89,7 +113,8 @@ export const WeightEvolutionSection: React.FC<{
                 </g>
               );
             })}
-          </svg>
+            </svg>
+          </>
         ) : (
           <div className="panel-subtitle">No base-to-current transitions available.</div>
         )}
@@ -136,7 +161,9 @@ export const WeightEvolutionSection: React.FC<{
             <tbody>
               {filtered.map((t, i) => (
                 <tr key={`${t.scope}-${t.source_checkpoint_id}-${t.target_checkpoint_id}-${i}`}>
-                  <td className="mono">{t.scope}</td>
+                  <td style={{ color: "var(--text-secondary)", whiteSpace: "nowrap" }}>
+                    {humanizeEnum(t.scope)}
+                  </td>
                   <td className="mono">
                     {t.source_label} → {t.target_label}
                   </td>
@@ -265,14 +292,22 @@ export const LayerEvolutionSection: React.FC<{ bundle: EvolutionRunBundle }> = (
       <div className="panel">
         <div className="panel-header">
           <div>
-            <h3 className="panel-title">Layer Weight Evolution Heatmap (Transitions × Layers)</h3>
+            <h3 className="panel-title">Layer Weight Evolution Matrix (Transitions × Layers)</h3>
             <div className="panel-subtitle">
-              Cell intensity normalized to peak transition Relative L2 ({maxHeat.toFixed(6)})
+              Peak transition Relative L2 = {maxHeat.toFixed(6)}
             </div>
           </div>
         </div>
 
-        <div className="data-table-wrap">
+        <PixelMatrixHeatmap
+          rowLabels={rows.map((r) => r.transition_label)}
+          colLabels={lids.map((lid) => `L${lid}`)}
+          matrix={rows.map((r) => r.relative_l2_by_layer)}
+          minVal={0}
+          maxVal={maxHeat}
+        />
+
+        <div className="data-table-wrap" style={{ marginTop: 14 }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -385,75 +420,68 @@ export const BehavioralEvolutionSection: React.FC<{ bundle: EvolutionRunBundle }
     new Set(beh.timeline.flatMap((t) => Object.keys(t.category_scores)))
   ).sort();
 
+  const radarSeries = (() => {
+    if (allCategories.length < 3 || beh.timeline.length === 0) return [];
+    const picks = [beh.timeline[0]];
+    if (beh.timeline.length > 2) {
+      const peakMid = beh.timeline
+        .slice(1, -1)
+        .reduce((best, cur) => (cur.pass_rate > best.pass_rate ? cur : best), beh.timeline[1]);
+      picks.push(peakMid);
+    }
+    if (beh.timeline.length > 1) {
+      picks.push(beh.timeline[beh.timeline.length - 1]);
+    }
+    const palette = ["#71717a", "#4ade80", "#d6c5a9"];
+    return picks.map((item, idx) => ({
+      label: item.version_label,
+      values: allCategories.map((c) => item.category_scores[c] ?? 0),
+      color: palette[idx % palette.length],
+    }));
+  })();
+
   return (
     <div data-testid="evo-section-behavioral">
-      <div className="editorial-footnote">{beh.statistical_disclosure}</div>
-
       <div className="panel">
         <div className="panel-header">
           <div>
             <h3 className="panel-title">
-              Multi-Generation Capability & Pass-Rate Timeline ({beh.suite_id}@{beh.suite_version})
+              Multi-Generation Capability &amp; Pass-Rate Trajectory ({beh.suite_id}@{beh.suite_version})
             </h3>
             <div className="panel-subtitle">
-              Deterministic programmatic rubric over n={beh.sample_size} cases with 95% Wilson CIs
+              Deterministic programmatic suites · n={beh.sample_size} paired cases · 95% Wilson CI
             </div>
           </div>
         </div>
 
-        <svg
-          viewBox={`0 0 760 ${Math.max(80, beh.timeline.length * 34 + 20)}`}
-          width="100%"
-          style={{ display: "block", marginBottom: 14 }}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: radarSeries.length > 0 ? "1.45fr 1fr" : "1fr",
+            gap: 16,
+            alignItems: "center",
+            marginBottom: 16,
+          }}
         >
-          {beh.timeline.map((item, idx) => {
-            const y = 14 + idx * 34;
-            const barW = Math.max(3, Math.round(item.pass_rate * 360));
-            const ciLowX = 180 + Math.round(item.pass_rate_wilson_ci95[0] * 360);
-            const ciHighX = 180 + Math.round(item.pass_rate_wilson_ci95[1] * 360);
-            return (
-              <g key={item.checkpoint_id}>
-                <text
-                  x={4}
-                  y={y + 13}
-                  fill="#e4e4e7"
-                  fontSize={11.5}
-                  fontFamily="JetBrains Mono, monospace"
-                >
-                  {item.version_label.slice(0, 22)}
-                </text>
-                <rect
-                  x={180}
-                  y={y + 3}
-                  width={360}
-                  height={11}
-                  fill="rgba(255,255,255,0.05)"
-                  rx={2}
-                />
-                <rect x={180} y={y + 3} width={barW} height={11} fill="#e4e4e7" rx={2} />
-                <line
-                  x1={ciLowX}
-                  y1={y + 8.5}
-                  x2={ciHighX}
-                  y2={y + 8.5}
-                  stroke="#d6c5a9"
-                  strokeWidth={1.6}
-                />
-                <text
-                  x={552}
-                  y={y + 13}
-                  fill="#a1a1aa"
-                  fontSize={11}
-                  fontFamily="JetBrains Mono, monospace"
-                >
-                  {fmtPct(item.pass_rate)} · score {item.mean_score.toFixed(3)} · CI [
-                  {fmtPct(item.pass_rate_wilson_ci95[0], 0)},{" "}
-                  {fmtPct(item.pass_rate_wilson_ci95[1], 0)}]
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+          <DualTrajectoryChart
+            xLabels={beh.timeline.map((t) => t.version_label)}
+            primary={beh.timeline.map((t) => t.pass_rate)}
+            primaryLabel="Pass Rate"
+            secondary={beh.timeline.map((t) => t.mean_score)}
+            secondaryLabel="Mean Rubric Score"
+            ciBands={beh.timeline.map((t) => t.pass_rate_wilson_ci95)}
+            yMin={0}
+            yMax={1}
+            height={210}
+          />
+          {radarSeries.length > 0 && (
+            <PolarRadarChart
+              axes={allCategories.map((c) => humanizeEnum(c))}
+              series={radarSeries}
+              size={258}
+            />
+          )}
+        </div>
 
         <div className="data-table-wrap">
           <table className="data-table">
@@ -582,10 +610,19 @@ export const RepresentationEvolutionSection: React.FC<{ bundle: EvolutionRunBund
               Representation Evolution Matrix (Centered Linear CKA vs Base Model)
             </h3>
             <div className="panel-subtitle">
-              Pooled across {rep.prompt_count} controlled diagnostic prompts; incompatible
-              tokenization/architectures explicitly flagged
+              Pooled across {rep.prompt_count} diagnostic prompts · scale &amp; orthogonal invariant
             </div>
           </div>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <PixelMatrixHeatmap
+            rowLabels={rows.map((r) => r.version_label)}
+            colLabels={lids.map((lid) => `L${lid}`)}
+            matrix={rows.map((r) => r.layer_cka)}
+            minVal={0}
+            maxVal={1}
+          />
         </div>
 
         <div className="data-table-wrap">
@@ -689,13 +726,6 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
   const events = bundle.regression_events ?? [];
   return (
     <div data-testid="evo-section-regressions">
-      <div className="editorial-footnote">
-        Automatic Regression Origin Pinpointing identifies the earliest DAG transition where each
-        capability drop occurred. Co-occurring layer weight or CKA shifts are strictly labeled{" "}
-        <span className="mono">CORRELATED</span> and are never claimed as causal unless verified by
-        interventional residual-stream patching (<span className="mono">CAUSALLY VERIFIED</span>).
-      </div>
-
       {events.length === 0 ? (
         <div className="panel">
           <div className="panel-subtitle">
@@ -710,19 +740,19 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
                 <h3 className="panel-title">
                   <span className="status-inline" style={{ marginRight: 10 }}>
                     <span className="dot dot-danger" />
-                    <span className="mono">{ev.affected_category}</span>
+                    <span>{humanizeEnum(ev.affected_category)}</span>
                   </span>
                   {ev.previous_label} → {ev.first_affected_label} ({ev.transformation_type})
                 </h3>
                 <div className="panel-subtitle">{ev.interpretation_note}</div>
               </div>
-              <span className="status-inline mono">
+              <span className="status-inline">
                 <span
                   className={`dot ${
-                    ev.causal_verification.causal_verification_exists ? "dot-ivory" : "dot-warn"
+                    ev.causal_verification.causal_verification_exists ? "dot-ok" : "dot-ivory"
                   }`}
                 />
-                {ev.epistemic_status}
+                {humanizeEnum(ev.epistemic_status)}
               </span>
             </div>
 
@@ -812,20 +842,44 @@ export const ExperimentExportSection: React.FC<{
   onRerun: (force: boolean) => void;
   running: boolean;
 }> = ({ bundle, onRerun, running }) => {
-  const [previewFmt, setPreviewFmt] = useState<"json" | "csv" | "html">("csv");
+  const [previewFmt, setPreviewFmt] = useState<"html" | "markdown" | "csv" | "json">("html");
   const [previewText, setPreviewText] = useState<string>("");
   const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
 
-  const handleLoadPreview = async (fmt: "json" | "csv" | "html") => {
+  const handleLoadPreview = async (fmt: "html" | "markdown" | "csv" | "json") => {
     setPreviewFmt(fmt);
     setLoadingPreview(true);
     try {
       const txt = await evolutionApi.fetchExportPreview(bundle.run_id, fmt);
-      setPreviewText(txt.slice(0, 6000));
+      setPreviewText(fmt === "html" ? txt : txt.slice(0, 12000));
+    } catch {
+      setPreviewText("");
     } finally {
       setLoadingPreview(false);
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingPreview(true);
+    evolutionApi
+      .fetchExportPreview(bundle.run_id, "html")
+      .then((txt) => {
+        if (!cancelled) {
+          setPreviewFmt("html");
+          setPreviewText(txt);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPreviewText("");
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingPreview(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [bundle.run_id]);
 
   const prov = bundle.provenance;
 
@@ -834,10 +888,10 @@ export const ExperimentExportSection: React.FC<{
       <div className="panel">
         <div className="panel-header">
           <div>
-            <h3 className="panel-title">Experiment Reproducibility & Provenance Ledger</h3>
+            <h3 className="panel-title">Experiment Reproducibility &amp; Provenance</h3>
             <div className="panel-subtitle">
-              Content-addressed SHA-256 caching ensures cached results are invalidated if any
-              checkpoint, relationship, dataset, or tolerance changes
+              Content-addressed SHA-256 cache invalidates automatically on any checkpoint, edge,
+              dataset, or tolerance mutation
             </div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
@@ -901,52 +955,79 @@ export const ExperimentExportSection: React.FC<{
       <div className="panel" data-testid="evo-export-panel">
         <div className="panel-header">
           <div>
-            <h3 className="panel-title">Export Evolution Reports (JSON · CSV · HTML · PDF)</h3>
+            <h3 className="panel-title">Report Artifacts (HTML · MD · PDF · CSV · JSON)</h3>
             <div className="panel-subtitle">
-              Complete provenance, checkpoint hashes, direct cumulative L2, layer heatmaps, CKA
-              matrices, and epistemic status classifications
+              Minimalist multi-format exports with embedded vector DAG, heatmaps, CKA matrices, and
+              Mermaid graphs
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {(["json", "csv", "html", "pdf"] as const).map((fmt) => (
+            {(
+              [
+                { fmt: "html", ext: "html", label: "HTML" },
+                { fmt: "markdown", ext: "md", label: "MD" },
+                { fmt: "pdf", ext: "pdf", label: "PDF" },
+                { fmt: "csv", ext: "csv", label: "CSV" },
+                { fmt: "json", ext: "json", label: "JSON" },
+              ] as const
+            ).map(({ fmt, ext, label }) => (
               <a
                 key={fmt}
                 className="btn"
                 data-testid={`btn-evo-download-${fmt}`}
                 href={evolutionApi.getExportUrl(bundle.run_id, fmt)}
-                download={`${bundle.run_id}.${fmt}`}
+                download={`${bundle.run_id}.${ext}`}
               >
                 <Download size={12} />
-                <span className="mono">{fmt.toUpperCase()}</span>
+                <span className="mono">{label}</span>
               </a>
             ))}
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-          {(["csv", "json", "html"] as const).map((fmt) => (
+        <div className="segmented-bar" style={{ marginBottom: 12 }}>
+          {(
+            [
+              { fmt: "html", label: "Visual HTML" },
+              { fmt: "markdown", label: "Markdown" },
+              { fmt: "csv", label: "CSV" },
+              { fmt: "json", label: "JSON" },
+            ] as const
+          ).map(({ fmt, label }) => (
             <button
               key={fmt}
               type="button"
               data-testid={`btn-evo-preview-${fmt}`}
-              className="btn"
-              style={{
-                borderColor: previewFmt === fmt && previewText ? "var(--border-focus)" : undefined,
-              }}
+              className={`segmented-btn ${previewFmt === fmt ? "active" : ""}`}
               onClick={() => void handleLoadPreview(fmt)}
             >
-              Preview {fmt.toUpperCase()}
+              {label}
             </button>
           ))}
         </div>
 
         {loadingPreview && <div className="panel-subtitle">Loading report preview…</div>}
-        {previewText && !loadingPreview && (
+        {previewText && !loadingPreview && previewFmt === "html" && (
+          <iframe
+            data-testid="evo-export-preview-content"
+            title="Evolution Visual HTML Report Preview"
+            sandbox=""
+            srcDoc={previewText}
+            style={{
+              width: "100%",
+              height: 540,
+              border: "1px solid var(--border-subtle)",
+              borderRadius: 8,
+              background: "#09090b",
+            }}
+          />
+        )}
+        {previewText && !loadingPreview && previewFmt !== "html" && (
           <pre
             data-testid="evo-export-preview-content"
             className="mono"
             style={{
-              maxHeight: 320,
+              maxHeight: 420,
               overflow: "auto",
               padding: 14,
               background: "#09090b",

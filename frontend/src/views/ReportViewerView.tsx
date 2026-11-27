@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => {
-  const [format, setFormat] = useState<"markdown" | "html" | "json">("markdown");
+  const [format, setFormat] = useState<"markdown" | "html" | "json">("html");
   const [content, setContent] = useState<string>("");
 
   useEffect(() => {
@@ -59,17 +59,17 @@ export const ReportViewerView: React.FC<Props> = ({ activeBundle, onError }) => 
             <div className="segmented-bar">
               <button
                 type="button"
+                className={`segmented-btn ${format === "html" ? "active" : ""}`}
+                onClick={() => setFormat("html")}
+              >
+                Visual Report
+              </button>
+              <button
+                type="button"
                 className={`segmented-btn ${format === "markdown" ? "active" : ""}`}
                 onClick={() => setFormat("markdown")}
               >
                 Markdown
-              </button>
-              <button
-                type="button"
-                className={`segmented-btn ${format === "html" ? "active" : ""}`}
-                onClick={() => setFormat("html")}
-              >
-                Preview Interactive HTML
               </button>
               <button
                 type="button"

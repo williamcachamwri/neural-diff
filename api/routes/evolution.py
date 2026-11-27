@@ -473,10 +473,10 @@ def build_evolution_router(
     @router.get("/runs/{run_id}/export/{fmt}")
     def export_evolution_report(run_id: str, fmt: str) -> Response:
         fmt_l = fmt.lower().strip()
-        if fmt_l not in ("json", "csv", "html", "pdf"):
+        if fmt_l not in ("json", "csv", "markdown", "md", "html", "pdf"):
             raise HTTPException(
                 status_code=400,
-                detail="Export format must be json, csv, html, or pdf.",
+                detail="Export format must be json, csv, markdown, html, or pdf.",
             )
         bundle = evo_store.get_run(run_id)
         if bundle.get("status") != "completed":
@@ -496,6 +496,12 @@ def build_evolution_router(
                 content=exporter.to_csv(bundle),
                 media_type="text/csv; charset=utf-8",
                 headers={"Content-Disposition": f'attachment; filename="{run_id}.csv"'},
+            )
+        if fmt_l in ("markdown", "md"):
+            return Response(
+                content=exporter.to_markdown(bundle),
+                media_type="text/markdown; charset=utf-8",
+                headers={"Content-Disposition": f'attachment; filename="{run_id}.md"'},
             )
         if fmt_l == "html":
             return Response(

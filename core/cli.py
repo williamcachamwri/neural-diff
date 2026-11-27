@@ -255,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
                     exp = EvolutionReportExporter()
                     exported = {
                         fmt: str(exp.export_file(run_res, fmt, args.output_dir))
-                        for fmt in ("json", "csv", "html", "pdf")
+                        for fmt in ("json", "csv", "markdown", "html", "pdf")
                     }
                     print(
                         json.dumps(

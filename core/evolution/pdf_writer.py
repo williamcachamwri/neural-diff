@@ -194,6 +194,62 @@ class MinimalPDFBuilder:
             self._y -= bar_h + 3.0
         self._y -= 4.0
 
+    def add_polyline_chart(
+        self,
+        title: str,
+        x_labels: list[str],
+        values: list[float],
+        *,
+        max_value: float = 1.0,
+    ) -> None:
+        """Render a minimalist vector polyline trajectory chart directly in PDF page coordinates."""
+        if not x_labels or not values:
+            return
+        chart_h = 68.0
+        needed = 24.0 + chart_h + 16.0
+        self._ensure_space(needed)
+        s = self._stream()
+        s.append(
+            f"BT /F2 8.8 Tf 0.14 0.14 0.18 rg {MARGIN_X:.1f} {self._y - 9.0:.1f} Td ({_pdf_escape(title)}) Tj ET"
+        )
+        self._y -= 14.0
+
+        plot_x = MARGIN_X + 28.0
+        plot_w = CONTENT_W - 40.0
+        plot_bottom = self._y - chart_h
+        eff_max = max(max_value, max(values, default=1.0), 1e-6)
+
+        # Frame + horizontal mid-line
+        s.append(
+            f"0.86 0.86 0.89 RG 0.5 w {plot_x:.1f} {plot_bottom:.1f} {plot_w:.1f} {chart_h:.1f} re S"
+        )
+        mid_y = plot_bottom + chart_h * 0.5
+        s.append(
+            f"0.91 0.91 0.93 RG 0.4 w {plot_x:.1f} {mid_y:.1f} m {plot_x + plot_w:.1f} {mid_y:.1f} l S"
+        )
+
+        n = len(values)
+        pts: list[tuple[float, float]] = []
+        for idx, val in enumerate(values):
+            px = plot_x + (idx / max(1, n - 1)) * plot_w if n > 1 else plot_x + plot_w * 0.5
+            py = plot_bottom + max(0.0, min(1.0, val / eff_max)) * (chart_h - 8.0) + 4.0
+            pts.append((px, py))
+
+        if len(pts) >= 2:
+            path_cmds = [f"{pts[0][0]:.1f} {pts[0][1]:.1f} m"]
+            for px, py in pts[1:]:
+                path_cmds.append(f"{px:.1f} {py:.1f} l")
+            s.append(f"0.15 0.16 0.20 RG 1.3 w {' '.join(path_cmds)} S")
+
+        for idx, (px, py) in enumerate(pts):
+            s.append(f"0.12 0.12 0.16 rg {px - 1.8:.1f} {py - 1.8:.1f} 3.6 3.6 re f")
+            lbl = x_labels[idx][:12] if idx < len(x_labels) else ""
+            s.append(
+                f"BT /F3 6.8 Tf 0.35 0.35 0.40 rg {max(MARGIN_X, px - 16.0):.1f} {plot_bottom - 10.0:.1f} Td ({_pdf_escape(lbl)}) Tj ET"
+            )
+
+        self._y -= chart_h + 18.0
+
     def to_bytes(self) -> bytes:
         """Assemble PDF object graph, exact byte-offset xref table, and trailer."""
         # Object IDs:

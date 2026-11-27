@@ -132,7 +132,7 @@ Long-running jobs support background execution (`async_job: true`), live step te
 
 - **Centered Linear CKA (`[0.0, 1.0]`):** Invariant to orthogonal transformations and isotropic scaling. Values near `1.000` indicate preserved representational geometry relative to the Base Model; `representation_drift = 1.0 - CKA` quantifies structural representation reorganization across depth.
 - **Hidden-State Cosine Similarity:** Sensitive to coordinate-aligned rotation and sign flips when hidden dimensions match.
-- **Next-Token Logit JS Divergence:**Bounded symmetric divergence (`[0, ln 2]`) between output token probability distributions.
+- **Next-Token Logit JS Divergence:** Bounded symmetric divergence (`[0, ln 2]`) between output token probability distributions.
 - **Logit Lens (`OBSERVED`):** Projects intermediate residual states through the final normalization and unembedding head (`lm_head`) when dimensionally compatible.
 
 ---
@@ -164,7 +164,7 @@ When evaluating a lineage such as `Base (92%) -> SFT (95%) -> DPO (91%) -> Quant
 
 ---
 
-## 10. Reproducibility & Multi-Format Exports (`JSON`, `CSV`, `HTML`, `PDF`)
+## 10. Reproducibility & Multi-Format Exports (`JSON`, `CSV`, `Markdown`, `HTML`, `PDF`)
 
 Every analysis computes a deterministic **content-addressed SHA-256 cache key** over:
 1. Sorted checkpoint SHA-256 content fingerprints & tensor structure hashes
@@ -173,4 +173,4 @@ Every analysis computes a deterministic **content-addressed SHA-256 cache key** 
 4. Canonical analysis configuration (`seed`, `tolerances`, thresholds, modules)
 5. `neural_diff` software version.
 
-Cached runs are **automatically invalidated** whenever any checkpoint weight, DAG edge, dataset case, seed, or tolerance changes, and can always be bypassed with `force_rerun=True`. Completed runs export directly via `GET /api/evolution/runs/{run_id}/export/{json|csv|html|pdf}` or `EvolutionReportExporter`.
+Cached runs are **automatically invalidated** whenever any checkpoint weight, DAG edge, dataset case, seed, or tolerance changes, and can always be bypassed with `force_rerun=True`. Completed runs export directly via `GET /api/evolution/runs/{run_id}/export/{json|csv|markdown|html|pdf}` or `EvolutionReportExporter`, including embedded Mermaid DAGs & Unicode gauges in Markdown, 5 data-driven SVGs in HTML, and multi-page vector bar & polyline charts in PDF 1.4.

@@ -326,7 +326,7 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
 
     exporter = EvolutionReportExporter()
     exports_dir = EVOLUTION_EVIDENCE / "exports"
-    for fmt in ("json", "csv", "html", "pdf"):
+    for fmt in ("json", "csv", "markdown", "html", "pdf"):
         exporter.export_file(bundle, fmt, exports_dir)
 
     return bundle
@@ -448,7 +448,7 @@ def capture_12_evolution_screenshots_and_e2e() -> list[dict[str, Any]]:
 
             # 3. Evolution timeline (wait for live pair comparison to finish completely before snapping!)
             page.get_by_test_id("btn-evo-compare-pair").click()
-            page.get_by_text("Scope · Common Ancestor").wait_for(timeout=20_000)
+            page.get_by_text("Scope · Common Ancestor").wait_for(timeout=45_000)
             page.get_by_test_id("evo-timeline-table").scroll_into_view_if_needed()
             _snap(
                 "17-evolution-timeline.png",
@@ -596,6 +596,10 @@ def main() -> int:
             if existing.get("status") == "completed":
                 bundle = existing
                 print("1/2 Reusing verified real SmolLM2-135M run evorun-real-smollm2 from SQLite.")
+                exporter = EvolutionReportExporter()
+                exports_dir = EVOLUTION_EVIDENCE / "exports"
+                for fmt in ("json", "csv", "markdown", "html", "pdf"):
+                    exporter.export_file(bundle, fmt, exports_dir)
         except Exception:
             bundle = None
 

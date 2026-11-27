@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeftRight, ChevronLeft, ChevronRight, Play, Plus } from "lucide-react";
 import type { ApiClientError } from "../api/client";
 import { evolutionApi } from "../api/evolutionClient";
+import { DualTrajectoryChart, humanizeEnum } from "../components/charts/StudioVisuals";
 import {
   BehavioralEvolutionSection,
   ExperimentExportSection,
@@ -310,6 +311,13 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
     return Array.from(new Set(timeline.flatMap((t) => Object.keys(t.category_scores)))).sort();
   }, [activeRun]);
 
+  const baseWeightSeries = useMemo(
+    () => (activeRun?.tensor_transitions ?? []).filter((t) => t.scope === "base_to_current"),
+    [activeRun]
+  );
+  const behTimeline = activeRun?.behavioral_evolution?.timeline ?? [];
+  const repRows = activeRun?.representation_evolution?.evolution_matrix?.rows ?? [];
+
   return (
     <div data-testid="evolution-studio-view">
       {/* Project Toolbar & Sub-Tab Navigation */}
@@ -437,14 +445,93 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
             </div>
           </div>
 
+          {/* 3-Panel Visual Trajectory Triptych */}
+          {activeRun && (baseWeightSeries.length > 0 || behTimeline.length > 0) && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  behTimeline.length > 0 && repRows.length > 0 ? "repeat(3, minmax(0, 1fr))" : "1fr",
+                gap: 14,
+                marginBottom: 16,
+              }}
+            >
+              {baseWeightSeries.length > 0 && (
+                <div className="panel" style={{ marginBottom: 0 }}>
+                  <div className="panel-header">
+                    <h3 className="panel-title">Direct Cumulative Weight Δ</h3>
+                    <span className="panel-subtitle mono">||W_current − W_base||_2</span>
+                  </div>
+                  <DualTrajectoryChart
+                    xLabels={baseWeightSeries.map((t) => t.target_label)}
+                    primary={baseWeightSeries.map((t) => t.l2_distance)}
+                    primaryLabel="Direct L2"
+                    secondary={baseWeightSeries.map(
+                      (t) => t.sum_of_step_l2_along_path ?? t.l2_distance
+                    )}
+                    secondaryLabel="Step Sum"
+                    yMin={0}
+                    yMax={
+                      Math.max(
+                        1,
+                        ...baseWeightSeries.map((t) =>
+                          Math.max(t.l2_distance ?? 0, t.sum_of_step_l2_along_path ?? 0)
+                        )
+                      ) * 1.08
+                    }
+                    height={176}
+                  />
+                </div>
+              )}
+
+              {behTimeline.length > 0 && (
+                <div className="panel" style={{ marginBottom: 0 }}>
+                  <div className="panel-header">
+                    <h3 className="panel-title">Capability Trajectory</h3>
+                    <span className="panel-subtitle mono">Pass rate + 95% CI</span>
+                  </div>
+                  <DualTrajectoryChart
+                    xLabels={behTimeline.map((b) => b.version_label)}
+                    primary={behTimeline.map((b) => b.pass_rate)}
+                    primaryLabel="Pass Rate"
+                    secondary={behTimeline.map((b) => b.mean_score)}
+                    secondaryLabel="Mean Score"
+                    ciBands={behTimeline.map((b) => b.pass_rate_wilson_ci95)}
+                    yMin={0}
+                    yMax={1}
+                    height={176}
+                  />
+                </div>
+              )}
+
+              {repRows.length > 0 && (
+                <div className="panel" style={{ marginBottom: 0 }}>
+                  <div className="panel-header">
+                    <h3 className="panel-title">Representation Alignment</h3>
+                    <span className="panel-subtitle mono">Centered Linear CKA</span>
+                  </div>
+                  <DualTrajectoryChart
+                    xLabels={repRows.map((r) => r.version_label)}
+                    primary={repRows.map((r) => r.mean_cka_to_base)}
+                    primaryLabel="Mean CKA"
+                    secondary={repRows.map((r) => r.representation_drift)}
+                    secondaryLabel="Drift (1−CKA)"
+                    yMin={0}
+                    yMax={1}
+                    height={176}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Evidence-Backed Evolution Insights */}
           <div className="panel">
             <div className="panel-header">
               <div>
-                <h3 className="panel-title">Evidence-Backed Evolution Insights</h3>
+                <h3 className="panel-title">Empirical Evolution Findings</h3>
                 <div className="panel-subtitle">
-                  Automatically derived from verified weight, CKA, and deterministic rubric
-                  measurements (zero unverified AI prose)
+                  Threshold-verified weight, representation, and rubric signals
                 </div>
               </div>
             </div>
@@ -455,27 +542,29 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
                   <thead>
                     <tr>
                       <th>Domain</th>
-                      <th>Status</th>
-                      <th>Finding</th>
-                      <th>Cases / Checkpoints</th>
+                      <th>Evidence</th>
+                      <th>Observation</th>
+                      <th>Scope</th>
                     </tr>
                   </thead>
                   <tbody>
                     {activeRun.insights.map((ins) => (
                       <tr key={ins.insight_id}>
-                        <td className="mono">{ins.domain}</td>
-                        <td className="mono">
+                        <td style={{ color: "var(--text-secondary)", whiteSpace: "nowrap" }}>
+                          {humanizeEnum(ins.domain)}
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
                           <span className="status-inline">
                             <span
                               className={`dot ${
                                 ins.domain === "regression_origin" ? "dot-danger" : "dot-ivory"
                               }`}
                             />
-                            {ins.epistemic_status}
+                            {humanizeEnum(ins.epistemic_status)}
                           </span>
                         </td>
                         <td>{ins.statement}</td>
-                        <td className="mono">
+                        <td className="mono" style={{ color: "var(--text-muted)" }}>
                           {ins.evaluation_cases.length > 0
                             ? ins.evaluation_cases.join(", ")
                             : `${ins.checkpoints.length} ckpts`}
@@ -698,8 +787,8 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
               <div className="kpi-grid" style={{ marginBottom: 0 }}>
                 <div className="kpi-card">
                   <div className="kpi-label">Scope · Common Ancestor</div>
-                  <div className="kpi-value mono" style={{ fontSize: 15 }}>
-                    {pairComparison.result.scope}
+                  <div className="kpi-value" style={{ fontSize: 15 }}>
+                    {humanizeEnum(pairComparison.result.scope)}
                   </div>
                   <div className="kpi-sub">LCA: {pairComparison.lcaLabel ?? "None"}</div>
                 </div>

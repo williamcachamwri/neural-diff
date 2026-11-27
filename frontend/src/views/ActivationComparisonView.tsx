@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { DualTrajectoryChart } from "../components/charts/StudioVisuals";
 import type { ComparisonBundle } from "../types/api";
 
 interface Props {
@@ -31,6 +32,10 @@ export const ActivationComparisonView: React.FC<Props> = ({ activeBundle }) => {
     firstCka != null && lastCka != null ? lastCka - firstCka : null;
 
   const currentPrompt = act.prompt_diffs[promptIdx] ?? act.prompt_diffs[0];
+  const ckaSeries = layerIndices.map((lk) => act.summary.mean_hidden_cka_by_layer[lk] ?? null);
+  const cosSeries = layerIndices.map((lk) => act.summary.mean_hidden_cosine_by_layer[lk] ?? null);
+  const validVals = [...ckaSeries, ...cosSeries].filter((v): v is number => v != null);
+  const yMinCurve = validVals.length > 0 ? Math.max(0, Math.min(...validVals) - 0.05) : 0;
 
   return (
     <div data-testid="view-activations">
@@ -70,6 +75,25 @@ export const ActivationComparisonView: React.FC<Props> = ({ activeBundle }) => {
           <div className="kpi-sub">Final prompt token logits</div>
         </div>
       </div>
+
+      {layerIndices.length > 0 && (
+        <div className="panel">
+          <div className="panel-header">
+            <h3 className="panel-title">Depth Representation Trajectory</h3>
+            <span className="panel-subtitle mono">Centered Linear CKA vs Hidden Cosine</span>
+          </div>
+          <DualTrajectoryChart
+            xLabels={layerIndices.map((lk) => `L${lk}`)}
+            primary={ckaSeries}
+            primaryLabel="Centered Linear CKA"
+            secondary={cosSeries}
+            secondaryLabel="Hidden Cosine"
+            yMin={yMinCurve}
+            yMax={1}
+            height={195}
+          />
+        </div>
+      )}
 
       <div className="panel">
         <div className="panel-header">

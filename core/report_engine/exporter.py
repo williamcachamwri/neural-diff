@@ -19,6 +19,15 @@ from core import __version__
 from core.activation_analysis.comparator import ActivationDiffReport
 from core.behavioral_analysis.runner import BehavioralDiffReport
 from core.regression_engine.engine import RegressionReport
+from core.report_engine.visuals import (
+    human_label,
+    md_bar,
+    svg_dual_line_chart,
+    svg_lollipop_chart,
+    svg_matrix_heatmap,
+    svg_radar_polygon,
+    svg_segmented_ratio_bar,
+)
 from core.structural_analysis.diff import StructuralDiffReport
 from core.structural_analysis.neuron_attention import NeuronAttentionReport
 from core.tensor_engine.comparator import TensorDiffReport
@@ -166,43 +175,90 @@ def default_reproducibility_metadata() -> dict[str, Any]:
     }
 
 
+def _fmt_f(val: float | None, digits: int = 6) -> str:
+    if val is None:
+        return "—"
+    return f"{val:.{digits}f}"
+
+
 class ReportEngine:
     """Exports `ComparisonBundle` measurements into strict JSON, Markdown, and SVG-rich HTML."""
 
     def to_json(self, bundle: ComparisonBundle, *, include_full_tensor_records: bool = True) -> str:
         payload = bundle.to_dict(include_full_tensor_records=include_full_tensor_records)
-        # allow_nan=False enforces strict RFC-8259 JSON compliance
         return json.dumps(payload, indent=2, allow_nan=False)
 
     def to_markdown(self, bundle: ComparisonBundle) -> str:
         ledger = bundle.build_epistemic_ledger()
+        verdict_raw = bundle.regression.verdict if bundle.regression else "NOT_RUN"
+        verdict_lbl = human_label(verdict_raw)
+
+        chg_pct_lbl = (
+            f"{bundle.tensor_diff.global_changed_pct:.2f}% params Δ"
+            if bundle.tensor_diff is not None
+            else "Structural only"
+        )
+        cka_lbl = (
+            f"Final CKA {bundle.activation.cross_prompt_pooled_cka_final_layer:.4f}"
+            if (
+                bundle.activation is not None
+                and bundle.activation.cross_prompt_pooled_cka_final_layer is not None
+            )
+            else "No hooks"
+        )
+        beh_lbl = (
+            f"Pass {bundle.behavioral.overall_statistics.pass_rate_a:.0%} -> "
+            f"{bundle.behavioral.overall_statistics.pass_rate_b:.0%}"
+            if bundle.behavioral is not None
+            else "No behavioral run"
+        )
+
         lines: list[str] = [
             f"# NEURAL DIFF Report — `{bundle.comparison_id}`",
             "",
-            f"- **Experiment Classification:** `{bundle.experiment_type}`",
-            f"- **Generated (UTC):** `{bundle.created_at_utc}`",
-            f"- **Model A (Baseline):** `{bundle.model_a.model_id}` (`{bundle.model_a.total_parameters:,}` params, format=`{bundle.model_a.format.value}`, rev=`{bundle.model_a.revision or 'local'}`)",
-            f"- **Model B (Candidate):** `{bundle.model_b.model_id}` (`{bundle.model_b.total_parameters:,}` params, format=`{bundle.model_b.format.value}`, rev=`{bundle.model_b.revision or 'local'}`)",
-            f"- **Executed Modules:** `{', '.join(bundle.selected_modules)}`",
+            "| Baseline (A) | Candidate (B) | Mode | Gate | Generated (UTC) |",
+            "| :--- | :--- | :--- | :--- | :--- |",
+            (
+                f"| `{bundle.model_a.model_id}` ({bundle.model_a.total_parameters:,}) "
+                f"| `{bundle.model_b.model_id}` ({bundle.model_b.total_parameters:,}) "
+                f"| {human_label(bundle.experiment_type)} "
+                f"| **{verdict_lbl}** "
+                f"| `{bundle.created_at_utc[:19]}` |"
+            ),
             "",
-            "## 1. Epistemic Classification Ledger",
+            "```mermaid",
+            "flowchart LR",
+            f'  A["Model A\\n{bundle.model_a.model_id.split("/")[-1]}"] --> W["Weights\\n{chg_pct_lbl}"]',
+            f'  B["Model B\\n{bundle.model_b.model_id.split("/")[-1]}"] --> W',
+            f'  W --> R["Representations\\n{cka_lbl}"]',
+            f'  R --> E["Evaluation\\n{beh_lbl}"]',
+            f'  E --> G["Gate\\n{verdict_lbl}"]',
+            "```",
             "",
-            "| Status | Finding | Source |",
+            "## Key Findings",
+            "",
+            "| Evidence | Observation | Source |",
             "| :--- | :--- | :--- |",
         ]
         for c in ledger:
-            lines.append(f"| `{c.epistemic_status.value}` | {c.statement} | {c.evidence_source} |")
+            lines.append(
+                f"| {human_label(c.epistemic_status.value)} | {c.statement} | {c.evidence_source} |"
+            )
 
         if bundle.structural is not None:
             st = bundle.structural
             lines.extend(
                 [
                     "",
-                    "## 2. Structural & Compatibility Diff (`OBSERVED` / `INFERRED`)",
+                    "## Architecture & Alignment",
                     "",
-                    f"- **Compatibility Summary:** {st.compatibility.summary}",
-                    f"- **Parameter Delta:** `{st.delta_parameters:+,}` (`{st.model_a_parameters:,}` -> `{st.model_b_parameters:,}`)",
-                    f"- **Shared Keys:** `{len(st.shared_tensors)}` | **Added:** `{len(st.added_tensors)}` | **Removed:** `{len(st.removed_tensors)}` | **Inferred Renames (`INFERRED`):** `{len(st.inferred_renames)}` | **Shape Changes:** `{len(st.shape_changes)}` | **Dtype Changes:** `{len(st.dtype_changes)}`",
+                    "| Shared Tensors | Added | Removed | Renamed (Inferred) | Shape Δ | Dtype Δ | Param Δ |",
+                    "| ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+                    (
+                        f"| {len(st.shared_tensors)} | {len(st.added_tensors)} | {len(st.removed_tensors)} "
+                        f"| {len(st.inferred_renames)} | {len(st.shape_changes)} "
+                        f"| {len(st.dtype_changes)} | `{st.delta_parameters:+,}` |"
+                    ),
                 ]
             )
 
@@ -211,28 +267,67 @@ class ReportEngine:
             lines.extend(
                 [
                     "",
-                    "## 3. Tensor Diff Summary (`OBSERVED`)",
+                    "## Weight Perturbation",
                     "",
-                    f"- **Compared Tensors:** `{td.compared_tensors}` (Identical: `{td.identical_tensors}`, Within Tolerance: `{td.within_tolerance_tensors}`, Modified: `{td.modified_tensors}`)",
-                    f"- **Global Changed Parameters:** `{td.total_changed_parameters:,} / {td.total_compared_parameters:,}` (`{td.global_changed_pct:.4f}%`)",
-                    f"- **Global Mean Cosine Similarity:** `{td.global_mean_cosine}`",
-                    f"- **Global Mean Relative L2:** `{td.global_mean_relative_l2}`",
-                    f"- **Global Max Absolute Diff:** `{td.global_max_abs_diff}`",
-                    "",
-                    "### Top Diverged Tensors",
-                    "",
-                    "| Tensor | Role | Shape | Cosine | Relative L2 | Max Abs Diff | Changed % |",
-                    "| :--- | :--- | :--- | ---: | ---: | ---: | ---: |",
+                    "| Compared | Modified | Changed Params | Mean Cosine | Mean Rel L2 | Max \\|Δ\\| |",
+                    "| ---: | ---: | ---: | ---: | ---: | ---: |",
+                    (
+                        f"| {td.compared_tensors} | {td.modified_tensors} "
+                        f"| `{td.global_changed_pct:.2f}%` ({td.total_changed_parameters:,}) "
+                        f"| `{_fmt_f(td.global_mean_cosine, 6)}` "
+                        f"| `{_fmt_f(td.global_mean_relative_l2, 6)}` "
+                        f"| `{_fmt_f(td.global_max_abs_diff, 5)}` |"
+                    ),
                 ]
             )
-            rec_map = {r.name: r for r in td.records}
-            for tname in td.top_diverged_names[:10]:
-                rec = rec_map.get(tname)
-                if rec and rec.metrics:
-                    m = rec.metrics
+
+            if td.layer_summaries:
+                max_layer_l2 = max(
+                    (ls.mean_relative_l2 or 0.0 for ls in td.layer_summaries), default=1.0
+                ) or 1.0
+                lines.extend(
+                    [
+                        "",
+                        "### Layer Perturbation Profile",
+                        "",
+                        "| Layer | Mean Rel L2 | Mean Cosine | Changed % | Magnitude |",
+                        "| :--- | ---: | ---: | ---: | :--- |",
+                    ]
+                )
+                for ls in td.layer_summaries[:28]:
+                    bar = md_bar(ls.mean_relative_l2, max_layer_l2, width=14)
                     lines.append(
-                        f"| `{rec.name}` | `{rec.canonical_role.value}` | `{list(rec.shape_a or [])}` | "
-                        f"`{m.cosine_similarity}` | `{m.relative_l2}` | `{m.max_abs_diff}` | `{m.changed_pct:.2f}%` |"
+                        f"| `L{ls.layer_index}` | `{_fmt_f(ls.mean_relative_l2, 5)}` "
+                        f"| `{_fmt_f(ls.mean_cosine_similarity, 6)}` | `{ls.changed_pct:.1f}%` | `{bar}` |"
+                    )
+
+            rec_map = {r.name: r for r in td.records}
+            top_recs = [
+                rec_map[n]
+                for n in td.top_diverged_names[:10]
+                if n in rec_map and rec_map[n].metrics is not None
+            ]
+            if top_recs:
+                max_rec_l2 = max(
+                    (r.metrics.relative_l2 or 0.0 for r in top_recs if r.metrics), default=1.0
+                ) or 1.0
+                lines.extend(
+                    [
+                        "",
+                        "### Top Diverged Tensors",
+                        "",
+                        "| Tensor | Role | Cosine | Rel L2 | Max \\|Δ\\| | Profile |",
+                        "| :--- | :--- | ---: | ---: | ---: | :--- |",
+                    ]
+                )
+                for rec in top_recs:
+                    m = rec.metrics
+                    if m is None:
+                        continue
+                    lines.append(
+                        f"| `{rec.name}` | `{rec.canonical_role.value}` "
+                        f"| `{_fmt_f(m.cosine_similarity, 6)}` | `{_fmt_f(m.relative_l2, 5)}` "
+                        f"| `{_fmt_f(m.max_abs_diff, 5)}` | `{md_bar(m.relative_l2, max_rec_l2, 10)}` |"
                     )
 
         if bundle.activation is not None:
@@ -240,89 +335,130 @@ class ReportEngine:
             lines.extend(
                 [
                     "",
-                    "## 4. Activation Analysis (`OBSERVED`)",
+                    "## Representation Geometry",
                     "",
-                    f"- **Controlled Prompts Executed:** `{act.prompt_count}`",
-                    f"- **Mean Final-Token Logit JS Divergence:** `{act.mean_final_token_js_divergence}`",
-                    f"- **Cross-Prompt Final-Layer Linear CKA:** `{act.cross_prompt_pooled_cka_final_layer}`",
+                    "| Prompts | Final-Layer Linear CKA | Next-Token Logit JS |",
+                    "| ---: | ---: | ---: |",
+                    (
+                        f"| {act.prompt_count} "
+                        f"| `{_fmt_f(act.cross_prompt_pooled_cka_final_layer, 5)}` "
+                        f"| `{_fmt_f(act.mean_final_token_js_divergence, 5)}` |"
+                    ),
                 ]
             )
+            lkeys = sorted(act.mean_hidden_cosine_by_layer.keys(), key=int)
+            if lkeys:
+                lines.extend(
+                    [
+                        "",
+                        "| Layer | Linear CKA | Hidden Cosine | CKA Alignment |",
+                        "| :--- | ---: | ---: | :--- |",
+                    ]
+                )
+                for lk in lkeys[:28]:
+                    cka_v = act.mean_hidden_cka_by_layer.get(lk)
+                    cos_v = act.mean_hidden_cosine_by_layer.get(lk)
+                    lines.append(
+                        f"| `L{lk}` | `{_fmt_f(cka_v, 5)}` | `{_fmt_f(cos_v, 5)}` "
+                        f"| `{md_bar(cka_v, 1.0, 14)}` |"
+                    )
 
         if bundle.behavioral is not None:
             beh = bundle.behavioral
-            st_overall = beh.overall_statistics
+            st_ov = beh.overall_statistics
             lines.extend(
                 [
                     "",
-                    "## 5. Deterministic Behavioral Comparison (`OBSERVED`)",
+                    f"## Behavioral Evaluation (`{beh.suite_id}@{beh.suite_version}`)",
                     "",
-                    f"- **Suite:** `{beh.suite_id}@{beh.suite_version}` (`{st_overall.n_cases}` paired cases)",
-                    f"- **Pass Rate:** Model A `{st_overall.pass_rate_a:.1%}` -> Model B `{st_overall.pass_rate_b:.1%}` (Delta `{st_overall.pass_rate_delta:+.1%}`)",
-                    f"- **Mean Score:** Model A `{st_overall.mean_score_a:.4f}` -> Model B `{st_overall.mean_score_b:.4f}` (Delta `{st_overall.mean_score_delta:+.4f}`, 95% Bootstrap CI `[{st_overall.bootstrap_ci95_low:+.4f}, {st_overall.bootstrap_ci95_high:+.4f}]`, McNemar p=`{st_overall.mcnemar_p_value:.4f}`)",
+                    "| Cases | Pass A → B | Mean Score A → B | 95% Bootstrap CI | McNemar p |",
+                    "| ---: | :--- | :--- | :--- | ---: |",
+                    (
+                        f"| {st_ov.n_cases} | `{st_ov.pass_rate_a:.1%} → {st_ov.pass_rate_b:.1%}` "
+                        f"(`{st_ov.pass_rate_delta:+.1%}`) "
+                        f"| `{st_ov.mean_score_a:.3f} → {st_ov.mean_score_b:.3f}` (`{st_ov.mean_score_delta:+.3f}`) "
+                        f"| `[{st_ov.bootstrap_ci95_low:+.3f}, {st_ov.bootstrap_ci95_high:+.3f}]` "
+                        f"| `{st_ov.mcnemar_p_value:.4f}` |"
+                    ),
                     "",
-                    "| Category | Cases | Pass A | Pass B | Mean Score A | Mean Score B | Delta |",
-                    "| :--- | ---: | ---: | ---: | ---: | ---: | ---: |",
+                    "| Suite | Cases | Score A | Score B | Delta | Candidate Profile |",
+                    "| :--- | ---: | ---: | ---: | ---: | :--- |",
                 ]
             )
             for cs in beh.category_summaries:
                 lines.append(
-                    f"| `{cs.category}` | {cs.case_count} | {cs.pass_rate_a:.0%} | {cs.pass_rate_b:.0%} | "
-                    f"{cs.mean_score_a:.3f} | {cs.mean_score_b:.3f} | {cs.mean_score_delta:+.3f} |"
+                    f"| {human_label(cs.category)} | {cs.case_count} | `{cs.mean_score_a:.3f}` "
+                    f"| `{cs.mean_score_b:.3f}` | `{cs.mean_score_delta:+.3f}` "
+                    f"| `{md_bar(cs.mean_score_b, 1.0, 12)}` |"
                 )
 
-        if bundle.regression is not None:
+        if bundle.regression is not None and bundle.regression.findings:
             reg = bundle.regression
             lines.extend(
                 [
                     "",
-                    "## 6. Regression Gate Verdict",
+                    f"## Regression Gate — {verdict_lbl} (`{reg.thresholds.policy_name}`)",
                     "",
-                    f"- **Verdict:** **`{reg.verdict}`** (Highest Severity: `{reg.highest_severity.value}`)",
-                    f"- **Policy:** `{reg.thresholds.policy_name}` | **Findings:** `{len(reg.findings)}`",
+                    "| Severity | Evidence | Finding | Detail |",
+                    "| :--- | :--- | :--- | :--- |",
                 ]
             )
             for f in reg.findings:
                 lines.append(
-                    f"  - `[{f.severity.value}]` (`{f.epistemic_status.value}`) **{f.title}**: {f.description}"
+                    f"| {human_label(f.severity.value)} | {human_label(f.epistemic_status.value)} "
+                    f"| **{f.title}** | {f.description} |"
                 )
 
         repro = bundle.reproducibility or default_reproducibility_metadata()
         lines.extend(
             [
                 "",
-                "## 7. Execution & Reproducibility Metadata",
+                "## Provenance",
                 "",
-                "```json",
-                json.dumps(
-                    {"reproducibility": repro, "telemetry": bundle.execution_telemetry},
-                    indent=2,
-                ),
-                "```",
+                "| Parameter | Value |",
+                "| :--- | :--- |",
+                f"| Platform | `{repro.get('platform', '—')}` |",
+                f"| Python / PyTorch | `{repro.get('python_version', '—')}` / `{repro.get('torch_version', '—')}` |",
+                f"| Transformers / Safetensors | `{repro.get('transformers_version', '—')}` / `{repro.get('safetensors_version', '—')}` |",
+                f"| Executed Modules | `{', '.join(bundle.selected_modules)}` |",
                 "",
             ]
         )
         return "\n".join(lines)
 
     def to_html(self, bundle: ComparisonBundle) -> str:
-        """Render a self-contained HTML report with data-driven SVG layer heatmaps and charts."""
+        """Render a minimalist Architectural Monochrome HTML report with 5 embedded SVG visuals."""
         ledger = bundle.build_epistemic_ledger()
         esc = html.escape
 
+        ratio_svg = self._render_param_composition_svg(bundle.tensor_diff)
         heatmap_svg = self._render_layer_heatmap_svg(bundle.tensor_diff)
-        behavior_svg = self._render_behavioral_svg(bundle.behavioral)
+        lollipop_svg = self._render_top_tensors_lollipop_svg(bundle.tensor_diff)
+        act_curve_svg = self._render_activation_curve_svg(bundle.activation)
+        radar_svg, beh_bars_svg = self._render_behavioral_visuals_svg(bundle.behavioral)
+
+        def _dot_for_status(st_val: str) -> str:
+            if st_val == "OBSERVED":
+                return "#4ade80"
+            if st_val in ("CORRELATED", "INFERRED"):
+                return "#d6c5a9"
+            return "#71717a"
 
         ledger_rows = "".join(
-            f"<tr><td><span class='badge ep-{esc(c.epistemic_status.value.lower().replace(' ', '-'))}'>"
-            f"{esc(c.epistemic_status.value)}</span></td>"
-            f"<td>{esc(c.statement)}</td><td>{esc(c.evidence_source)}</td></tr>"
+            f"<tr>"
+            f"<td class='nowrap'><span class='dot' style='background:{_dot_for_status(c.epistemic_status.value)}'></span>"
+            f"{esc(human_label(c.epistemic_status.value))}</td>"
+            f"<td>{esc(c.statement)}</td>"
+            f"<td class='muted mono'>{esc(c.evidence_source)}</td>"
+            f"</tr>"
             for c in ledger
         )
 
         tensor_rows = ""
         if bundle.tensor_diff is not None:
             rec_map = {r.name: r for r in bundle.tensor_diff.records}
-            target_names = bundle.tensor_diff.top_diverged_names[:15] or [
-                r.name for r in bundle.tensor_diff.records[:15]
+            target_names = bundle.tensor_diff.top_diverged_names[:14] or [
+                r.name for r in bundle.tensor_diff.records[:14]
             ]
             for tname in target_names:
                 r = rec_map.get(tname)
@@ -331,99 +467,150 @@ class ReportEngine:
                 m = r.metrics
                 tensor_rows += (
                     f"<tr><td class='mono'>{esc(r.name)}</td>"
-                    f"<td>{esc(r.canonical_role.value)}</td>"
-                    f"<td class='mono'>{esc(str(list(r.shape_a or r.shape_b or [])))}</td>"
-                    f"<td>{esc(r.status.value)}</td>"
-                    f"<td class='num'>{m.cosine_similarity if m else '—'}</td>"
-                    f"<td class='num'>{m.relative_l2 if m else '—'}</td>"
-                    f"<td class='num'>{m.max_abs_diff if m else '—'}</td>"
-                    f"<td class='num'>{f'{m.changed_pct:.2f}%' if m else '—'}</td></tr>"
+                    f"<td class='muted'>{esc(r.canonical_role.value)}</td>"
+                    f"<td class='mono muted'>{esc('×'.join(str(d) for d in (r.shape_a or r.shape_b or [])))}</td>"
+                    f"<td class='num mono'>{_fmt_f(m.cosine_similarity, 6) if m else '—'}</td>"
+                    f"<td class='num mono'>{_fmt_f(m.relative_l2, 6) if m else '—'}</td>"
+                    f"<td class='num mono'>{_fmt_f(m.max_abs_diff, 5) if m else '—'}</td>"
+                    f"<td class='num mono'>{f'{m.changed_pct:.2f}%' if m else '—'}</td></tr>"
                 )
 
         beh_case_rows = ""
         if bundle.behavioral is not None:
-            for pc in bundle.behavioral.cases:
+            for pc in bundle.behavioral.cases[:16]:
+                d_col = "#4ade80" if pc.score_delta > 0.01 else ("#f87171" if pc.score_delta < -0.01 else "#a1a1aa")
                 beh_case_rows += (
                     f"<tr><td class='mono'>{esc(pc.case.case_id)}</td>"
-                    f"<td>{esc(pc.case.category)}</td>"
-                    f"<td>{esc(pc.status_change)}</td>"
-                    f"<td class='num'>{pc.eval_a.score:.2f} → {pc.eval_b.score:.2f} ({pc.score_delta:+.2f})</td>"
+                    f"<td class='muted'>{esc(human_label(pc.case.category))}</td>"
+                    f"<td class='num mono' style='color:{d_col}'>{pc.eval_a.score:.2f} → {pc.eval_b.score:.2f} ({pc.score_delta:+.2f})</td>"
                     f"<td><div class='prompt'>{esc(pc.case.prompt)}</div>"
-                    f"<div class='out-grid'><div><strong>Model A:</strong> {esc(pc.output_a[:280])}</div>"
-                    f"<div><strong>Model B:</strong> {esc(pc.output_b[:280])}</div></div></td></tr>"
+                    f"<div class='out-grid'><div><span class='lbl-inline'>A</span> {esc(pc.output_a[:220])}</div>"
+                    f"<div><span class='lbl-inline'>B</span> {esc(pc.output_b[:220])}</div></div></td></tr>"
                 )
 
-        verdict_str = bundle.regression.verdict if bundle.regression else "NOT_RUN"
-        repro_json = esc(
-            json.dumps(
-                {
-                    "reproducibility": bundle.reproducibility or default_reproducibility_metadata(),
-                    "telemetry": bundle.execution_telemetry,
-                },
-                indent=2,
-            )
+        verdict_raw = bundle.regression.verdict if bundle.regression else "NOT_RUN"
+        verdict_col = (
+            "#f87171"
+            if "FAIL" in verdict_raw
+            else ("#4ade80" if verdict_raw == "PASSED" else "#d6c5a9")
         )
+        chg_kpi = (
+            f"{bundle.tensor_diff.global_changed_pct:.2f}%"
+            if bundle.tensor_diff is not None
+            else "—"
+        )
+        cos_kpi = (
+            _fmt_f(bundle.tensor_diff.global_mean_cosine, 5)
+            if bundle.tensor_diff is not None
+            else "—"
+        )
+        cka_kpi = (
+            _fmt_f(bundle.activation.cross_prompt_pooled_cka_final_layer, 4)
+            if bundle.activation is not None
+            else "—"
+        )
+        pass_kpi = (
+            f"{bundle.behavioral.overall_statistics.pass_rate_a:.0%} → {bundle.behavioral.overall_statistics.pass_rate_b:.0%}"
+            if bundle.behavioral is not None
+            else "—"
+        )
+
+        repro = bundle.reproducibility or default_reproducibility_metadata()
 
         return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>NEURAL DIFF Report — {esc(bundle.comparison_id)}</title>
+<title>NEURAL DIFF — {esc(bundle.comparison_id)}</title>
 <style>
   :root {{
-    --bg: #0b1020; --panel: #131a2e; --border: #253152; --text: #e5ecff;
-    --muted: #93a3c7; --accent: #4fd1c5; --warn: #f6ad55; --danger: #fc8181; --ok: #68d391;
+    --bg: #09090b; --surface: #121216; --border: rgba(255,255,255,0.08);
+    --border-faint: rgba(255,255,255,0.05); --text: #f4f4f5; --secondary: #a1a1aa;
+    --muted: #71717a; --champagne: #d6c5a9;
   }}
-  body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 28px; line-height: 1.5; }}
-  .container {{ max-width: 1240px; margin: 0 auto; }}
-  header {{ background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }}
-  h1 {{ margin: 0 0 6px 0; font-size: 24px; }}
-  h2 {{ font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 26px; }}
-  .meta-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; }}
-  .card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }}
-  .mono {{ font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12.5px; }}
-  table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 13px; }}
-  th, td {{ padding: 9px 11px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }}
-  th {{ background: #192340; color: var(--muted); font-weight: 600; }}
-  td.num {{ text-align: right; font-variant-numeric: tabular-nums; }}
-  .badge {{ display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; background: #233258; }}
-  .ep-observed {{ background: #1c4532; color: #9ae6b4; }}
-  .ep-inferred {{ background: #44337a; color: #d6bcfa; }}
-  .ep-correlated {{ background: #744210; color: #fbd38d; }}
-  .ep-not-verified {{ background: #2d3748; color: #cbd5e0; }}
-  .out-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; font-size: 12px; color: var(--muted); }}
-  pre {{ background: var(--panel); border: 1px solid var(--border); padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 12px; }}
+  * {{ box-sizing: border-box; }}
+  body {{ font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 32px 28px; line-height: 1.5; -webkit-font-smoothing: antialiased; }}
+  .container {{ max-width: 1180px; margin: 0 auto; }}
+  header {{ display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }}
+  h1 {{ margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }}
+  h2 {{ font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); margin: 0 0 12px 0; display: flex; justify-content: space-between; align-items: center; }}
+  .sub {{ color: var(--muted); font-size: 12px; margin-top: 4px; }}
+  .kpis {{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }}
+  .kpi {{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }}
+  .kpi .k-lbl {{ color: var(--muted); font-size: 11px; }}
+  .kpi .k-val {{ font-size: 18px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }}
+  .panel {{ background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }}
+  .grid-2 {{ display: grid; grid-template-columns: 1fr 1.35fr; gap: 16px; align-items: center; }}
+  .mono {{ font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11.5px; }}
+  .muted {{ color: var(--muted); }}
+  .nowrap {{ white-space: nowrap; }}
+  .dot {{ display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 7px; vertical-align: middle; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 12.5px; }}
+  th, td {{ padding: 8px 10px; border-bottom: 1px solid var(--border-faint); text-align: left; vertical-align: top; }}
+  th {{ color: var(--muted); font-weight: 500; font-size: 11.5px; border-bottom: 1px solid var(--border); }}
+  td.num, th.num {{ text-align: right; font-variant-numeric: tabular-nums; }}
+  .prompt {{ color: var(--text); font-size: 12px; margin-bottom: 5px; }}
+  .out-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; color: var(--secondary); }}
+  .lbl-inline {{ display: inline-block; color: var(--muted); font-family: monospace; margin-right: 4px; }}
+  .kv-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px; }}
+  .kv-item {{ padding: 8px 10px; border: 1px solid var(--border-faint); border-radius: 6px; background: rgba(255,255,255,0.015); }}
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <div class="badge">{esc(bundle.experiment_type)}</div>
-    <h1>NEURAL DIFF — {esc(bundle.comparison_id)}</h1>
-    <div style="color:var(--muted)">Git for AI Brains • Generated {esc(bundle.created_at_utc)} • Regression Verdict: <strong>{esc(verdict_str)}</strong></div>
-    <div class="meta-grid">
-      <div class="card"><strong>Model A (Baseline)</strong><div class="mono">{esc(bundle.model_a.model_id)}</div><div>{bundle.model_a.total_parameters:,} params • {esc(bundle.model_a.format.value)}</div></div>
-      <div class="card"><strong>Model B (Candidate)</strong><div class="mono">{esc(bundle.model_b.model_id)}</div><div>{bundle.model_b.total_parameters:,} params • {esc(bundle.model_b.format.value)}</div></div>
-      <div class="card"><strong>Modules Executed</strong><div class="mono">{esc(", ".join(bundle.selected_modules))}</div></div>
+    <div>
+      <h1>NEURAL DIFF · {esc(bundle.comparison_id)}</h1>
+      <div class="sub mono">{esc(bundle.model_a.model_id)} ({bundle.model_a.total_parameters:,})  →  {esc(bundle.model_b.model_id)} ({bundle.model_b.total_parameters:,})</div>
     </div>
+    <div class="mono muted">{esc(human_label(bundle.experiment_type))} · {esc(bundle.created_at_utc[:19])}Z</div>
   </header>
 
-  <h2>1. Epistemic Status Ledger</h2>
-  <table><thead><tr><th>Epistemic Label</th><th>Finding</th><th>Evidence Source</th></tr></thead><tbody>{ledger_rows}</tbody></table>
+  <div class="kpis">
+    <div class="kpi"><div class="k-lbl">Modified Parameters</div><div class="k-val mono">{esc(chg_kpi)}</div></div>
+    <div class="kpi"><div class="k-lbl">Mean Weight Cosine</div><div class="k-val mono">{esc(cos_kpi)}</div></div>
+    <div class="kpi"><div class="k-lbl">Final-Layer CKA</div><div class="k-val mono">{esc(cka_kpi)}</div></div>
+    <div class="kpi"><div class="k-lbl">Pass Rate (A → B)</div><div class="k-val mono">{esc(pass_kpi)}</div></div>
+    <div class="kpi"><div class="k-lbl">Gate Verdict</div><div class="k-val mono" style="color:{verdict_col}">{esc(human_label(verdict_raw))}</div></div>
+  </div>
 
-  <h2>2. Layer-by-Component Weight Diff Heatmap (OBSERVED)</h2>
-  <div class="card">{heatmap_svg}</div>
+  <div class="panel">
+    <h2><span>Weight Perturbation Matrix &amp; Parameter Composition</span><span class="muted mono">Relative L2 across transformer depth</span></h2>
+    {ratio_svg}
+    <div style="margin-top:12px">{heatmap_svg}</div>
+  </div>
 
-  <h2>3. Tensor Diff Explorer Summary (OBSERVED)</h2>
-  <table><thead><tr><th>Tensor</th><th>Role</th><th>Shape</th><th>Status</th><th>Cosine</th><th>Rel L2</th><th>Max Abs</th><th>Changed</th></tr></thead><tbody>{tensor_rows or "<tr><td colspan='8'>Tensor diff module not selected.</td></tr>"}</tbody></table>
+  <div class="panel">
+    <h2><span>Empirical Findings</span><span class="muted mono">{len(ledger)} verified records</span></h2>
+    <table><thead><tr><th>Evidence</th><th>Observation</th><th>Source</th></tr></thead><tbody>{ledger_rows}</tbody></table>
+  </div>
 
-  <h2>4. Behavioral Intelligence Comparison (OBSERVED)</h2>
-  <div class="card">{behavior_svg}</div>
-  <table style="margin-top:12px"><thead><tr><th>Case</th><th>Category</th><th>Change</th><th>Score A → B</th><th>Prompt &amp; Paired Outputs</th></tr></thead><tbody>{beh_case_rows or "<tr><td colspan='5'>Behavioral module not selected.</td></tr>"}</tbody></table>
+  <div class="panel">
+    <h2><span>Peak Diverged Tensors</span><span class="muted mono">Ranked by float64 Relative L2</span></h2>
+    {lollipop_svg}
+    <table style="margin-top:12px"><thead><tr><th>Tensor</th><th>Role</th><th>Shape</th><th class="num">Cosine</th><th class="num">Rel L2</th><th class="num">Max |Δ|</th><th class="num">Changed</th></tr></thead><tbody>{tensor_rows or "<tr><td colspan='7' class='muted'>Tensor diff module not executed.</td></tr>"}</tbody></table>
+  </div>
 
-  <h2>5. Execution &amp; Reproducibility Manifest</h2>
-  <pre class="mono">{repro_json}</pre>
+  {f'<div class="panel"><h2><span>Layer Representation Trajectory</span><span class="muted mono">Centered Linear CKA vs Hidden Cosine</span></h2>{act_curve_svg}</div>' if act_curve_svg else ''}
+
+  <div class="panel">
+    <h2><span>Behavioral Capability Profile</span><span class="muted mono">Deterministic programmatic suites</span></h2>
+    <div class="grid-2">
+      <div>{radar_svg}</div>
+      <div>{beh_bars_svg}</div>
+    </div>
+    {f'<table style="margin-top:14px"><thead><tr><th>Case</th><th>Suite</th><th class="num">Score A → B</th><th>Prompt &amp; Paired Responses</th></tr></thead><tbody>{beh_case_rows}</tbody></table>' if beh_case_rows else ''}
+  </div>
+
+  <div class="panel">
+    <h2><span>Provenance &amp; Runtime Environment</span><span class="muted mono">{esc(", ".join(bundle.selected_modules))}</span></h2>
+    <div class="kv-grid mono">
+      <div class="kv-item"><div class="muted">Platform</div><div>{esc(str(repro.get("platform", "—"))[:42])}</div></div>
+      <div class="kv-item"><div class="muted">Python / PyTorch</div><div>{esc(str(repro.get("python_version", "—")))} · {esc(str(repro.get("torch_version", "—")))}</div></div>
+      <div class="kv-item"><div class="muted">Transformers / Safetensors</div><div>{esc(str(repro.get("transformers_version", "—")))} · {esc(str(repro.get("safetensors_version", "—")))}</div></div>
+    </div>
+  </div>
 </div>
 </body>
 </html>"""
@@ -441,83 +628,105 @@ class ReportEngine:
         return {"json": json_path, "markdown": md_path, "html": html_path}
 
     @staticmethod
-    def _render_layer_heatmap_svg(tensor_diff: TensorDiffReport | None) -> str:
-        if tensor_diff is None or not tensor_diff.layer_summaries:
-            return "<div style='color:#93a3c7'>No layered tensor diff measurements available for heatmap.</div>"
-
-        roles = ["attn_q", "attn_k", "attn_v", "attn_o", "mlp_gate", "mlp_up", "mlp_down", "norm"]
-        layers = tensor_diff.layer_summaries
-        cell_w = 26
-        cell_h = 22
-        left_pad = 92
-        top_pad = 28
-        width = left_pad + max(len(layers) * cell_w, 240) + 30
-        height = top_pad + len(roles) * cell_h + 32
-
-        # Normalize color intensity by observed max relative_l2 across cells
-        max_rel = 1e-6
-        for ls in layers:
-            for rname in roles:
-                val = (ls.role_breakdown.get(rname) or {}).get("mean_relative_l2")
-                if val is not None and val > max_rel:
-                    max_rel = val
-
-        rects: list[str] = []
-        for l_pos, ls in enumerate(layers):
-            x = left_pad + l_pos * cell_w
-            if l_pos % max(1, len(layers) // 12) == 0:
-                rects.append(
-                    f"<text x='{x + cell_w // 2}' y='18' fill='#93a3c7' font-size='10' text-anchor='middle'>L{ls.layer_index}</text>"
-                )
-            for r_pos, rname in enumerate(roles):
-                y = top_pad + r_pos * cell_h
-                val = (ls.role_breakdown.get(rname) or {}).get("mean_relative_l2")
-                if val is None:
-                    fill = "#18223d"
-                    tip = f"L{ls.layer_index} {rname}: N/A"
-                else:
-                    ratio = min(1.0, max(0.0, val / max_rel))
-                    r_col = int(30 + 215 * ratio)
-                    g_col = int(55 + 135 * (1.0 - abs(ratio - 0.5)))
-                    b_col = int(130 * (1.0 - ratio) + 45)
-                    fill = f"rgb({r_col},{g_col},{b_col})"
-                    tip = f"L{ls.layer_index} {rname}: rel_L2={val:.6f}"
-                rects.append(
-                    f"<rect x='{x}' y='{y}' width='{cell_w - 2}' height='{cell_h - 2}' rx='2' fill='{fill}'><title>{html.escape(tip)}</title></rect>"
-                )
-
-        for r_pos, rname in enumerate(roles):
-            y = top_pad + r_pos * cell_h + 14
-            rects.append(f"<text x='6' y='{y}' fill='#cbd5e0' font-size='11'>{html.escape(rname)}</text>")
-
-        return (
-            f"<svg viewBox='0 0 {width} {height}' width='100%' style='max-height:260px'>"
-            + "".join(rects)
-            + "</svg>"
+    def _render_param_composition_svg(tensor_diff: TensorDiffReport | None) -> str:
+        if tensor_diff is None or tensor_diff.compared_tensors <= 0:
+            return ""
+        return svg_segmented_ratio_bar(
+            [
+                ("Modified", float(tensor_diff.modified_tensors), "#d6c5a9"),
+                ("Within tol", float(tensor_diff.within_tolerance_tensors), "#71717a"),
+                ("Identical", float(tensor_diff.identical_tensors), "rgba(255,255,255,0.22)"),
+            ]
         )
 
     @staticmethod
-    def _render_behavioral_svg(behavioral: BehavioralDiffReport | None) -> str:
+    def _render_layer_heatmap_svg(tensor_diff: TensorDiffReport | None) -> str:
+        if tensor_diff is None or not tensor_diff.layer_summaries:
+            return "<div class='muted'>No layered tensor diff measurements available.</div>"
+
+        roles = ["attn_q", "attn_k", "attn_v", "attn_o", "mlp_gate", "mlp_up", "mlp_down", "norm"]
+        layers = tensor_diff.layer_summaries
+        col_labels = [f"L{ls.layer_index}" for ls in layers]
+        matrix: list[list[float | None]] = []
+        for rname in roles:
+            matrix.append(
+                [(ls.role_breakdown.get(rname) or {}).get("mean_relative_l2") for ls in layers]
+            )
+        return svg_matrix_heatmap(row_labels=roles, col_labels=col_labels, matrix=matrix)
+
+    @staticmethod
+    def _render_top_tensors_lollipop_svg(tensor_diff: TensorDiffReport | None) -> str:
+        if tensor_diff is None or not tensor_diff.records:
+            return ""
+        rec_map = {r.name: r for r in tensor_diff.records}
+        names = tensor_diff.top_diverged_names[:10]
+        items: list[tuple[str, float, str]] = []
+        for n in names:
+            rec = rec_map.get(n)
+            if rec and rec.metrics and rec.metrics.relative_l2 is not None:
+                items.append(
+                    (rec.name, float(rec.metrics.relative_l2), f"Rel L2 {rec.metrics.relative_l2:.5f}")
+                )
+        return svg_lollipop_chart(items)
+
+    @staticmethod
+    def _render_activation_curve_svg(activation: ActivationDiffReport | None) -> str:
+        if activation is None or not activation.mean_hidden_cosine_by_layer:
+            return ""
+        lkeys = sorted(activation.mean_hidden_cosine_by_layer.keys(), key=int)
+        xlbls = [f"L{k}" for k in lkeys]
+        cka_vals = [activation.mean_hidden_cka_by_layer.get(k) for k in lkeys]
+        cos_vals = [activation.mean_hidden_cosine_by_layer.get(k) for k in lkeys]
+        valid = [v for v in [*cka_vals, *cos_vals] if v is not None]
+        lo = max(0.0, min(valid) - 0.05) if valid else 0.0
+        return svg_dual_line_chart(
+            x_labels=xlbls,
+            series_primary=cka_vals,
+            label_primary="Centered Linear CKA",
+            series_secondary=cos_vals,
+            label_secondary="Hidden Cosine",
+            y_min=lo,
+            y_max=1.0,
+        )
+
+    @staticmethod
+    def _render_behavioral_visuals_svg(
+        behavioral: BehavioralDiffReport | None,
+    ) -> tuple[str, str]:
         if behavioral is None or not behavioral.category_summaries:
-            return "<div style='color:#93a3c7'>Behavioral diff module not executed.</div>"
+            return ("", "<div class='muted'>Behavioral diff module not executed.</div>")
 
         cats = behavioral.category_summaries
-        row_h = 30
-        left_pad = 165
-        bar_max = 360
-        width = left_pad + bar_max + 130
-        height = len(cats) * row_h + 24
+        axes = [human_label(c.category) for c in cats]
+        vals_a = [float(c.mean_score_a) for c in cats]
+        vals_b = [float(c.mean_score_b) for c in cats]
+        radar = svg_radar_polygon(
+            axes=axes,
+            series=[
+                ("Model A", vals_a, "#71717a"),
+                ("Model B", vals_b, "#d6c5a9"),
+            ],
+            size=270,
+        )
 
+        row_h = 26
+        left_pad = 148
+        bar_max = 260
+        width = left_pad + bar_max + 118
+        height = len(cats) * row_h + 16
         elems: list[str] = []
         for idx, cs in enumerate(cats):
-            y = 14 + idx * row_h
-            wa = int(cs.mean_score_a * bar_max)
-            wb = int(cs.mean_score_b * bar_max)
-            elems.append(f"<text x='6' y='{y + 14}' fill='#e5ecff' font-size='11'>{html.escape(cs.category)}</text>")
-            elems.append(f"<rect x='{left_pad}' y='{y}' width='{max(2, wa)}' height='9' fill='#63b3ed' rx='2' />")
-            elems.append(f"<rect x='{left_pad}' y='{y + 11}' width='{max(2, wb)}' height='9' fill='#4fd1c5' rx='2' />")
+            y = 10 + idx * row_h
+            wa = max(2, int(cs.mean_score_a * bar_max))
+            wb = max(2, int(cs.mean_score_b * bar_max))
+            col_b = "#f87171" if cs.mean_score_delta < -0.01 else "#f4f4f5"
             elems.append(
-                f"<text x='{left_pad + bar_max + 10}' y='{y + 14}' fill='#93a3c7' font-size='11'>"
-                f"A={cs.mean_score_a:.2f} / B={cs.mean_score_b:.2f}</text>"
+                f"<text x='{left_pad - 8}' y='{y + 12}' fill='#a1a1aa' font-size='10.5' text-anchor='end' font-family='ui-monospace,Consolas,monospace'>{html.escape(human_label(cs.category)[:18])}</text>"
+                f"<rect x='{left_pad}' y='{y + 1}' width='{bar_max}' height='6' fill='rgba(255,255,255,0.04)' rx='2'/>"
+                f"<rect x='{left_pad}' y='{y + 1}' width='{wa}' height='6' fill='#71717a' rx='2'/>"
+                f"<rect x='{left_pad}' y='{y + 9}' width='{bar_max}' height='6' fill='rgba(255,255,255,0.04)' rx='2'/>"
+                f"<rect x='{left_pad}' y='{y + 9}' width='{wb}' height='6' fill='{col_b}' rx='2'/>"
+                f"<text x='{left_pad + bar_max + 8}' y='{y + 12}' fill='#d6c5a9' font-size='10' font-family='ui-monospace,Consolas,monospace'>{cs.mean_score_a:.2f} → {cs.mean_score_b:.2f}</text>"
             )
-        return f"<svg viewBox='0 0 {width} {height}' width='100%'>" + "".join(elems) + "</svg>"
+        bars = f"<svg viewBox='0 0 {width} {height}' width='100%' style='display:block'>{''.join(elems)}</svg>"
+        return (radar, bars)
