@@ -1,4 +1,4 @@
-name: Full-Stack Playwright E2E
+name: Full-Stack Playwright E2E (Sharded Specs)
 
 on:
   push:
@@ -15,9 +15,45 @@ permissions:
   contents: read
 
 jobs:
-  playwright-e2e:
-    name: Live FastAPI + Vite Studio Chromium E2E
+  build-studio:
+    name: Build Production Vite 8 Studio Artifact
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 22.x LTS
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.x"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies & build production bundle
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload built studio dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-studio-dist
+          path: frontend/dist
+          retention-days: 3
+
+  playwright-sharded:
+    name: Chromium E2E (${{ matrix.suite_label }})
+    needs: build-studio
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - spec: "tests/e2e.spec.ts"
+            suite_label: "Pairwise Studio & Security Gate"
+          - spec: "tests/evolution.e2e.spec.ts"
+            suite_label: "Neural Evolution DAG & Export"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -27,27 +63,29 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Provision Python backend environment
+      - name: Provision Python 3.12 backend environment
         run: uv sync --locked --python 3.12
 
-      - name: Set up Node.js 22
+      - name: Set up Node.js 22.x LTS
         uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "22.x"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies & build studio
+      - name: Install Playwright & frontend runtime
         working-directory: frontend
         run: |
           npm ci
-          npm run build
+          npx playwright install --with-deps chromium
 
-      - name: Install Playwright Chromium browser
-        working-directory: frontend
-        run: npx playwright install --with-deps chromium
+      - name: Download built studio dist
+        uses: actions/download-artifact@v8
+        with:
+          name: e2e-studio-dist
+          path: frontend/dist
 
-      - name: Seed Safetensors fixtures, start FastAPI + Vite preview, and run E2E
+      - name: Seed Safetensors fixtures, boot FastAPI + Vite preview & run ${{ matrix.spec }}
         run: |
           uv run python scripts/seed_demo_fixtures.py
           uv run uvicorn api.app:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
@@ -66,20 +104,18 @@ jobs:
           done
 
           if [ "$READY" -ne 1 ]; then
-            echo "=== Backend startup log ==="
             cat /tmp/backend.log || true
-            echo "=== Frontend preview log ==="
             cat /tmp/frontend.log || true
             exit 1
           fi
 
-          npm --prefix frontend run test:e2e
+          npx --prefix frontend playwright test ${{ matrix.spec }}
 
       - name: Upload E2E failure diagnostics
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: playwright-e2e-diagnostics
+          name: playwright-diagnostics-${{ strategy.job-index }}
           path: |
             /tmp/backend.log
             /tmp/frontend.log

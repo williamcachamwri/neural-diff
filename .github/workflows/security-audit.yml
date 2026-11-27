@@ -17,8 +17,18 @@ permissions:
   contents: read
 
 jobs:
-  security-gate:
-    name: Secret Hygiene, Adversarial Deserialization & Supply-Chain CVEs
+  secret-scan:
+    name: Source Tree Secret & Token Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Scan tracked files for leaked credentials & API keys
+        run: python3 scripts/run_security_audit.py --secret-scan-only
+
+  adversarial-deserialization:
+    name: Pickle Opcode RCE, Path Traversal & Symlink Gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -32,23 +42,46 @@ jobs:
       - name: Provision Python 3.12 environment
         run: uv sync --locked --python 3.12
 
-      - name: Set up Node.js 22
+      - name: Execute adversarial security suite
+        run: uv run pytest -m security -v
+
+  python-cve-audit:
+    name: PyPA Advisory Database Audit (pip-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Audit Python packages against PyPA Advisory DB
+        run: uv run python -m pip_audit --skip-editable --desc
+
+  npm-cve-matrix:
+    name: npm Supply-Chain Advisory Audit (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["20.x", "22.x"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Scan source tree for leaked credentials & tokens
-        run: uv run python scripts/run_security_audit.py --secret-scan-only
-
-      - name: Execute adversarial security test suite (pickle RCE, path traversal, symlink escape)
-        run: uv run pytest -m security -v
-
-      - name: Audit Python dependencies against PyPA Advisory DB
-        run: uv run python -m pip_audit --skip-editable --desc
-
-      - name: Audit npm dependencies against GitHub Advisory DB
+      - name: Audit frontend dependency graph
         working-directory: frontend
         run: |
           npm ci

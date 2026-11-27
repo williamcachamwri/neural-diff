@@ -1,0 +1,140 @@
+name: API OpenAPI Contract, SQLite WAL & CLI Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: api-contract-and-db-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  openapi-schema-audit:
+    name: FastAPI 37-Route OpenAPI 3.1 Schema Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Export and audit OpenAPI 3.1 contract across all routers
+        run: |
+          uv run python - <<'PY'
+          import json
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from api.app import create_app
+
+          with TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+              app = create_app(db_path=Path(tmp) / "schema_audit.db")
+              schema = app.openapi()
+
+          paths = schema.get("paths", {})
+          required_paths = [
+              "/api/health",
+              "/api/models/discover",
+              "/api/models/inspect",
+              "/api/models/validate",
+              "/api/comparisons/run",
+              "/api/comparisons/{comparison_id}/export/{fmt}",
+              "/api/diagnostics/tensor-probe",
+              "/api/evolution/overview",
+              "/api/evolution/projects",
+              "/api/evolution/projects/{project_id}/checkpoints",
+              "/api/evolution/projects/{project_id}/compare",
+              "/api/evolution/projects/{project_id}/analyze",
+              "/api/evolution/runs/{run_id}/export/{fmt}",
+          ]
+          for req_p in required_paths:
+              assert req_p in paths, f"Missing required OpenAPI path: {req_p}"
+
+          op_count = sum(len(methods) for methods in paths.values())
+          assert op_count >= 35, f"Expected >=35 HTTP operations in OpenAPI schema, got {op_count}"
+          Path("/tmp/openapi.json").write_text(json.dumps(schema, indent=2), encoding="utf-8")
+          print(f"Verified OpenAPI {schema.get('openapi')}: {len(paths)} paths, {op_count} operations.")
+          PY
+
+      - name: Upload OpenAPI 3.1 specification artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: neural-diff-openapi-spec
+          path: /tmp/openapi.json
+          retention-days: 14
+
+  sqlite-wal-concurrency:
+    name: Multi-Threaded SQLite WAL & SHA-256 Cache Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Stress concurrent SQLite WAL writers & cache invalidation
+        run: |
+          uv run python - <<'PY'
+          from concurrent.futures import ThreadPoolExecutor
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from api.store import ExperimentStore
+          from core.evolution.store import EvolutionStore
+
+          with TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+              db = Path(tmp) / "concurrent.db"
+              exp_store = ExperimentStore(db_path=db)
+              evo_store = EvolutionStore(db_path=db)
+
+              def _worker(idx: int) -> str:
+                  p = evo_store.create_project(name=f"Concurrent-{idx}", description="WAL stress")
+                  exp_store.update_settings({"chunk_elements": 1_048_576 + idx})
+                  return p.project_id
+
+              with ThreadPoolExecutor(max_workers=8) as pool:
+                  pids = list(pool.map(_worker, range(24)))
+
+              total, listed = evo_store.list_projects(limit=50)
+              assert total == 24 and len(pids) == 24
+              print(f"Verified 24 concurrent WAL transactions across 8 threads cleanly.")
+          PY
+
+  cli-json-contract:
+    name: CLI Pairwise & Evolution JSON Output Contract
+    needs: [openapi-schema-audit, sqlite-wal-concurrency]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Verify deterministic JSON stdout across CLI commands
+        run: |
+          uv run python scripts/seed_demo_fixtures.py
+          uv run python -m core.cli suites | python3 -m json.tool > /dev/null
+          uv run python -m core.cli inspect data/demo_fixtures/synth_model_a --local-only | python3 -m json.tool > /dev/null
+          uv run python -m core.cli validate --model-a data/demo_fixtures/synth_model_a --model-b data/demo_fixtures/synth_model_b --local-only | python3 -m json.tool > /dev/null

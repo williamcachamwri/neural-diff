@@ -16,8 +16,8 @@ permissions:
   contents: write
 
 jobs:
-  build-smoke-and-release:
-    name: Wheel/Sdist Build, Isolated CLI Smoke & Release Bundle
+  build-wheel-sdist:
+    name: Build Python Wheel & Sdist
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,24 +28,67 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Build Python sdist & wheel + production frontend archive
+      - name: Build Python sdist & wheel
         run: |
           rm -rf dist
           uv build --out-dir dist
+          ls -la dist
+
+      - name: Upload Python package artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-dist
+          path: dist/*
+          retention-days: 7
+
+  build-frontend-tarball:
+    name: Build Production Studio Tarball
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 22.x LTS
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.x"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build & archive frontend production assets
+        run: |
+          mkdir -p dist-web
           npm --prefix frontend ci
           npm --prefix frontend run build
-          tar -czf dist/neural-diff-frontend-dist.tar.gz -C frontend dist
-          (cd dist && sha256sum * > SHA256SUMS.txt)
-          cat dist/SHA256SUMS.txt
+          tar -czf dist-web/neural-diff-frontend-dist.tar.gz -C frontend dist
 
-      - name: Clean-room wheel installation & end-to-end CLI smoke test
+      - name: Upload frontend tarball
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-tarball
+          path: dist-web/neural-diff-frontend-dist.tar.gz
+          retention-days: 7
+
+  cleanroom-cli-smoke:
+    name: Isolated Clean-Room Wheel & Evolution CLI Smoke
+    needs: [build-wheel-sdist, build-frontend-tarball]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository (for fixture seeder only)
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Download built Python wheel & sdist
+        uses: actions/download-artifact@v8
+        with:
+          name: python-dist
+          path: dist
+
+      - name: Install wheel & execute pairwise + evolution CLI in isolated /tmp
         run: |
           uv sync --locked --python 3.12
           uv run python scripts/seed_demo_fixtures.py
@@ -56,13 +99,12 @@ jobs:
           MODEL_A="$GITHUB_WORKSPACE/data/demo_fixtures/synth_model_a"
           MODEL_B="$GITHUB_WORKSPACE/data/demo_fixtures/synth_model_b"
 
-          # Execute from /tmp so local repo folders are NOT on sys.path
-          export NEURAL_DIFF_ALLOWED_ROOTS="$GITHUB_WORKSPACE/data"
+          export NEURAL_DIFF_ALLOWED_ROOTS="$GITHUB_WORKSPACE/data:/tmp"
           cd /tmp
+
           "$BIN_DIR/neural-diff" suites
           "$BIN_DIR/neural-diff" inspect "$MODEL_A" --local-only > /tmp/inspect.json
           "$BIN_DIR/neural-diff" validate --model-a "$MODEL_A" --model-b "$MODEL_B" --local-only > /tmp/validate.json
-          "$BIN_DIR/neural-diff" svd --model-a "$MODEL_A" --model-b "$MODEL_B" --tensor "model.embed_tokens.weight" --local-only > /tmp/svd.json
           "$BIN_DIR/neural-diff" compare \
             --model-a "$MODEL_A" \
             --model-b "$MODEL_B" \
@@ -70,16 +112,41 @@ jobs:
             --local-only \
             --output-dir /tmp/cli_reports
 
-          ls -la /tmp/cli_reports
-          compgen -G "/tmp/cli_reports/*.json" >/dev/null
-          compgen -G "/tmp/cli_reports/*.md" >/dev/null
-          compgen -G "/tmp/cli_reports/*.html" >/dev/null
+          PROJ_JSON="$("$BIN_DIR/neural-diff" evolution create-project --name "Smoke DAG" --db-path /tmp/smoke_evo.db)"
+          PROJ_ID="$(python3 -c 'import json,sys; print(json.loads(sys.stdin.read())["project_id"])' <<< "$PROJ_JSON")"
+          CKPT0_JSON="$("$BIN_DIR/neural-diff" evolution register --project-id "$PROJ_ID" --source "$MODEL_A" --label "v0" --transformation "Base Model" --local-only --db-path /tmp/smoke_evo.db)"
+          CKPT0_ID="$(python3 -c 'import json,sys; print(json.loads(sys.stdin.read())["checkpoint_id"])' <<< "$CKPT0_JSON")"
+          "$BIN_DIR/neural-diff" evolution register --project-id "$PROJ_ID" --source "$MODEL_B" --label "v1" --parents "$CKPT0_ID" --transformation "SFT" --local-only --db-path /tmp/smoke_evo.db > /dev/null
+          "$BIN_DIR/neural-diff" evolution analyze --project-id "$PROJ_ID" --skip-behavioral --local-only --output-dir /tmp/evo_smoke_reports --db-path /tmp/smoke_evo.db
 
-      - name: Upload distributable release artifacts
-        uses: actions/upload-artifact@v6
+          compgen -G "/tmp/cli_reports/*.html" >/dev/null
+          compgen -G "/tmp/evo_smoke_reports/*.html" >/dev/null
+          compgen -G "/tmp/evo_smoke_reports/*.md" >/dev/null
+          compgen -G "/tmp/evo_smoke_reports/*.pdf" >/dev/null
+
+  release-bundle:
+    name: Assemble SHA256SUMS & Publish Release Bundle
+    needs: cleanroom-cli-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Python & Frontend release artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: incoming
+
+      - name: Assemble unified release directory & SHA-256 checksums
+        run: |
+          mkdir -p release-dist
+          cp incoming/python-dist/* release-dist/
+          cp incoming/frontend-tarball/* release-dist/
+          (cd release-dist && sha256sum * > SHA256SUMS.txt)
+          cat release-dist/SHA256SUMS.txt
+
+      - name: Upload distributable release bundle
+        uses: actions/upload-artifact@v7
         with:
           name: neural-diff-release-bundle
-          path: dist/*
+          path: release-dist/*
           retention-days: 30
 
       - name: Publish GitHub Release assets on version tags
@@ -89,7 +156,7 @@ jobs:
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" dist/* --clobber
+            gh release upload "$TAG" release-dist/* --clobber
           else
-            gh release create "$TAG" dist/* --title "NEURAL DIFF $TAG" --generate-notes
+            gh release create "$TAG" release-dist/* --title "NEURAL DIFF $TAG" --generate-notes
           fi

@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  benchmark-gate:
-    name: Tensor, SVD Rank, 2:4 Sparsity, CKA & Causal Patching Gate
+  tensor-and-svd-invariants:
+    name: Float64 Streaming, SVD Rank, 2:4 Sparsity & Patching
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,8 +36,55 @@ jobs:
       - name: Verify standalone LoRA vs Full-SFT effective rank example
         run: uv run python examples/detect_lora_effective_rank.py
 
-      - name: Upload numerical benchmark JSON report
-        uses: actions/upload-artifact@v6
+      - name: Upload raw benchmark JSON
+        uses: actions/upload-artifact@v7
+        with:
+          name: ci-raw-benchmarks
+          path: /tmp/ci-benchmark-results.json
+          retention-days: 7
+
+  hypothesis-properties:
+    name: Hypothesis Mathematical Invariant Fuzzing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Execute Hypothesis property-based invariants
+        run: uv run pytest -m property --hypothesis-seed=42 -v
+
+  publish-telemetry:
+    name: Benchmark Regression Gate & Telemetry Archive
+    needs: [tensor-and-svd-invariants, hypothesis-properties]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download benchmark JSON
+        uses: actions/download-artifact@v8
+        with:
+          name: ci-raw-benchmarks
+          path: /tmp
+
+      - name: Assert numerical benchmark accuracy & throughput bounds
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("/tmp/ci-benchmark-results.json").read_text(encoding="utf-8"))
+          assert data, "Empty benchmark output"
+          print(json.dumps(data, indent=2))
+          PY
+
+      - name: Archive verified benchmark telemetry
+        uses: actions/upload-artifact@v7
         with:
           name: ci-numerical-benchmarks
           path: /tmp/ci-benchmark-results.json

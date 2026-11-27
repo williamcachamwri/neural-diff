@@ -1,0 +1,164 @@
+name: Neural Evolution DAG & 5-Format Report Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: evolution-pipeline-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  dag-and-migrations:
+    name: DAG Cycle Guard, SHA-256 Registry & Migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Verify 14 transformation types, multi-parent merge, cycle DFS & SQLite migrations
+        run: uv run pytest tests/unit/test_evolution_dag_and_store.py tests/security/test_evolution_security.py -v
+
+  cumulative-math-and-origin:
+    name: Direct Base L2 Math, Wilson CI & Regression Origin
+    needs: dag-and-migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Verify direct cumulative L2 vs step sum & epistemic origin pinpointing
+        run: uv run pytest tests/unit/test_evolution_math_and_behavioral.py tests/integration/test_evolution_pipeline_and_api.py -v
+
+  live-evolution-example:
+    name: End-to-End Branched & Merged Lifecycle Run
+    needs: dag-and-migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Execute standalone branched & merged evolution example and export all 5 formats
+        run: |
+          uv run python examples/track_model_evolution.py > /tmp/evolution-example-summary.json
+          cat /tmp/evolution-example-summary.json
+          uv run python - <<'PY'
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from core.evolution.exporter import EvolutionReportExporter
+          from core.evolution.orchestrator import EvolutionAnalysisConfig, EvolutionOrchestrator
+          from core.evolution.registry import inspect_and_build_checkpoint_record
+          from core.evolution.store import EvolutionStore
+          from core.security import SecurityPolicy
+          from tests.fixtures.evolution_factory import make_evolution_checkpoint_family
+
+          out_dir = Path("/tmp/evo-ci-exports")
+          out_dir.mkdir(parents=True, exist_ok=True)
+          with TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+              root = Path(tmp)
+              pol = SecurityPolicy(allowed_roots=[root, out_dir])
+              fam = make_evolution_checkpoint_family(root)
+              store = EvolutionStore(db_path=root / "ci_evo.db")
+              proj = store.create_project(name="CI Evolution Export Verification")
+              c0 = store.add_checkpoint(inspect_and_build_checkpoint_record(
+                  project_id=proj.project_id, source=fam["base"], version_label="v0-Base",
+                  transformation_type="Base Model", policy=pol, local_files_only=True
+              ))
+              c1 = store.add_checkpoint(inspect_and_build_checkpoint_record(
+                  project_id=proj.project_id, source=fam["sft_a"], version_label="v1-SFT",
+                  parent_checkpoint_ids=[c0.checkpoint_id], transformation_type="SFT",
+                  policy=pol, local_files_only=True
+              ))
+              c2 = store.add_checkpoint(inspect_and_build_checkpoint_record(
+                  project_id=proj.project_id, source=fam["quant"], version_label="v2-Quant",
+                  parent_checkpoint_ids=[c1.checkpoint_id], transformation_type="Quantization",
+                  policy=pol, local_files_only=True
+              ))
+              bundle = EvolutionOrchestrator(store=store, policy=pol).run_analysis(
+                  proj.project_id,
+                  EvolutionAnalysisConfig(include_behavioral_evolution=False, local_files_only=True),
+                  run_id="evorun-ci-gate",
+              )
+              exp = EvolutionReportExporter()
+              for fmt in ("json", "csv", "markdown", "html", "pdf"):
+                  exp.export_file(bundle, fmt, out_dir)
+          PY
+
+      - name: Upload 5-format evolution report artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: evolution-ci-exports
+          path: /tmp/evo-ci-exports/*
+          retention-days: 7
+
+  multiformat-export-gate:
+    name: Validate JSON, CSV, Mermaid-MD, 5-SVG HTML & PDF 1.4
+    needs: [cumulative-math-and-origin, live-evolution-example]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download 5-format evolution report artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: evolution-ci-exports
+          path: /tmp/evo-ci-exports
+
+      - name: Inspect structural validity of all 5 exported formats
+        run: |
+          python3 - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          base = Path("/tmp/evo-ci-exports")
+          data = json.loads((base / "evorun-ci-gate.json").read_text(encoding="utf-8"))
+          assert data["run_id"] == "evorun-ci-gate"
+          assert len(data["checkpoints"]) == 3
+
+          csv_txt = (base / "evorun-ci-gate.csv").read_text(encoding="utf-8")
+          for header in ("[CHECKPOINT_REGISTRY]", "[TENSOR_EVOLUTION_TRANSITIONS]", "[REGRESSION_ORIGIN_EVENTS]"):
+              assert header in csv_txt, f"Missing CSV section {header}"
+
+          md_txt = (base / "evorun-ci-gate.md").read_text(encoding="utf-8")
+          assert "```mermaid" in md_txt and "flowchart LR" in md_txt
+          assert "█" in md_txt or "░" in md_txt
+
+          html_txt = (base / "evorun-ci-gate.html").read_text(encoding="utf-8")
+          svg_count = len(re.findall(r"<svg\b", html_txt))
+          assert svg_count >= 3, f"Expected >=3 embedded SVGs in HTML report, got {svg_count}"
+          assert "class='badge" not in html_txt, "Regression: legacy badge class found in HTML report"
+
+          pdf_bytes = (base / "evorun-ci-gate.pdf").read_bytes()
+          assert pdf_bytes.startswith(b"%PDF-1.4")
+          assert b"/Type /Page" in pdf_bytes and b"xref" in pdf_bytes and pdf_bytes.strip().endswith(b"%%EOF")
+          print(f"Verified 5 formats: JSON ({len(data['checkpoints'])} ckpts), CSV, MD, HTML ({svg_count} SVGs), PDF ({len(pdf_bytes)} bytes).")
+          PY

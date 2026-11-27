@@ -1,4 +1,4 @@
-name: Frontend Typecheck, Vitest & Bundle Gate
+name: Frontend Multi-Node LTS, Vitest & Bundle Gate
 
 on:
   push:
@@ -15,17 +15,21 @@ permissions:
   contents: read
 
 jobs:
-  frontend-verify:
-    name: TypeScript, Vitest & Production Chunk Budget
+  typecheck-and-vitest:
+    name: TypeScript & Vitest (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["20.x", "22.x", "24.x"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Node.js 22
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
@@ -37,44 +41,78 @@ jobs:
         working-directory: frontend
         run: npm run typecheck
 
-      - name: Vitest UI & domain formatter tests
+      - name: Vitest UI, Evolution Studio & formatter suites
         working-directory: frontend
         run: npm run test
 
-      - name: Build production Vite bundle
-        working-directory: frontend
-        run: npm run build
+  production-bundle:
+    name: Vite 8 Production Bundle Build
+    needs: typecheck-and-vitest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: Enforce JS chunk size budget (<500 KB per chunk)
+      - name: Set up Node.js 22.x LTS
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.x"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build production Vite 8 Studio bundle
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload production frontend bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+
+  chunk-size-and-asset-budget:
+    name: JS/CSS Chunk Size & Vendor Split Gate
+    needs: production-bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built frontend bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Enforce JS (<500 KB) & CSS (<60 KB) budgets and vendor chunk split
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import sys
 
           dist = Path("frontend/dist")
-          index_html = dist / "index.html"
-          if not index_html.is_file():
+          if not (dist / "index.html").is_file():
               sys.exit("Missing frontend/dist/index.html")
 
           js_chunks = sorted((dist / "assets").glob("*.js"))
-          if not js_chunks:
-              sys.exit("No JS chunks emitted under frontend/dist/assets/")
+          css_chunks = sorted((dist / "assets").glob("*.css"))
+          if not js_chunks or not css_chunks:
+              sys.exit("Missing JS or CSS assets under frontend/dist/assets/")
 
-          max_kb = 500.0
-          oversized = []
+          names = [c.name for c in js_chunks]
+          for expected_prefix in ("vendor-xyflow", "vendor-motion", "index-"):
+              if not any(n.startswith(expected_prefix) for n in names):
+                  sys.exit(f"Expected chunk prefix '{expected_prefix}' missing from {names}")
+
           for chunk in js_chunks:
               kb = chunk.stat().st_size / 1024.0
-              print(f"{chunk.name}: {kb:.1f} KB")
-              if kb > max_kb:
-                  oversized.append((chunk.name, kb))
+              print(f"JS  {chunk.name}: {kb:.1f} KB")
+              if kb > 500.0:
+                  sys.exit(f"JS chunk {chunk.name} exceeded 500 KB budget ({kb:.1f} KB)")
 
-          if oversized:
-              sys.exit(f"Chunks exceeded {max_kb} KB budget: {oversized}")
+          for css in css_chunks:
+              kb = css.stat().st_size / 1024.0
+              print(f"CSS {css.name}: {kb:.1f} KB")
+              if kb > 60.0:
+                  sys.exit(f"CSS asset {css.name} exceeded 60 KB budget ({kb:.1f} KB)")
           PY
-
-      - name: Upload production frontend bundle
-        uses: actions/upload-artifact@v6
-        with:
-          name: frontend-dist
-          path: frontend/dist
-          retention-days: 7

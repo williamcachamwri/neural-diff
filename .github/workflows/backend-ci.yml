@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   static-analysis:
-    name: Ruff Lint & MyPy Typecheck
+    name: Ruff Lint & MyPy Typecheck (86 Files)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,8 +36,8 @@ jobs:
       - name: MyPy static type check
         run: uv run mypy core adapters benchmarks api
 
-  pytest-matrix:
-    name: Pytest Matrix (Python ${{ matrix.python-version }})
+  unit-property-matrix:
+    name: Unit, Property & Regression (Python ${{ matrix.python-version }})
     needs: static-analysis
     runs-on: ubuntu-latest
     strategy:
@@ -56,17 +56,56 @@ jobs:
       - name: Provision Python ${{ matrix.python-version }}
         run: uv sync --locked --python ${{ matrix.python-version }}
 
-      - name: Run Unit, Property (Hypothesis), Integration & Golden Regression suites
+      - name: Run Unit, Hypothesis Property & Golden Regression suites
+        run: uv run pytest -m "unit or property or regression" -v
+
+  windows-portability:
+    name: Windows Safetensors Mmap & NTFS Confinement
+    needs: static-analysis
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision Windows CPU Python 3.12 environment
+        run: uv sync --no-sources --python 3.12
+
+      - name: Verify Windows mmap clone safety, SQLite WAL & path confinement
         run: |
-          uv run pytest -m "not security and not real_model" \
+          uv run pytest tests/unit/test_loaders_and_adapters.py tests/unit/test_evolution_dag_and_store.py tests/security/test_evolution_security.py -v
+
+  integration-and-coverage:
+    name: Full Integration & Coverage Gate (>=85%)
+    needs: [unit-property-matrix, windows-portability]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Provision locked Python 3.12 environment
+        run: uv sync --locked --python 3.12
+
+      - name: Run complete backend suite with 85% coverage gate
+        run: |
+          uv run pytest -m "not real_model" \
             --cov=core --cov=adapters --cov=benchmarks --cov=api \
             --cov-report=term-missing \
-            --cov-report=xml:coverage-${{ matrix.python-version }}.xml \
+            --cov-report=xml:coverage-3.12.xml \
             --cov-fail-under=85 -v
 
       - name: Upload XML coverage report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: backend-coverage-py${{ matrix.python-version }}
-          path: coverage-${{ matrix.python-version }}.xml
+          name: backend-coverage-py3.12
+          path: coverage-3.12.xml
           retention-days: 14

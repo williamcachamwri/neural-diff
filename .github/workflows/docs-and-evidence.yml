@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  verify-docs-and-manifest:
-    name: SHA-256 Evidence Manifest & 5-Language Docs Links
+  evidence-sha256:
+    name: SHA-256 & Byte-Size Manifest Integrity
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,5 +25,49 @@ jobs:
       - name: Verify SHA-256 & byte-size integrity of all evidence artifacts
         run: python3 scripts/verify_evidence.py
 
-      - name: Verify local file & screenshot links across all 26 Markdown docs
+  multilingual-docs-links:
+    name: 5-Language Docs Links & CHANGELOG Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Verify local file & screenshot links across all Markdown docs
         run: python3 scripts/verify_docs_links.py
+
+      - name: Verify CHANGELOG.md Keep-a-Changelog sections
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          txt = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          for section in ("## [Unreleased]", "## [0.2.0]", "## [0.1.0]"):
+              assert section in txt, f"Missing {section} in CHANGELOG.md"
+          print("CHANGELOG.md verified cleanly.")
+          PY
+
+  screenshot-png-provenance:
+    name: Screenshot PNG Header & Index Completeness (01..27)
+    needs: [evidence-sha256, multilingual-docs-links]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Validate PNG headers & SCREENSHOT_INDEX.md entries for 01..27
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          pngs = sorted(Path("evidence/frontend").glob("*.png"))
+          assert len(pngs) >= 27, f"Expected >=27 live screenshots, found {len(pngs)}"
+          index_md = Path("evidence/SCREENSHOT_INDEX.md").read_text(encoding="utf-8")
+
+          for p in pngs:
+              raw = p.read_bytes()
+              assert raw[:8] == b"\x89PNG\r\n\x1a\n", f"Invalid PNG magic header on {p}"
+              assert len(raw) > 8_000, f"Suspiciously small PNG file {p} ({len(raw)} bytes)"
+              assert p.name in index_md, f"Screenshot {p.name} missing from SCREENSHOT_INDEX.md"
+
+          print(f"Verified {len(pngs)} authentic PNG screenshots and provenance index.")
+          PY
