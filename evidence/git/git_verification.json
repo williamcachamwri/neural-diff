@@ -1,9 +1,11 @@
 {
-  "captured_at_utc": "2026-11-27T08:10:37.859120+00:00",
-  "commit_count": 127,
+  "captured_at_utc": "2026-11-27T09:03:19.631214+00:00",
+  "commit_count": 129,
   "clean_working_tree": true,
   "status_short": [],
   "recent_commits": [
+    "6fa0915 fix(evolution): enforce 4-tier causal rigor, Holm-Bonferroni stats, 5-part SHA-256, and distinct v3/v4 pruning benchmark",
+    "65bc344 chore(evidence): refresh SHA-256 manifest and git history for Studio UI redesign",
     "054f7cf feat(ui): precision rounded Studio redesign, optical cables, \u2318K palette, and transparent ND brand mark",
     "6a24059 docs(evidence): refresh git verification log and SHA-256 manifest",
     "b7264b7 fix(ci): resolve lazy loader package cycle and align sharded E2E & evolution factory imports",
@@ -26,8 +28,6 @@
     "add3f2f docs(readme): expand 7-layer architecture specification, sequence diagrams, and API reference across all 5 languages",
     "d2938bf chore(evidence): update SHA-256 evidence manifest for final artifacts",
     "b4e4546 docs(evidence): capture verified 105-commit git history log",
-    "a619282 docs(report): finalize engineering acceptance report across all 20 phases",
-    "064f446 docs(readme): publish comprehensive 5-language documentation with 15 screenshots and full benchmarks",
-    "1e5645a test(evidence): capture final anti-slop studio screenshots and 55-test coverage logs"
+    "a619282 docs(report): finalize engineering acceptance report across all 20 phases"
   ]
 }
