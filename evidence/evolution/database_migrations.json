@@ -1,0 +1,8 @@
+[
+  {
+    "migration_id": "0001_evolution_core_tables",
+    "description": "Create projects, checkpoints, relationships, runs, and granular evolution result tables",
+    "checksum_sha256": "38c5a8947961aee3e980c48300f171738aaab343d52157976837e629d85919fb",
+    "applied_at_utc": "2026-11-27T05:53:26.596549+00:00"
+  }
+]

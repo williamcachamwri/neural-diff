@@ -1,7 +1,7 @@
 === Suite: security_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m security -v
-Started (UTC): 2026-11-26T20:40:45.363718+00:00
-Completed (UTC): 2026-11-26T20:40:53.396862+00:00
+Started (UTC): 2026-11-27T06:54:39.476631+00:00
+Completed (UTC): 2026-11-27T06:54:47.665757+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -14,15 +14,18 @@ configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
-collecting ... collected 55 items / 50 deselected / 5 selected
+collecting ... collected 64 items / 56 deselected / 8 selected
 
-tests/security/test_security_controls.py::test_path_traversal_null_bytes_and_unc_rejected PASSED [ 20%]
-tests/security/test_security_controls.py::test_shard_index_traversal_rejected PASSED [ 40%]
-tests/security/test_security_controls.py::test_malformed_and_adversarial_safetensors_headers PASSED [ 60%]
-tests/security/test_security_controls.py::test_unsafe_pickle_rce_gadget_rejected_before_execution PASSED [ 80%]
-tests/security/test_security_controls.py::test_api_security_headers_payload_limit_and_traversal_blocking PASSED [100%]
+tests/security/test_evolution_security.py::test_evolution_api_blocks_traversal_pickle_rce_and_schema_injection PASSED [ 12%]
+tests/security/test_evolution_security.py::test_tampered_checkpoint_detected_via_sha256_revalidation PASSED [ 25%]
+tests/security/test_security_controls.py::test_path_traversal_null_bytes_and_unc_rejected PASSED [ 37%]
+tests/security/test_security_controls.py::test_shard_index_traversal_rejected PASSED [ 50%]
+tests/security/test_security_controls.py::test_malformed_and_adversarial_safetensors_headers PASSED [ 62%]
+tests/security/test_security_controls.py::test_unsafe_pickle_rce_gadget_rejected_before_execution PASSED [ 75%]
+tests/security/test_security_controls.py::test_api_security_headers_payload_limit_and_traversal_blocking PASSED [ 87%]
+tests/security/test_security_controls.py::test_default_allowed_roots_honors_cwd_and_env_override PASSED [100%]
 
-====================== 5 passed, 50 deselected in 6.67s =======================
+====================== 8 passed, 56 deselected in 6.84s =======================
 
 --- STDERR ---
 

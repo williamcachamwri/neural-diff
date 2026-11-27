@@ -1,0 +1,122 @@
+[
+  {
+    "filename": "evidence/frontend/16-evolution-dashboard.png",
+    "timestamp_utc": "2026-11-27T07:00:47.054890+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Evolution Dashboard & Insights",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Evolution Analytics Dashboard showing global KPIs, 6-checkpoint SmolLM2-135M DAG summary, and evidence-backed evolution insights."
+  },
+  {
+    "filename": "evidence/frontend/18-evolution-branched-graph.png",
+    "timestamp_utc": "2026-11-27T07:00:47.864242+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Branched & Merged Evolution Graph",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Interactive ReactFlow branched & merged Evolution DAG (Base -> Instruct-SFT & SFT-Conservative -> Merged-AB -> Quantized-LowBit -> Pruned-MLP) with regression & peak \u0394W highlighting."
+  },
+  {
+    "filename": "evidence/frontend/17-evolution-timeline.png",
+    "timestamp_utc": "2026-11-27T07:00:58.847961+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Evolution Lineage Timeline & Pair Comparator",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Evolution generation timeline and live arbitrary cross-version comparison panel showing LCA and direct float64 L2/Cosine metrics."
+  },
+  {
+    "filename": "evidence/frontend/19-evolution-checkpoint-registry.png",
+    "timestamp_utc": "2026-11-27T07:00:59.650068+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Checkpoint Registry",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Checkpoint Registry table listing all 6 SmolLM2-135M checkpoints with transformation types, parameter/layer counts, and SHA-256 content fingerprints."
+  },
+  {
+    "filename": "evidence/frontend/20-evolution-checkpoint-details.png",
+    "timestamp_utc": "2026-11-27T07:01:00.555607+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Checkpoint Provenance & Details",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Checkpoint Details inspector for `v3 \u00b7 Quantized-LowBit` showing SHA-256 hash, tensor structure hash, parent IDs, format, file size, and quantization metadata."
+  },
+  {
+    "filename": "evidence/frontend/21-evolution-tensor-comparison.png",
+    "timestamp_utc": "2026-11-27T07:01:01.365627+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Multi-Gen & Cumulative Tensor Evolution",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Multi-Generation & Direct Cumulative Weight Distance (Base -> Current vs Step Sum) SVG chart, sparsity deltas, and zero-transition ledger."
+  },
+  {
+    "filename": "evidence/frontend/22-evolution-layer-heatmap.png",
+    "timestamp_utc": "2026-11-27T07:01:02.113013+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Layer Evolution Heatmap",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Layer Weight Evolution Heatmap across 30 SmolLM2 decoder blocks, outlier layer KPIs, and canonical Attention/MLP/Norm/Embedding breakdown."
+  },
+  {
+    "filename": "evidence/frontend/23-evolution-behavioral-chart.png",
+    "timestamp_utc": "2026-11-27T07:01:02.935969+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Behavioral Evolution Chart",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Multi-Generation Behavioral Capability & Pass-Rate Timeline with 95% Wilson CIs, McNemar p-values, output consistency, and category score matrix."
+  },
+  {
+    "filename": "evidence/frontend/24-evolution-representation-matrix.png",
+    "timestamp_utc": "2026-11-27T07:01:03.777265+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Representation CKA Evolution Matrix",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Representation Evolution Matrix displaying layer-wise Centered Linear CKA relative to Base, representation drift, Logit JS divergence, and cross-checkpoint causal patching."
+  },
+  {
+    "filename": "evidence/frontend/25-evolution-regression-origin.png",
+    "timestamp_utc": "2026-11-27T07:01:04.584640+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Regression Origin Analysis",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Automatic Regression Origin Analysis pinpointing `v2 \u00b7 Merged-AB -> v3 \u00b7 Quantized-LowBit` as the origin of capability regression with epistemic CORRELATED vs CAUSALLY VERIFIED distinction."
+  },
+  {
+    "filename": "evidence/frontend/26-evolution-experiment-details.png",
+    "timestamp_utc": "2026-11-27T07:01:05.378726+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Experiment Reproducibility Details",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Experiment Reproducibility & Provenance Ledger showing SHA-256 content cache key, dataset fingerprint, random seed, hardware/software versions, and JSON/CSV/HTML/PDF export links."
+  },
+  {
+    "filename": "evidence/frontend/27-evolution-exported-report.png",
+    "timestamp_utc": "2026-11-27T07:01:05.930142+00:00",
+    "app_version": "0.1.0",
+    "browser_version": "Chromium 159.0.8154.6",
+    "scenario": "Exported Standalone Evolution Report",
+    "capture_method": "Playwright Chromium headless (`page.screenshot`)",
+    "data_provenance": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+    "demonstrates": "Rendered standalone HTML Evolution Report (`evidence/evolution/exports/evorun-real-smollm2.html`) containing SVG cumulative weight & behavioral charts, registry hashes, and regression origin tables."
+  }
+]

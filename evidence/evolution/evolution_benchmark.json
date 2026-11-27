@@ -1,0 +1,240 @@
+{
+  "experiment_type": "REAL MODEL EXPERIMENT (SmolLM2-135M 6-Checkpoint Branched & Merged DAG)",
+  "run_id": "evorun-real-smollm2",
+  "wall_clock_seconds": 442.816,
+  "overview": {
+    "total_checkpoints": 6,
+    "healthy_checkpoints": 6,
+    "total_transformations": 6,
+    "branch_count": 2,
+    "detected_regressions": 12,
+    "most_modified_layers": [
+      0,
+      2,
+      1
+    ],
+    "least_modified_layers": [
+      19,
+      12,
+      11
+    ],
+    "peak_cumulative_l2": 293.20594318564014,
+    "min_base_cosine_similarity": 0.9904327496350145
+  },
+  "regression_events_count": 12,
+  "regression_origins": [
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "code_preservation",
+      "pass_rate_before": 0.666667,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v0 \u00b7 SmolLM2-Base",
+      "first_affected_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "affected_category": "conciseness",
+      "pass_rate_before": 0.333333,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "factual_accuracy",
+      "pass_rate_before": 0.666667,
+      "pass_rate_after": 0.333333,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "refusal_behavior",
+      "pass_rate_before": 0.666667,
+      "pass_rate_after": 0.333333,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v0 \u00b7 SmolLM2-Base",
+      "first_affected_label": "v1a \u00b7 Instruct-SFT",
+      "transformation_type": "Instruction Tuning",
+      "affected_category": "conciseness",
+      "pass_rate_before": 0.333333,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v1b \u00b7 SFT-Conservative",
+      "first_affected_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "affected_category": "math_reasoning",
+      "pass_rate_before": 0.333333,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "overall",
+      "pass_rate_before": 0.375,
+      "pass_rate_after": 0.125,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v0 \u00b7 SmolLM2-Base",
+      "first_affected_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "affected_category": "json_reliability",
+      "pass_rate_before": 0.0,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v1a \u00b7 Instruct-SFT",
+      "first_affected_label": "v2 \u00b7 Merged-AB",
+      "transformation_type": "Model Merging",
+      "affected_category": "json_reliability",
+      "pass_rate_before": 0.666667,
+      "pass_rate_after": 0.666667,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v0 \u00b7 SmolLM2-Base",
+      "first_affected_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "affected_category": "vietnamese",
+      "pass_rate_before": 0.0,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v0 \u00b7 SmolLM2-Base",
+      "first_affected_label": "v1b \u00b7 SFT-Conservative",
+      "transformation_type": "SFT",
+      "affected_category": "code_preservation",
+      "pass_rate_before": 0.0,
+      "pass_rate_after": 0.0,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    },
+    {
+      "previous_label": "v2 \u00b7 Merged-AB",
+      "first_affected_label": "v3 \u00b7 Quantized-LowBit",
+      "transformation_type": "Quantization",
+      "affected_category": "instruction_following",
+      "pass_rate_before": 0.333333,
+      "pass_rate_after": 0.333333,
+      "epistemic_status": "CAUSALLY VERIFIED"
+    }
+  ],
+  "insights": [
+    {
+      "insight_id": "insight-peak-weight-shift",
+      "domain": "weight_evolution",
+      "statement": "Quantization (v2 \u00b7 Merged-AB \u2192 v3 \u00b7 Quantized-LowBit) introduced the largest observed weight perturbation (Relative L2 = 0.119012, RMSE = 0.021662, 98.71% parameters modified).",
+      "epistemic_status": "OBSERVED",
+      "checkpoints": [
+        "ckpt-smol-02-merged",
+        "ckpt-smol-03-quant"
+      ],
+      "evaluation_cases": [],
+      "supporting_measurements": {
+        "relative_l2_distance": 0.11901182925437641,
+        "l2_distance": 251.2417673633857,
+        "rmse": 0.021662394912257348,
+        "max_abs_diff": 0.0390625,
+        "modified_parameter_pct": 98.711479
+      }
+    },
+    {
+      "insight_id": "insight-cumulative-geometry",
+      "domain": "weight_evolution",
+      "statement": "Direct cumulative L2 distance from v0 \u00b7 SmolLM2-Base to v3 \u00b7 Quantized-LowBit is 293.205943 versus 461.536515 summed across individual transitions (direct/sum ratio = 0.6353), reflecting non-collinear multi-stage parameter updates.",
+      "epistemic_status": "OBSERVED",
+      "checkpoints": [
+        "ckpt-smol-00-base",
+        "ckpt-smol-03-quant"
+      ],
+      "evaluation_cases": [],
+      "supporting_measurements": {
+        "direct_base_to_target_l2": 293.20594318564014,
+        "sum_of_consecutive_step_l2": 461.5365146392894,
+        "path_cancellation_ratio": 0.635282
+      }
+    },
+    {
+      "insight_id": "insight-peak-representation-drift",
+      "domain": "representation_evolution",
+      "statement": "Most representation drift occurred between v1b \u00b7 SFT-Conservative and v2 \u00b7 Merged-AB (Model Merging: mean Linear CKA = 0.835273, drift = 0.164727).",
+      "epistemic_status": "OBSERVED",
+      "checkpoints": [
+        "ckpt-smol-01b-branch",
+        "ckpt-smol-02-merged"
+      ],
+      "evaluation_cases": [],
+      "supporting_measurements": {
+        "mean_linear_cka": 0.835273,
+        "mean_representation_drift": 0.164727,
+        "mean_logit_js_divergence": 0.408168
+      }
+    },
+    {
+      "insight_id": "insight-trajectory-reversal-instruction_following",
+      "domain": "behavioral_evolution",
+      "statement": "Category 'instruction_following' improved after Instruction Tuning (v0 \u00b7 SmolLM2-Base \u2192 v1a \u00b7 Instruct-SFT, \u0394=+0.278) but declined downstream after Model Merging (v1a \u00b7 Instruct-SFT \u2192 v2 \u00b7 Merged-AB, \u0394=-0.056, n=3).",
+      "epistemic_status": "OBSERVED",
+      "checkpoints": [
+        "ckpt-smol-00-base",
+        "ckpt-smol-01a-instruct",
+        "ckpt-smol-02-merged"
+      ],
+      "evaluation_cases": [],
+      "supporting_measurements": {
+        "category": "instruction_following",
+        "sample_size": 3,
+        "initial_gain_delta": 0.277778,
+        "subsequent_drop_delta": -0.055556
+      }
+    },
+    {
+      "insight_id": "insight-regression-origin-reg-orig-8aad5006",
+      "domain": "regression_origin",
+      "statement": "Quantization (v2 \u00b7 Merged-AB \u2192 v3 \u00b7 Quantized-LowBit) is the first observed transition associated with regression in 'code_preservation' (pass rate 66.7% \u2192 0.0%, failed cases: code-01, code-03).",
+      "epistemic_status": "CAUSALLY VERIFIED",
+      "checkpoints": [
+        "ckpt-smol-02-merged",
+        "ckpt-smol-03-quant"
+      ],
+      "evaluation_cases": [
+        "code-01",
+        "code-03"
+      ],
+      "supporting_measurements": {
+        "pass_rate_before": 0.666667,
+        "pass_rate_after": 0.0,
+        "score_drop": 0.666667,
+        "confidence_level": "exploratory_small_sample",
+        "causal_verification_exists": true
+      }
+    },
+    {
+      "insight_id": "insight-anomalous-layer-shift",
+      "domain": "layer_evolution",
+      "statement": "Layer 0 exhibited an unusually concentrated weight modification (peak Relative L2 = 0.140196, z-score = +5.21).",
+      "epistemic_status": "OBSERVED",
+      "checkpoints": [],
+      "evaluation_cases": [],
+      "supporting_measurements": {
+        "layer_index": 0,
+        "peak_relative_l2": 0.1401963,
+        "z_score": 5.211,
+        "epistemic_status": "OBSERVED"
+      }
+    }
+  ]
+}

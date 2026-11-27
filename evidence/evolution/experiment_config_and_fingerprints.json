@@ -1,0 +1,107 @@
+{
+  "project": {
+    "project_id": "evo-smollm2-dag",
+    "name": "SmolLM2-135M Post-Training & Compression DAG",
+    "description": "Real 6-checkpoint branched & merged lifecycle: Base -> Instruct-A / SFT-B -> Merged-AB -> LowBit-Quantized -> MLP-Pruned",
+    "base_checkpoint_id": "ckpt-smol-00-base",
+    "created_at_utc": "2026-11-27T06:04:30.949378+00:00",
+    "updated_at_utc": "2026-11-27T06:11:55.408639+00:00",
+    "tags": [
+      "real-model",
+      "smollm2-135m",
+      "branched-dag",
+      "merge",
+      "quantization",
+      "pruning"
+    ],
+    "metadata": {}
+  },
+  "config": {
+    "include_tensor_evolution": true,
+    "include_layer_evolution": true,
+    "include_behavioral_evolution": true,
+    "include_representation_evolution": true,
+    "enable_causal_patching": true,
+    "preferred_device": "auto",
+    "tolerances": {
+      "atol": 1e-06,
+      "rtol": 1e-05,
+      "zero_threshold": 0.0,
+      "eps": 1e-12
+    },
+    "chunk_elements": 1048576,
+    "top_k_tensors": 10,
+    "behavioral_categories": null,
+    "behavioral_max_cases": null,
+    "max_new_tokens": 64,
+    "seed": 42,
+    "prompt_mode": "chat_if_available",
+    "overall_pass_rate_drop_threshold": 0.05,
+    "category_score_drop_threshold": 0.1,
+    "local_files_only": true,
+    "allow_cache": true,
+    "force_rerun": true
+  },
+  "provenance": {
+    "run_id": "evorun-real-smollm2",
+    "project_id": "evo-smollm2-dag",
+    "content_cache_key": "d984226c67dc9c7a2a474ec783bdbd503ecf960d4226a25a2ea904c1b080a9b8",
+    "checkpoint_fingerprints": {
+      "ckpt-smol-00-base": {
+        "version_label": "v0 \u00b7 SmolLM2-Base",
+        "sha256": "63ab1871ad3c75fc48cb5e13ea2c513b8de8fce592809075eceb3e53c55387d8",
+        "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b"
+      },
+      "ckpt-smol-01a-instruct": {
+        "version_label": "v1a \u00b7 Instruct-SFT",
+        "sha256": "f3f4354aca65b660200a7774eb4e0e807d0e07dfc8b06bf46f99143d4aa186d5",
+        "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b"
+      },
+      "ckpt-smol-01b-branch": {
+        "version_label": "v1b \u00b7 SFT-Conservative",
+        "sha256": "9c08df59e186d163f43bdbdbb6d5ff5928b799f74e49c80b2c89e66949cbff29",
+        "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b"
+      },
+      "ckpt-smol-02-merged": {
+        "version_label": "v2 \u00b7 Merged-AB",
+        "sha256": "47d3304b11ee1ede82bb7de1c2f17b8ce7e1b3d9696c37aca14f9b647ca5e426",
+        "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b"
+      },
+      "ckpt-smol-03-quant": {
+        "version_label": "v3 \u00b7 Quantized-LowBit",
+        "sha256": "a7bc6af1db3af889290736ff490fb1ea0a181b60abb717db5315ac1f8e24a4bb",
+        "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b"
+      },
+      "ckpt-smol-04-pruned": {
+        "version_label": "v4 \u00b7 Pruned-MLP",
+        "sha256": "1843abcb58ed9810a6c9967a4599cd77f4765ae9e65a5c62ffd6fff31b26d394",
+        "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b"
+      }
+    },
+    "evaluation_dataset_fingerprint": "af4eb4452a640ee386ca89214dd3d51125d9d0af383195c6eadf9aa28ca95d44",
+    "random_seed": 42,
+    "software_versions": {
+      "python": "3.12.16",
+      "platform": "Windows-11-10.0.26320-SP0",
+      "neural_diff": "0.1.0",
+      "torch": "2.10.0+cu128",
+      "transformers": "5.24.1",
+      "safetensors": "0.8.0"
+    },
+    "hardware": {
+      "timestamp_monotonic": 2940.0115984,
+      "process_rss_mb": 1706.02,
+      "system_available_ram_mb": 1378.07,
+      "system_total_ram_mb": 16088.54,
+      "cuda_available": true,
+      "cuda_allocated_mb": 0.0,
+      "cuda_reserved_mb": 0.0,
+      "cuda_total_vram_mb": 8150.56,
+      "selected_device": "cuda:0"
+    },
+    "selected_device": "cuda:0",
+    "device_reason": "Verified CUDA kernel execution on NVIDIA GeForce RTX 5050 Laptop GPU (7062 MB free VRAM).",
+    "started_at_utc": "2026-11-27T06:04:32.925638+00:00",
+    "completed_at_utc": "2026-11-27T06:11:55.408639+00:00"
+  }
+}

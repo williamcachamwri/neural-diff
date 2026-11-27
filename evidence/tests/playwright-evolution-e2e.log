@@ -1,0 +1,11 @@
+=== Command: npx playwright test ===
+Exit Code: 0
+
+
+Running 2 tests using 2 workers
+
+  ok 1 [chromium] › tests\e2e.spec.ts:4:3 › NEURAL DIFF Full-Stack Live E2E Workflow › verifies live backend health, compatibility validation, error handling, and all 12 views (3.2s)
+  ok 2 [chromium] › tests\evolution.e2e.spec.ts:4:3 › NEURAL DIFF Neural Evolution Tracking Live E2E › creates an evolution project, registers checkpoints, runs analysis, inspects DAG, and previews export (6.0s)
+
+  2 passed (6.5s)
+

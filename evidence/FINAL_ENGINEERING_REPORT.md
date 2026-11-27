@@ -30,7 +30,8 @@ Captured via [`scripts/capture_environment.py`](../scripts/capture_environment.p
 | **Module E — Activation Diff, Logit Lens & Patching** | `VERIFIED` | Identical-prompt forward hooks, orthogonal-invariant Linear CKA, next-token JS divergence (`OBSERVED`), Logit Lens (`OBSERVED`), and counterfactual residual-stream activation patching (`CAUSALLY VERIFIED` on paired prompts) (`core/activation_analysis/`) |
 | **Module F — Deterministic Behavioral Harness** | `VERIFIED` | 8 zero-LLM-judge evaluation suites (`24` paired cases), paired bootstrap 95% CI, exact two-sided McNemar test (`core/behavioral_analysis/`, `benchmarks/`) |
 | **Module G — Regression Engine & Diff-of-Diffs** | `VERIFIED` | Threshold policy evaluation, severity classification, SQLite/JSON baselines, deterministic CLI reproducers, multi-run historical trend comparator (`core/regression_engine/`) |
-| **Module H — Multi-Format Report Engine** | `VERIFIED` | Standalone HTML (inline SVG charts), Markdown, and strict JSON exports (`core/report_engine/exporter.py`) |
+| **Module H — Multi-Format Report Engine** | `VERIFIED` | Minimalist Architectural Monochrome HTML (5 inline SVGs), Mermaid + Unicode sparkbar Markdown, and strict JSON exports (`core/report_engine/exporter.py`, `core/report_engine/visuals.py`) |
+| **Module I — Neural Evolution Tracking** | `VERIFIED` | Branched & merged DAG (`core/evolution/dag.py`), SHA-256 registry (`registry.py`), direct base-to-current cumulative math (`tensor_evolution.py`), layer engine, behavioral Wilson/McNemar timeline, representation CKA + cross-checkpoint patching, regression origin pinpointing, SQLite migrations (`store.py`), 20 REST routes, and JSON/CSV/MD/HTML/PDF exporters |
 | **FastAPI Backend, Diagnostics & CLI** | `VERIFIED` | REST API (`api/app.py`, `api/routes/diagnostics.py`), WAL SQLite store (`data/neural_diff.db`), security hardening middleware, cooperative job cancellation, and `neural-diff` CLI (`core/cli.py`) |
 | **ComfyUI Nodes 2.0 Monochrome Frontend Studio** | `VERIFIED` | Unified single-header React 19 + TypeScript + `@xyflow/react` + `framer-motion` studio with 9-node interactive DAG, Bezier/Orthogonal PCB cable routing, proportional head bars, master-detail behavioral workbench, and live SVD probe (`frontend/`) |
 | **Multilingual Documentation (5 Languages)** | `VERIFIED` | Primary English [`README.md`](../README.md) + full translations in Vietnamese, Simplified Chinese, Japanese, and French under [`docs/i18n/`](../docs/i18n/) + 12 technical guides under [`docs/`](../docs/) |
@@ -44,17 +45,17 @@ Executed via `.venv\Scripts\python.exe scripts/run_all_tests.py` and `.venv\Scri
 | Suite | Exact Command | Exit Code | Result | Evidence Log |
 | :--- | :--- | ---: | :--- | :--- |
 | Ruff Linting | `python -m ruff check core adapters benchmarks api tests scripts` | `0` | **PASS** | [`evidence/tests/ruff-lint.log`](tests/ruff-lint.log) |
-| MyPy Typecheck | `python -m mypy core adapters benchmarks api` (`70` files) | `0` | **PASS** | [`evidence/tests/mypy-typecheck.log`](tests/mypy-typecheck.log) |
-| Unit Tests | `python -m pytest -m unit -v` | `0` | **36 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
+| MyPy Typecheck | `python -m mypy core adapters benchmarks api` (`86` files) | `0` | **PASS** | [`evidence/tests/mypy-typecheck.log`](tests/mypy-typecheck.log) |
+| Unit Tests | `python -m pytest -m unit -v` | `0` | **42 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
 | Property Tests | `python -m pytest -m property -v` (Hypothesis) | `0` | **7 passed** | [`evidence/tests/property-tests.log`](tests/property-tests.log) |
-| Integration Tests | `python -m pytest -m integration -v` | `0` | **4 passed** | [`evidence/tests/integration-tests.log`](tests/integration-tests.log) |
+| Integration Tests | `python -m pytest -m integration -v` | `0` | **6 passed** | [`evidence/tests/integration-tests.log`](tests/integration-tests.log) |
 | Regression Tests | `python -m pytest -m regression -v` | `0` | **1 passed** | [`evidence/tests/regression-tests.log`](tests/regression-tests.log) |
-| Security Tests | `python -m pytest -m security -v` | `0` | **5 passed** | [`evidence/tests/security-tests.log`](tests/security-tests.log) |
-| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **55 passed · `90%` (`4,682` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
+| Security Tests | `python -m pytest -m security -v` | `0` | **7 passed** | [`evidence/tests/security-tests.log`](tests/security-tests.log) |
+| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **64 passed · `89%` (`7,590` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
 | Frontend Typecheck | `npm --prefix frontend run typecheck` | `0` | **PASS** | [`evidence/tests/frontend-typecheck.log`](tests/frontend-typecheck.log) |
-| Frontend Unit | `npm --prefix frontend run test` (Vitest) | `0` | **3 passed (2 files)** | [`evidence/tests/frontend-vitest.log`](tests/frontend-vitest.log) |
+| Frontend Unit | `npm --prefix frontend run test` (Vitest) | `0` | **4 passed (3 files)** | [`evidence/tests/frontend-vitest.log`](tests/frontend-vitest.log) |
 | Production Build | `npm --prefix frontend run build` (Vite 8) | `0` | **PASS** | [`evidence/tests/frontend-build.log`](tests/frontend-build.log) |
-| Live Full-Stack E2E | `npx playwright test` (Chromium) | `0` | **1 passed** | [`evidence/tests/playwright-e2e.log`](tests/playwright-e2e.log) |
+| Live Full-Stack E2E | `npx playwright test` (Chromium) | `0` | **2 passed** | [`evidence/tests/playwright-e2e.log`](tests/playwright-e2e.log) |
 
 **Preserved Historical Failure Logs & Corrections (Section 2.4):**
 * [`evidence/tests/ruff-lint-initial-failure.log`](tests/ruff-lint-initial-failure.log) & [`evidence/tests/mypy-typecheck-initial-failure.log`](tests/mypy-typecheck-initial-failure.log) — Initial import sorting and variable-shadowing lints resolved cleanly.
@@ -65,7 +66,7 @@ Executed via `.venv\Scripts\python.exe scripts/run_all_tests.py` and `.venv\Scri
 
 ## D. Live Application Screenshots (`VERIFIED`)
 
-All 15 screenshots are indexed with timestamps, browser engine (`Chromium`), and provenance in [`evidence/SCREENSHOT_INDEX.md`](SCREENSHOT_INDEX.md):
+All 27 live screenshots (`01`..`15` Pairwise Studio + `16`..`27` Neural Evolution Studio & Exported Report) are indexed with timestamps, browser engine (`Chromium`), and provenance in [`evidence/SCREENSHOT_INDEX.md`](SCREENSHOT_INDEX.md):
 
 1. [`evidence/frontend/01-dashboard.png`](frontend/01-dashboard.png) — 9-node ComfyUI workflow graph canvas (Bezier spline mode).
 2. [`evidence/frontend/02-model-selection.png`](frontend/02-model-selection.png) — Model A & Model B comparison configuration.
@@ -150,8 +151,19 @@ npm --prefix frontend run dev
 # 4. Run benchmarks, recapture Playwright screenshots, and verify SHA-256 manifest
 .\.venv\Scripts\python.exe scripts/run_benchmarks.py
 .\.venv\Scripts\python.exe scripts/capture_screenshots.py
+.\.venv\Scripts\python.exe scripts/capture_evolution_evidence.py
 .\.venv\Scripts\python.exe scripts/verify_evidence.py
 ```
+
+---
+
+## J.2 Neural Evolution Tracking Extension (`VERIFIED`)
+
+Implemented in `core/evolution/`, `api/routes/evolution.py`, and `frontend/src/views/EvolutionStudioView.tsx` (documented in [`docs/NEURAL_EVOLUTION_TRACKING.md`](../docs/NEURAL_EVOLUTION_TRACKING.md)):
+
+* **Real 6-Checkpoint Branched & Merged Experiment (`evorun-real-smollm2`):** Executed across `SmolLM2-135M` Base -> (`Instruct-SFT` || `SFT-Conservative`) -> `Merged-AB` -> `Quantized-LowBit` -> `Pruned-MLP` ([`evidence/evolution/evolution_benchmark.json`](evolution/evolution_benchmark.json)).
+* **Verified Multi-Format Exports:** JSON, CSV, Mermaid-Markdown, 5-SVG HTML, and pure-Python multi-page `%PDF-1.4` reports archived under [`evidence/evolution/exports/`](evolution/exports/).
+* **Live Playwright Screenshots (`16`..`27`):** All 12 required Evolution views captured in `evidence/frontend/16-evolution-dashboard.png` through `27-evolution-exported-report.png` and indexed in [`evidence/SCREENSHOT_INDEX.md`](SCREENSHOT_INDEX.md).
 
 ---
 
