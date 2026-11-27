@@ -15,6 +15,7 @@ import { ActivationComparisonView } from "./views/ActivationComparisonView";
 import { BehavioralDiffView } from "./views/BehavioralDiffView";
 import { CompatibilityView } from "./views/CompatibilityView";
 import { DashboardView } from "./views/DashboardView";
+import { EvolutionStudioView } from "./views/EvolutionStudioView";
 import { ExperimentHistoryView } from "./views/ExperimentHistoryView";
 import { LayerVisualizationView } from "./views/LayerVisualizationView";
 import { ModelComparisonView } from "./views/ModelComparisonView";
@@ -26,6 +27,7 @@ import { TensorExplorerView } from "./views/TensorExplorerView";
 
 const NAV_ITEMS: Array<{ id: ViewId; short: string; title: string }> = [
   { id: "dashboard", short: "Canvas", title: "Workflow Graph" },
+  { id: "evolution", short: "Evolution", title: "Neural Evolution Tracking" },
   { id: "compare", short: "Compare", title: "Configure Comparison" },
   { id: "compatibility", short: "Validate", title: "Compatibility Check" },
   { id: "tensors", short: "Tensors", title: "Tensor Explorer" },
@@ -283,7 +285,9 @@ export const App: React.FC = () => {
               />
               <motion.section
                 aria-label="Inspector Sheet"
-                className={`inspector-sheet ${drawerExpanded ? "is-expanded" : ""}`}
+                className={`inspector-sheet ${
+                  drawerExpanded || activeView === "evolution" ? "is-expanded" : ""
+                }`}
                 initial={{ opacity: 0, x: 48 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 36 }}
@@ -364,6 +368,9 @@ export const App: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   >
+                    {activeView === "evolution" && (
+                      <EvolutionStudioView discovered={discovered} onError={handleError} />
+                    )}
                     {activeView === "compare" && (
                       <ModelComparisonView
                         discovered={discovered}

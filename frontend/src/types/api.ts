@@ -1,5 +1,6 @@
 export type ViewId =
   | "dashboard"
+  | "evolution"
   | "compare"
   | "compatibility"
   | "tensors"

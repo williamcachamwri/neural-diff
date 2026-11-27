@@ -406,6 +406,24 @@ function buildStudioNodes(
         onInspect,
       },
     },
+    {
+      id: "node-evolution",
+      pos: { x: 386, y: 534 },
+      matchViews: ["evolution"],
+      data: {
+        nodeIndex: "10",
+        title: "Evolution Lineage",
+        accentColor: "#d6c5a9",
+        targetView: "evolution",
+        inSocket: [{ id: "in-evo", label: "dag", color: "#d6c5a9" }],
+        rows: [
+          { key: "Topology", value: "Branch & Merge DAG", highlight: "#f4f4f5" },
+          { key: "Scopes", value: "Step · Base · Branch" },
+          { key: "Origin gate", value: "CKA · Behavioral" },
+        ],
+        onInspect,
+      },
+    },
   ];
 
   return defs.map((d) => ({
@@ -509,6 +527,14 @@ function buildStudioEdges(
       target: "node-regression",
       targetHandle: "in-reg-beh",
       color: "#e4e4e7",
+    },
+    {
+      id: "e-st-evo",
+      source: "node-structural",
+      sourceHandle: "out-st",
+      target: "node-evolution",
+      targetHandle: "in-evo",
+      color: "#d6c5a9",
     },
   ];
 
