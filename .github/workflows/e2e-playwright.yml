@@ -109,7 +109,7 @@ jobs:
             exit 1
           fi
 
-          npx --prefix frontend playwright test ${{ matrix.spec }}
+          (cd frontend && npx playwright test ${{ matrix.spec }})
 
       - name: Upload E2E failure diagnostics
         if: failure()

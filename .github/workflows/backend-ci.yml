@@ -77,7 +77,7 @@ jobs:
 
       - name: Verify Windows mmap clone safety, SQLite WAL & path confinement
         run: |
-          uv run pytest tests/unit/test_loaders_and_adapters.py tests/unit/test_evolution_dag_and_store.py tests/security/test_evolution_security.py -v
+          uv run --no-sources pytest tests/unit/test_loaders_and_adapters.py tests/unit/test_evolution_dag_and_store.py tests/security/test_evolution_security.py -v
 
   integration-and-coverage:
     name: Full Integration & Coverage Gate (>=85%)

@@ -80,27 +80,27 @@ jobs:
           from core.evolution.registry import inspect_and_build_checkpoint_record
           from core.evolution.store import EvolutionStore
           from core.security import SecurityPolicy
-          from tests.fixtures.evolution_factory import make_evolution_checkpoint_family
+          from tests.fixtures.evolution_factory import create_known_evolution_checkpoints
 
           out_dir = Path("/tmp/evo-ci-exports")
           out_dir.mkdir(parents=True, exist_ok=True)
           with TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
               root = Path(tmp)
               pol = SecurityPolicy(allowed_roots=[root, out_dir])
-              fam = make_evolution_checkpoint_family(root)
+              fam = create_known_evolution_checkpoints(root)
               store = EvolutionStore(db_path=root / "ci_evo.db")
               proj = store.create_project(name="CI Evolution Export Verification")
               c0 = store.add_checkpoint(inspect_and_build_checkpoint_record(
-                  project_id=proj.project_id, source=fam["base"], version_label="v0-Base",
+                  project_id=proj.project_id, source=fam["a"], version_label="v0-Base",
                   transformation_type="Base Model", policy=pol, local_files_only=True
               ))
               c1 = store.add_checkpoint(inspect_and_build_checkpoint_record(
-                  project_id=proj.project_id, source=fam["sft_a"], version_label="v1-SFT",
+                  project_id=proj.project_id, source=fam["b"], version_label="v1-SFT",
                   parent_checkpoint_ids=[c0.checkpoint_id], transformation_type="SFT",
                   policy=pol, local_files_only=True
               ))
               c2 = store.add_checkpoint(inspect_and_build_checkpoint_record(
-                  project_id=proj.project_id, source=fam["quant"], version_label="v2-Quant",
+                  project_id=proj.project_id, source=fam["d"], version_label="v2-Quant",
                   parent_checkpoint_ids=[c1.checkpoint_id], transformation_type="Quantization",
                   policy=pol, local_files_only=True
               ))
