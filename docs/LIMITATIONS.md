@@ -16,11 +16,17 @@ NEURAL DIFF is engineered with strict honesty about what static parameter compar
 
 ---
 
-## 2. Behavioral Evaluation Limitations
+## 2. Behavioral Evaluation & Statistical Power Limitations
 
 1. **Finite Deterministic Benchmark Coverage:**
-   The default deterministic suite (`neural-diff-core-v1`, 24 cases across 8 domains) eliminates external LLM-as-a-judge variance and API dependencies, but finite programmatic assertions cannot measure open-ended creative writing nuance, long-horizon multi-turn agentic planning, or subtle pragmatic tone shifts.
-2. **Prompt Formatting Sensitivity (Base vs. Instruct Checkpoints):**
+   The default deterministic suite (`neural-diff-core-v1`, 24 cases across 8 domains, $n = 3$ per category) eliminates external LLM-as-a-judge variance and API dependencies, but finite programmatic assertions cannot measure open-ended creative writing nuance, long-horizon multi-turn agentic planning, or subtle pragmatic tone shifts.
+2. **Minimum Sample Floor (`min_category_sample_size = 8`) & Binomial Discreteness:**
+   - Categories with $n < 8$ are strictly marked `is_exploratory = true` and `statistically_significant = false` regardless of raw score drops.
+   - Under exact two-sided binomial McNemar testing, the discrete minimum attainable raw $p$-value for $n$ discordant pairs is $p_{\min}(n) = 2^{1-n}$. At the minimum non-exploratory threshold $n = 8$, $p_{\min}(8) = 2^{-7} = 0.0078125$. Under step-down **Holm-Bonferroni** family-wise error correction across $m \ge 7$ categories (e.g., $m = 8$), even an $8/8$ unidirectional collapse yields $p_{\text{adj}} = 8 \times 0.0078125 = 0.0625 > 0.05$. Non-zero rejection power at $\alpha = 0.05$ for $m = 8$ requires $n \ge 9$, and $\ge 80\%$ power for moderate ($25\text{--}30\%$) pass-rate drops requires $n \ge 30$ per category (supported via `benchmark_suite_path`).
+   - Exact McNemar evaluates binary pass/fail flips only; continuous `score_only` regressions where binary pass/fail outcomes do not flip yield `mcnemar_p_value = 1.0` and must be interpreted via paired bootstrap 95% score CIs.
+3. **Strict Causal Verification Scoping:**
+   In Neural Evolution Tracking, diagnostic-prompt cross-checkpoint patching achieves at most `CAUSAL SUPPORT`. `CAUSALLY VERIFIED` requires all four provenance checks (`case_targeted`, `target_vs_foil_verified`, `negative_control_verified`, and case+site `verification_scope`) to be explicitly verified for every failed case in the event, and applies strictly to the tested prompt fingerprint and layer intervention site.
+4. **Prompt Formatting Sensitivity (Base vs. Instruct Checkpoints):**
    Pretrained base models lack chat templates (`tokenizer.chat_template`), whereas instruction-tuned models expect structured role delimiters. `BehavioralDiffEngine` records exact `formatted_input_a` and `formatted_input_b` strings under `chat_if_available` (default) and supports `identical_raw` mode so formatting choices remain auditable.
 
 ---
@@ -32,6 +38,6 @@ NEURAL DIFF is engineered with strict honesty about what static parameter compar
 2. **Apple Silicon Metal (`MPS`) & Multi-Node Sharding:**
    `ResourceManager` includes runtime `torch.backends.mps.is_available()` detection, which is `NOT VERIFIED` on this Windows 11 `AMD64` + NVIDIA RTX 5050 host. Very large multi-GPU models (>14B parameters exceeding local `8 GB` VRAM + `16 GB` RAM) can be compared structurally and via chunked out-of-core Safetensors tensor diffing on disk, but full forward-pass activation/behavioral inference is bounded by local RAM/VRAM capacity.
 3. **GitHub Actions Runner Hardware Scope:**
-   `.github/workflows/` runs 8 automated CI workflows (`backend-ci.yml`, `frontend-ci.yml`, `e2e-playwright.yml`, `security-audit.yml`, `codeql.yml`, `numerical-benchmarks.yml`, `docs-and-evidence.yml`, and `package-and-release.yml`) on CPU-hosted `ubuntu-latest` runners; real GPU-accelerated Hugging Face model benchmarks (`Qwen2.5-0.5B`, `SmolLM2-135M`) are verified on local CUDA hardware and archived in `evidence/`.
+   `.github/workflows/` runs 10 multi-node automated CI workflows (`backend-ci.yml`, `frontend-ci.yml`, `evolution-pipeline.yml`, `api-contract-and-db.yml`, `e2e-playwright.yml`, `security-audit.yml`, `codeql.yml`, `numerical-benchmarks.yml`, `docs-and-evidence.yml`, and `package-and-release.yml`) across CPU-hosted `ubuntu-latest` and `windows-latest` runners; real GPU-accelerated Hugging Face model benchmarks (`Qwen2.5-0.5B`, `SmolLM2-135M`) are verified on local CUDA hardware and archived in `evidence/`.
 4. **Localhost Single-User API Scope:**
    The FastAPI server is designed for local workstation execution (`127.0.0.1`) without built-in multi-user authentication or rate-limiting across untrusted public networks.

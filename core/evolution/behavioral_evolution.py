@@ -62,31 +62,38 @@ def wilson_ci_95(successes: int, total: int) -> tuple[float, float]:
 
 
 def holm_bonferroni_adjust(p_values: list[float]) -> list[float]:
-    """Apply Holm-Bonferroni step-down family-wise error correction to a list of raw p-values."""
+    """Apply Holm-Bonferroni step-down family-wise error correction to a list of raw p-values.
+
+    Uses deterministic `(clamped_p, original_index)` tie-breaking so tied raw p-values
+    always receive identical monotonic adjusted p-values in original input order.
+    """
     m = len(p_values)
     if m == 0:
         return []
-    indexed = sorted(enumerate(p_values), key=lambda kv: float(kv[1]))
+    clamped = [min(1.0, max(0.0, float(p))) for p in p_values]
+    indexed = sorted(enumerate(clamped), key=lambda kv: (kv[1], kv[0]))
     adjusted = [1.0] * m
     running_max = 0.0
     for rank, (orig_idx, raw_p) in enumerate(indexed):
-        scaled = min(1.0, max(0.0, float(raw_p)) * (m - rank))
+        scaled = min(1.0, raw_p * (m - rank))
         running_max = max(running_max, scaled)
         adjusted[orig_idx] = round(running_max, 6)
     return adjusted
 
 
 def build_behavioral_checkpoint_cache_key(ckpt: RegisteredCheckpoint) -> str:
-    """Build cache key spanning weights, architecture config, tokenizer artifacts, and adapter hashes."""
+    """Build cache key spanning all 5 component fingerprints (`weights`, `architecture_config`, `tokenizer`, `adapter`, `metadata`)."""
     comp = ckpt.component_fingerprints or {}
     if comp:
         payload = json.dumps(
             {
                 "composite": ckpt.sha256_fingerprint,
+                "tensor_metadata_hash": ckpt.tensor_metadata_hash,
                 "weights_sha256": comp.get("weights_sha256"),
                 "architecture_config_sha256": comp.get("architecture_config_sha256"),
                 "tokenizer_sha256": comp.get("tokenizer_sha256"),
                 "adapter_sha256": comp.get("adapter_sha256"),
+                "metadata_sha256": comp.get("metadata_sha256"),
             },
             sort_keys=True,
             separators=(",", ":"),
@@ -355,6 +362,7 @@ class BehavioralEvolutionEngine:
                 "pass_rate_after": cb["pass_rate"],
                 "pass_rate_delta": pr_delta,
                 "wilson_ci95_after": cb["pass_rate_wilson_ci95"],
+                "raw_p_value": cat_sig.mcnemar_p_value,
                 "mcnemar_p_value": cat_sig.mcnemar_p_value,
                 "bootstrap_ci95": [cat_sig.bootstrap_ci95_low, cat_sig.bootstrap_ci95_high],
                 "is_exploratory": n_cat < 8,
@@ -362,7 +370,7 @@ class BehavioralEvolutionEngine:
                     f"Exploratory sample (n={n_cat} < 8); insufficient power for standalone capability claims without an expanded suite."
                     if n_cat < 8
                     else (
-                        f"Observed on n={n_cat} deterministic test cases; moderate sample size."
+                        f"Observed on n={n_cat} deterministic test cases; exact two-sided McNemar minimum attainable p=2^(1-n)={2 ** (1 - n_cat):.6f} limits Holm-Bonferroni power across multi-category families unless n >= 30."
                         if n_cat < 30
                         else f"Observed on n={n_cat} test cases."
                     )
@@ -379,6 +387,7 @@ class BehavioralEvolutionEngine:
         holm_ps = holm_bonferroni_adjust(raw_cat_ps)
         for entry, adj_p in zip(cat_deltas, holm_ps, strict=True):
             entry["holm_bonferroni_p_value"] = adj_p
+            entry["adjusted_p_value"] = adj_p
 
         return {
             "scope": scope,
@@ -555,8 +564,8 @@ class BehavioralEvolutionEngine:
                 "sample_size": len(active_suite.cases),
                 "statistical_disclosure": (
                     f"Deterministic evaluation over n={len(active_suite.cases)} cases ({len({c.category for c in active_suite.cases})} categories). "
-                    "Pass rates include 95% Wilson binomial CIs; transition deltas include 95% bootstrap CIs and exact McNemar p-values. "
-                    "Higher scores on finite suites indicate observed benchmark gains, not unrestricted general capability acquisition."
+                    "Pass rates include 95% Wilson binomial CIs; transition deltas include 95% bootstrap CIs, exact two-sided McNemar raw p-values, and step-down Holm-Bonferroni adjusted p-values across category families. "
+                    "Categories with n < 8 are strictly gated as exploratory (`statistically_significant=False`); note that exact two-sided McNemar has a discrete floor p_min = 2^(1-n) (0.0078125 at n=8), requiring n >= 9 to reject at alpha=0.05 across m >= 7 categories and n >= 30 for >=80% power on moderate drops, while continuous score-only drops with zero binary flips yield McNemar p=1.0."
                 ),
                 "checkpoint_evaluations": [evals_by_id[cid] for cid in topo if cid in evals_by_id],
                 "timeline": timeline,

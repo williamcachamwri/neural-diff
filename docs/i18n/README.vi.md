@@ -156,8 +156,9 @@ flowchart TB
 
 ### Tầng 7 — Động Cơ Tiến Hóa Đa Thế Hệ DAG & Truy Nguyên (`Layer 7 · Module I`)
 * **Mã nguồn:** [`core/evolution/`](../../core/evolution/) (`dag.py`, `registry.py`, `store.py`, `tensor_evolution.py`, `layer_evolution.py`, `behavioral_evolution.py`, `representation_evolution.py`, `regression_origin.py`, `orchestrator.py`)
-* **Đồ thị tiến hóa phân nhánh & gộp mô hình:** Hỗ trợ 14 phép biến đổi (`Base Model`, `SFT`, `DPO`, `RLHF`, `LoRA`, `QLoRA`, `Model Merging`, `Quantization`, `Pruning`, `Distillation`...), đa cha có trọng số gộp, sắp xếp topo Kahn, truy vấn tổ tiên chung thấp nhất (LCA) và chặn chu trình DFS 3 màu (`CYCLIC_DEPENDENCY_ERROR`).
-* **Khoảng cách tích lũy trực tiếp & Truy vết nguồn gốc suy giảm:** Tính trực tiếp $\|W_{\text{current}} - W_{\text{base}}\|_2$ bằng `float64` (tuyệt đối không cộng dồn bước), theo dõi ma trận Linear CKA đa thế hệ và tự động chỉ đích danh bước chuyển đầu tiên gây suy giảm năng lực (`CORRELATED` so với `CAUSALLY VERIFIED`).
+* **Đồ thị DAG phân nhánh, gộp mô hình & DP không sót nhánh:** Hỗ trợ 14 phép biến đổi (`Base Model`, `SFT`, `DPO`, `RLHF`, `LoRA`, `QLoRA`, `Model Merging`, `Quantization`, `Pruning`, `Distillation`...), đa cha có trọng số gộp, sắp xếp topo Kahn, LCA, phân loại 7 quan hệ `classify_pair_scope()` và chặn chu trình DFS 3 màu. Hàm `count_total_branches()` đếm chính xác tổng đường đi gốc-lá trong $O(V+E)$ kết hợp `iter_branches(max_paths)`; khi `branch_count > max_branches`, cờ `branches_truncated = true` được gắn rõ ràng và `RegressionOriginEngine` chạy quy hoạch động trạng thái dòng dõi toàn đồ thị $O(|V|\cdot|E|)$ đảm bảo không bỏ sót cạnh, không nhân đôi sự kiện và không trộn lẫn lịch sử qua điểm gộp.
+* **Dấu vân tay SHA-256 trực giao 5 thành phần:** Băm luồng 4 MiB độc lập trên 5 miền — `weights_sha256` (dữ liệu trọng số thuần), `architecture_config_sha256` (`config.json`, `generation_config.json`, `quantize_config.json`), `tokenizer_sha256` (`tokenizer.json`, `tokenizer.model`, `spiece.model`, `tokenizer_config.json`, `vocab.json`, `merges.txt`, `special_tokens_map.json`, `added_tokens.json`, `chat_template.jinja`, `chat_template.json`), `adapter_sha256` (`adapter_config.json`, `adapter_model.safetensors`) và `metadata_sha256` (header mô tả tensor & `__metadata__`) — tự động vô hiệu hóa bộ nhớ đệm hành vi khi bất kỳ thành phần nào thay đổi.
+* **4 tầng nhận thức luận nhân quả & Thống kê chặt chẽ:** Tách biệt `OBSERVED`, `CORRELATED`, `CAUSAL SUPPORT` (vá kích hoạt câu chẩn đoán $\ge 20\%$) và `CAUSALLY VERIFIED` (bắt buộc cả 4 điều kiện `case_targeted`, `target_vs_foil_verified`, `negative_control_verified`, `verification_scope` đều tường minh `true` cho mọi ca lỗi của sự kiện; dữ liệu khuyết không bao giờ mặc định `true`). Kết hợp Wilson CI 95%, Bootstrap CI 95%, McNemar hai phía chính xác, hiệu chỉnh bậc thang **Holm-Bonferroni**, phân loại `pass_rate_and_score` / `pass_rate_only` / `score_only` và ngưỡng mẫu `min_category_sample_size = 8`.
 
 ### Tầng 8 — Giao Diện Studio, 37 REST Endpoints, CLI & Báo Cáo Trực Quan 5 Định Dạng (`Layer 8`)
 * **Mã nguồn:** [`core/report_engine/visuals.py`](../../core/report_engine/visuals.py), [`core/report_engine/exporter.py`](../../core/report_engine/exporter.py), [`core/evolution/exporter.py`](../../core/evolution/exporter.py), [`core/evolution/pdf_writer.py`](../../core/evolution/pdf_writer.py), [`api/`](../../api/), [`frontend/src/`](../../frontend/src/)
@@ -249,7 +250,7 @@ Toàn bộ 27 ảnh chụp dưới đây (`01`..`27`) được ghi lại tự đ
 #### 11. Xem Trước Trực Tiếp Báo Cáo Trực Quan HTML Tối Giản (`.html`, `.md`, `.json`)
 ![11 — Report Export](../../evidence/frontend/11-report-export.png)
 
-#### 12. Sổ Cái Kiểm Thử Tự Động & Độ Bao Phủ Câu Lệnh `89%` (64 Test Python)
+#### 12. Sổ Cái Kiểm Thử Tự Động & Độ Bao Phủ Câu Lệnh `89%` (69 Test Python)
 ![12 — Test Execution Summary](../../evidence/frontend/12-test-execution-summary.png)
 
 #### 13. Chặn Tấn Công Leo Thang Đường Dẫn Trực Tiếp (`HTTP 403`)
@@ -424,7 +425,7 @@ npm --prefix frontend run dev
 ## 11. Kiến Trúc CI/CD Đa Node, Kiểm Thử (`89%` Độ Phủ) & Kiểm Toán Bảo Mật
 
 * **10 Quy Trình GitHub Actions Đa Node ([`.github/workflows/`](../../.github/workflows)):** Bao gồm ma trận `Python 3.11 / 3.12`, ma trận `Node.js 20 / 22 LTS`, kiểm chứng chéo `ubuntu-latest` + `windows-latest` (kiểm định an toàn mmap Safetensors & khóa SQLite WAL trên Windows), phân mảnh song song Playwright E2E (`e2e.spec.ts` $\parallel$ `evolution.e2e.spec.ts`), quy trình kiểm định đồ thị tiến hóa & 5 định dạng báo cáo (`evolution-pipeline.yml`), cổng kiểm tra hợp đồng 37 REST OpenAPI & đồng thời SQLite (`api-contract-and-db.yml`), CodeQL, quét CVE/bí mật, kiểm chứng toán học Hypothesis và cài đặt sạch `.whl` tại `/tmp`.
-* **Phân tích tĩnh & Kiểm thử Python (`64 passed`):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `7,590` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
+* **Phân tích tĩnh & Kiểm thử Python (`69 passed`):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `8,149` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
 * **Frontend & E2E thực tế:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 build (`exit 0`, mọi JS chunk `< 500 KB`) và Playwright Chromium E2E (`2 passed`, `exit 0`).
 * **Kiểm toán lỗ hổng & bí mật:** `pip-audit` (`0` lỗ hổng), `npm audit` (`0` lỗ hổng) và trình quét khóa bí mật (`0` phát hiện).
 
@@ -432,8 +433,8 @@ npm --prefix frontend run dev
 
 ## 12. Toàn Vẹn Bằng Chứng SHA-256 & Giới Hạn Kỹ Thuật
 
-* **Xác minh SHA-256 & Nhật ký thay đổi:** Chạy `.\.venv\Scripts\python.exe scripts/verify_evidence.py` để đối chiếu toàn bộ các tệp bằng chứng trong [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json); lịch sử phát hành chi tiết xem tại [`CHANGELOG.md`](../../CHANGELOG.md) và [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md).
-* **Giới hạn kỹ thuật ([`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)):** Các chỉ số tọa độ cơ sở MLP/head mang tính đa nghĩa dưới hiện tượng chồng chập nếu không đi kèm phân rã thưa; bộ `default_suite_v1` gồm 24 câu kiểm thử tất định cho thời gian chạy cục bộ hợp lý; và `run_residual_patching` chứng minh tính nhân quả trong phạm vi cặp câu sạch/nhiễu và vị trí khối được thử nghiệm.
+* **Xác minh SHA-256 (`99` tệp bằng chứng) & Nhật ký thay đổi:** Chạy `.\.venv\Scripts\python.exe scripts/verify_evidence.py` để đối chiếu toàn bộ `99` tệp bằng chứng trong [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json); lịch sử phát hành chi tiết xem tại [`CHANGELOG.md`](../../CHANGELOG.md) và [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md).
+* **Giới hạn kỹ thuật & thống kê ([`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)):** Các chỉ số tọa độ cơ sở MLP/head mang tính đa nghĩa dưới hiện tượng chồng chập; bộ `default_suite_v1` gồm 24 câu ($n=3$/miền, được gắn cờ `is_exploratory = true` và `statistically_significant = false`); kiểm định nhị thức McNemar hai phía có sàn rời rạc $p_{\min}(n) = 2^{1-n}$ ($0.0078125$ tại `min_category_sample_size = 8`, cần $n \ge 9$ để bác bỏ ở $\alpha=0.05$ khi hiệu chỉnh Holm-Bonferroni trên $m \ge 7$ miền và cần $n \ge 30$ để đạt lực thống kê $\ge 80\%$, đồng thời suy giảm `score_only` không đảo nhãn đỗ/trượt có McNemar $p=1.0$); và nhãn `CAUSALLY VERIFIED` chỉ áp dụng nghiêm ngặt cho câu lệnh và tầng can thiệp đã kiểm chứng.
 
 ## Giấy Phép
 

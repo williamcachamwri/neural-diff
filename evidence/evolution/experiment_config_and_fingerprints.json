@@ -4,8 +4,8 @@
     "name": "SmolLM2-135M Post-Training & Compression DAG",
     "description": "Real 6-checkpoint branched & merged lifecycle: Base -> Instruct-A / SFT-B -> Merged-AB -> LowBit-Quantized -> MLP-Pruned",
     "base_checkpoint_id": "ckpt-smol-00-base",
-    "created_at_utc": "2026-11-27T08:42:04.781150+00:00",
-    "updated_at_utc": "2026-11-27T08:50:00.636919+00:00",
+    "created_at_utc": "2026-11-27T10:29:40.785915+00:00",
+    "updated_at_utc": "2026-11-27T10:37:21.660037+00:00",
     "tags": [
       "real-model",
       "smollm2-135m",
@@ -50,78 +50,78 @@
   "provenance": {
     "run_id": "evorun-real-smollm2",
     "project_id": "evo-smollm2-dag",
-    "content_cache_key": "4559df78467d3d57b19923b50757c2fab67c6488216c560dfb3d7a1a8b6f50c2",
+    "content_cache_key": "dcd6008e81cb40878e7168a29bf55ae192d58708ba57dec6a2889ec47bf705c8",
     "checkpoint_fingerprints": {
       "ckpt-smol-00-base": {
         "version_label": "v0 \u00b7 SmolLM2-Base",
-        "sha256": "cff3853ede6018c9b73f867aac70df17ba9d4e94969b750863867bfedc90675e",
+        "sha256": "a8e73d9570a0d6c085076522355ce681a46958143cd647012ecb6725d94310fa",
         "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
         "component_fingerprints": {
-          "weights_sha256": "720a76cbc5580aed4787ea52e25b3a4bce046b7b2d213c762180ef9693963090",
+          "weights_sha256": "76ceb14472cf61a2668c0fc17537d23c4433e2a7e2979477804bbf60d5a61b6e",
           "architecture_config_sha256": "5b130dc60de0d842a3c2e0317c1738d7f2f495ff1fca850d316e07a3ec402d91",
           "tokenizer_sha256": "28374742b2397be65510eaafee4188aa4b208e46566412db8a7d66c2f6b37982",
           "adapter_sha256": null,
-          "metadata_sha256": "b885263c1043ddc752841c0f95254a93c95a129cf6af2b4b3e6fe341bb8e0bf4"
+          "metadata_sha256": "a71565996daa51807cadc4a99a8a23e0d26ccbb0fde56e25107356605f3df56d"
         }
       },
       "ckpt-smol-01a-instruct": {
         "version_label": "v1a \u00b7 Instruct-SFT",
-        "sha256": "48511b85401c213adffc58a8ca8b195866e89f50f7e10ad03e22a72a81c6c3a2",
+        "sha256": "400d22e7ec47ab544a53bccc8d4a98805b7529ba3131104711d0e10a8ba68bda",
         "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
         "component_fingerprints": {
-          "weights_sha256": "ee5875a9f07e3e5eeb1a01e762bd84f48e8448ead427c15152805d6a494d216d",
+          "weights_sha256": "e4ed29bbb30e76e61bd8691db106d9bb1facd279384cae60b712d796f1e3676d",
           "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
           "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
           "adapter_sha256": null,
-          "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+          "metadata_sha256": "a71565996daa51807cadc4a99a8a23e0d26ccbb0fde56e25107356605f3df56d"
         }
       },
       "ckpt-smol-01b-branch": {
         "version_label": "v1b \u00b7 SFT-Conservative",
-        "sha256": "077d0e450295a09979245f4706ce441982c3c1cead2f27efdd8b2f7276774386",
+        "sha256": "f6fc0f4bbc137179bc0ae9fcdcd0bd94da05ef16f56bb93c627321ae36bbfbed",
         "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
         "component_fingerprints": {
-          "weights_sha256": "549a611f37138b774252fc67fc3d906793985a479c96a1a557eb7b080d6d20a1",
+          "weights_sha256": "04d52bc7f9808fc316b6e11feae47f1f99d0ad70def68a99769585eafd7a9c91",
           "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
           "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
           "adapter_sha256": null,
-          "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+          "metadata_sha256": "d8813c843b24a24d7d729c393828419999f52eff852a532fea2a67e532218ec7"
         }
       },
       "ckpt-smol-02-merged": {
         "version_label": "v2 \u00b7 Merged-AB",
-        "sha256": "93376a898fcf240906f533baae02a4e6a54fc84056a807bda9ec42f92029a8b3",
+        "sha256": "fa045e62f15dd004ce035edd3a6426f95495bfcd25eb6b024eadb02ce696ae06",
         "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
         "component_fingerprints": {
-          "weights_sha256": "2ebdf174b35744d588dd9650a45475f0e6134c50243faa23b2671c38db379064",
+          "weights_sha256": "8b510ccf10f9e80bd2495f6968b3ae9894d4d79e3c7ba75b58e6bbe2e1f2b313",
           "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
           "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
           "adapter_sha256": null,
-          "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+          "metadata_sha256": "d8813c843b24a24d7d729c393828419999f52eff852a532fea2a67e532218ec7"
         }
       },
       "ckpt-smol-03-quant": {
         "version_label": "v3 \u00b7 Quantized-LowBit",
-        "sha256": "4d80198e87abfa4887deb371c6bf051f6b61a3634c2414e85e7fe6e47cfdbf34",
+        "sha256": "420eeea0ed2117adc2f3262c054d972c808c6238d4e74fc24923634d305e446f",
         "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
         "component_fingerprints": {
-          "weights_sha256": "3b5f02006281719c461161763c87503df04f611410bf7a6a7ffcc2aeb867e24c",
+          "weights_sha256": "7aaaac79bdabe0669fd2291602bc5d01ed99867c462ce3c5b34b10ea437b6197",
           "architecture_config_sha256": "f829e86e202b5d79e340807973811c6118c5b7890630a3b241636455cadf4c60",
           "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
           "adapter_sha256": null,
-          "metadata_sha256": "21ce92b585ff704586a0bcfe662fac312b647ab554cc5abb79d11f6941a4e5e1"
+          "metadata_sha256": "d8813c843b24a24d7d729c393828419999f52eff852a532fea2a67e532218ec7"
         }
       },
       "ckpt-smol-04-pruned": {
         "version_label": "v4 \u00b7 Pruned-MLP",
-        "sha256": "e8cab17c9e414fb4c8129506e5e2dd78d1e9923e28d3ca1c0f4a499921361d50",
+        "sha256": "26e026a2fda19cd1dae43be362d4be31b240f58e08d8cf8915540b0e0640b9f1",
         "tensor_metadata_hash": "10d1fd31b2bfc23fe19b56ccfe2faa3377396a6840377734173dcbae34e2b28b",
         "component_fingerprints": {
-          "weights_sha256": "05a6e1c90c735775ad08a2b01ab2bea07e62e62b72edec3ea22d46c1cabc0ac4",
+          "weights_sha256": "c2000b40ba2ca4676ad845b79be93fb001e7b6e925edebaec068df7409ff7a67",
           "architecture_config_sha256": "039f4f95b5e27cae9847f625f01ca63f655b6c135ef646cec089cbb44f8669ff",
           "tokenizer_sha256": "ddbfaf8ba163c4103bf244608a3dacb453b6a153659ef46b2d4586855670c65d",
           "adapter_sha256": null,
-          "metadata_sha256": "299057e0ba491a83c22b821e8aa4d3fb160556b08b7dfddbf7ec0991df2a4fcf"
+          "metadata_sha256": "d8813c843b24a24d7d729c393828419999f52eff852a532fea2a67e532218ec7"
         }
       }
     },
@@ -136,9 +136,9 @@
       "safetensors": "0.8.0"
     },
     "hardware": {
-      "timestamp_monotonic": 12394.2484232,
-      "process_rss_mb": 1125.13,
-      "system_available_ram_mb": 1347.36,
+      "timestamp_monotonic": 18849.7978123,
+      "process_rss_mb": 568.27,
+      "system_available_ram_mb": 5230.48,
       "system_total_ram_mb": 16088.54,
       "cuda_available": true,
       "cuda_allocated_mb": 0.0,
@@ -148,7 +148,7 @@
     },
     "selected_device": "cuda:0",
     "device_reason": "Verified CUDA kernel execution on NVIDIA GeForce RTX 5050 Laptop GPU (7062 MB free VRAM).",
-    "started_at_utc": "2026-11-27T08:42:07.162002+00:00",
-    "completed_at_utc": "2026-11-27T08:50:00.636919+00:00"
+    "started_at_utc": "2026-11-27T10:29:42.458511+00:00",
+    "completed_at_utc": "2026-11-27T10:37:21.660037+00:00"
   }
 }

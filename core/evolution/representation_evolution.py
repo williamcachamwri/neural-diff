@@ -2,7 +2,8 @@
 
 Integrates forward-hook hidden-state capture, Centered Linear CKA, hidden-state cosine
 similarity, activation & logit distribution drift, Logit Lens (when architecture-compatible),
-and optional cross-checkpoint residual-stream Activation Patching (`CAUSALLY VERIFIED` vs `CORRELATED`).
+and optional cross-checkpoint residual-stream Activation Patching (`CAUSAL SUPPORT` on generic
+diagnostic transition prompts vs `CAUSALLY VERIFIED` strictly on case-targeted failed prompts).
 """
 
 from __future__ import annotations
@@ -97,10 +98,12 @@ def run_cross_checkpoint_layer_patching(
     input_ids: torch.Tensor,
     *,
     device: str = "cpu",
+    prompt_text: str | None = None,
 ) -> dict[str, Any] | None:
     """Interventional cross-checkpoint patching: patch clean Model A block outputs into Model B one layer at a time.
 
-    Strictly labeled `CAUSALLY VERIFIED` for the tested prompt sequence and residual stream site.
+    Labeled `CAUSAL SUPPORT` because it operates on a generic diagnostic prompt rather than
+    a case-targeted failed behavioral rubric case (`case_targeted=False`).
     """
     from transformers import AutoModelForCausalLM
 
@@ -188,7 +191,7 @@ def run_cross_checkpoint_layer_patching(
                 h_patch.remove()
 
             p_diff = float((patched_logits[target_tok] - patched_logits[foil_tok]).item())
-            recovery = 0.0 if abs(denom) < 1e-9 else (p_diff - corrupted_diff) / denom
+            recovery = 0.0 if denom <= 0.05 else (p_diff - corrupted_diff) / denom
             layer_effects.append(
                 {
                     "layer_index": idx,
@@ -200,21 +203,60 @@ def run_cross_checkpoint_layer_patching(
         del model_b
 
     top_causal = sorted(
-        layer_effects, key=lambda x: abs(float(x["recovery_fraction"])), reverse=True
+        layer_effects, key=lambda x: float(x["recovery_fraction"]), reverse=True
     )
     peak_rec = float(top_causal[0]["recovery_fraction"]) if top_causal else 0.0
-    non_top_abs = [abs(float(x["recovery_fraction"])) for x in top_causal[1:]]
-    min_control_abs = min(non_top_abs) if non_top_abs else 0.0
+    most_layer = int(top_causal[0]["layer_index"]) if top_causal else None
+    non_top = top_causal[1:]
+    min_control_entry = (
+        min(non_top, key=lambda x: abs(float(x["recovery_fraction"]))) if non_top else None
+    )
+    min_control_abs = (
+        abs(float(min_control_entry["recovery_fraction"])) if min_control_entry is not None else 0.0
+    )
+    prompt_raw = (
+        prompt_text.encode("utf-8")
+        if prompt_text is not None
+        else ",".join(str(int(x)) for x in input_ids.reshape(-1).tolist()).encode("utf-8")
+    )
+    prompt_fp = hashlib.sha256(prompt_raw).hexdigest()
+    target_foil_ok = bool(
+        target_tok != foil_tok and denom > 0.05 and peak_rec >= 0.20
+    )
+    neg_ctrl_ok = bool(
+        min_control_entry is not None and min_control_abs < 0.15 and min_control_abs < peak_rec
+    )
     return {
-        "epistemic_status": EpistemicStatus.CAUSAL_SUPPORT.value,
-        "prompt_level_causal_verification": abs(peak_rec) >= 0.20 and abs(denom) > 1e-6,
+        "epistemic_status": (
+            EpistemicStatus.CAUSAL_SUPPORT.value
+            if peak_rec >= 0.20 and denom > 0.05
+            else EpistemicStatus.OBSERVED.value
+        ),
+        "case_targeted": False,
+        "target_vs_foil_verified": target_foil_ok,
+        "negative_control_verified": neg_ctrl_ok,
+        "verification_scope": "diagnostic_prompt_transition_only",
+        "prompt_fingerprint": prompt_fp,
+        "failed_case_id": None,
+        "layer_index": most_layer,
+        "intervention_type": "residual_stream_layer_patch",
+        "target_token": target_tok,
+        "foil_token": foil_tok,
+        "negative_control_result": {
+            "control_layer_index": (
+                int(min_control_entry["layer_index"]) if min_control_entry is not None else None
+            ),
+            "control_recovery_fraction": round(min_control_abs, 6),
+        },
+        "recovery_measurement": round(peak_rec, 6),
+        "prompt_level_causal_verification": peak_rec >= 0.20 and denom > 0.05,
         "intervention_target": "diagnostic_prompt",
         "scope": "cross-checkpoint single-layer residual stream intervention on generic diagnostic prompt (supports transition hypothesis; does not causally verify unpatched behavioral rubric cases)",
         "target_token_id": target_tok,
         "foil_token_id": foil_tok,
         "clean_logit_diff": round(clean_diff, 6),
         "corrupted_logit_diff": round(corrupted_diff, 6),
-        "most_causal_layer": top_causal[0]["layer_index"] if top_causal else None,
+        "most_causal_layer": most_layer,
         "peak_recovery_fraction": peak_rec,
         "min_control_layer_abs_recovery": round(min_control_abs, 6),
         "layer_effects": layer_effects,
@@ -582,7 +624,11 @@ class RepresentationEvolutionEngine:
                 )
                 try:
                     patching_payload = run_cross_checkpoint_layer_patching(
-                        p_dir, c_dir, first_tok_ids, device=device
+                        p_dir,
+                        c_dir,
+                        first_tok_ids,
+                        device=device,
+                        prompt_text=bundles[pa_id].traces[0].prompt,
                     )
                 except Exception as exc:
                     _ = exc

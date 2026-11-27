@@ -2,7 +2,7 @@
 
 | Project ID | Run ID | Checkpoints | Branches | Regressions | Peak Direct L2 |
 | :--- | :--- | ---: | ---: | ---: | ---: |
-| `evo-smollm2-dag` | `evorun-real-smollm2` | 6 | 2 | 13 | `264.2170` |
+| `evo-smollm2-dag` | `evorun-real-smollm2` | 6 | 2 | 14 | `264.2170` |
 
 ```mermaid
 flowchart LR
@@ -68,24 +68,25 @@ flowchart LR
 
 | Transition | Stage | Category | Pass Shift | Evidence | Failed Cases |
 | :--- | :--- | :--- | ---: | :--- | :--- |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | conciseness | `33.3% → 0.0%` | Causal support | `conc-03` |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | conciseness | `33.3% → 0.0%` | Correlated | `conc-03` |
 | `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | Code preservation | `66.7% → 33.3%` | Causal support | `code-01` |
-| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Factual accuracy | `66.7% → 33.3%` | Causal support | `fact-01` |
-| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Refusal behavior | `66.7% → 33.3%` | Causal support | `ref-02` |
-| `v0 · SmolLM2-Base → v1a · Instruct-SFT` | Instruction Tuning | conciseness | `33.3% → 0.0%` | Causal support | `conc-03` |
-| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Instruction following | `33.3% → 0.0%` | Causal support | `inst-02` |
-| `v1b · SFT-Conservative → v2 · Merged-AB` | Model Merging | Math reasoning | `33.3% → 0.0%` | Causal support | `math-02` |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Json reliability | `0.0% → 0.0%` | Causal support | `—` |
+| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Factual accuracy | `66.7% → 33.3%` | Correlated | `fact-01` |
+| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | Json reliability | `66.7% → 33.3%` | Causal support | `json-01, json-03` |
+| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Refusal behavior | `66.7% → 33.3%` | Correlated | `ref-02` |
+| `v0 · SmolLM2-Base → v1a · Instruct-SFT` | Instruction Tuning | conciseness | `33.3% → 0.0%` | Correlated | `conc-03` |
+| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Instruction following | `33.3% → 0.0%` | Correlated | `inst-02` |
+| `v1b · SFT-Conservative → v2 · Merged-AB` | Model Merging | Math reasoning | `33.3% → 0.0%` | Correlated | `math-02` |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Json reliability | `0.0% → 0.0%` | Correlated | `—` |
 | `v1a · Instruct-SFT → v2 · Merged-AB` | Model Merging | Json reliability | `66.7% → 66.7%` | Causal support | `—` |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | vietnamese | `0.0% → 0.0%` | Causal support | `—` |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | vietnamese | `0.0% → 0.0%` | Correlated | `—` |
 | `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | overall | `37.5% → 33.3%` | Causal support | `code-01, json-01, json-03, inst-01` |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Code preservation | `0.0% → 0.0%` | Correlated | `—` |
 | `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | vietnamese | `0.0% → 0.0%` | Causal support | `—` |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Code preservation | `0.0% → 0.0%` | Causal support | `—` |
 
 ## Provenance
 
 | Parameter | Value |
 | :--- | :--- |
-| Content Cache Key | `4559df78467d3d57b19923b50757c2fab67c6488216c560dfb3d7a1a8b6f50c2` |
+| Content Cache Key | `dcd6008e81cb40878e7168a29bf55ae192d58708ba57dec6a2889ec47bf705c8` |
 | Device & Seed | `cuda:0` · seed `42` |
 | Dataset SHA-256 | `af4eb4452a640ee386ca8921` |

@@ -46,12 +46,12 @@ Executed via `.venv\Scripts\python.exe scripts/run_all_tests.py` and `.venv\Scri
 | :--- | :--- | ---: | :--- | :--- |
 | Ruff Linting | `python -m ruff check core adapters benchmarks api tests scripts` | `0` | **PASS** | [`evidence/tests/ruff-lint.log`](tests/ruff-lint.log) |
 | MyPy Typecheck | `python -m mypy core adapters benchmarks api` (`86` files) | `0` | **PASS** | [`evidence/tests/mypy-typecheck.log`](tests/mypy-typecheck.log) |
-| Unit Tests | `python -m pytest -m unit -v` | `0` | **46 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
+| Unit Tests | `python -m pytest -m unit -v` | `0` | **47 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
 | Property Tests | `python -m pytest -m property -v` (Hypothesis) | `0` | **7 passed** | [`evidence/tests/property-tests.log`](tests/property-tests.log) |
 | Integration Tests | `python -m pytest -m integration -v` | `0` | **6 passed** | [`evidence/tests/integration-tests.log`](tests/integration-tests.log) |
 | Regression Tests | `python -m pytest -m regression -v` | `0` | **1 passed** | [`evidence/tests/regression-tests.log`](tests/regression-tests.log) |
 | Security Tests | `python -m pytest -m security -v` | `0` | **8 passed** | [`evidence/tests/security-tests.log`](tests/security-tests.log) |
-| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **68 passed · `89%` (`7,828` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
+| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **69 passed · `89%` (`8,149` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
 | Frontend Typecheck | `npm --prefix frontend run typecheck` | `0` | **PASS** | [`evidence/tests/frontend-typecheck.log`](tests/frontend-typecheck.log) |
 | Frontend Unit | `npm --prefix frontend run test` (Vitest) | `0` | **4 passed (3 files)** | [`evidence/tests/frontend-vitest.log`](tests/frontend-vitest.log) |
 | Production Build | `npm --prefix frontend run build` (Vite 8) | `0` | **PASS** | [`evidence/tests/frontend-build.log`](tests/frontend-build.log) |

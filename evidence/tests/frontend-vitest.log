@@ -1,7 +1,7 @@
 === Suite: frontend_unit_tests ===
 Command: C:\Program Files\nodejs\npm.CMD --prefix frontend run test
-Started (UTC): 2026-11-27T08:59:17.592593+00:00
-Completed (UTC): 2026-11-27T08:59:21.084347+00:00
+Started (UTC): 2026-11-27T10:28:55.795165+00:00
+Completed (UTC): 2026-11-27T10:28:59.160728+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -12,14 +12,14 @@ Exit Code: 0
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.2 [39m[90mD:/LLM/frontend[39m
 
- [32m✓[39m src/__tests__/Formatters.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 3[2mms[22m[39m
- [32m✓[39m src/__tests__/EvolutionStudio.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 138[2mms[22m[39m
- [32m✓[39m src/__tests__/App.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 124[2mms[22m[39m
+ [32m✓[39m src/__tests__/Formatters.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/__tests__/EvolutionStudio.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 119[2mms[22m[39m
+ [32m✓[39m src/__tests__/App.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 129[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
 [2m      Tests [22m [1m[32m4 passed[39m[22m[90m (4)[39m
-[2m   Start at [22m 15:59:18
-[2m   Duration [22m 2.81s[2m (import 62%, environment 32%, tests 4%, transform 1%)[22m
+[2m   Start at [22m 17:28:56
+[2m   Duration [22m 2.70s[2m (import 59%, environment 35%, tests 4%, transform 1%)[22m
 
 
 --- STDERR ---

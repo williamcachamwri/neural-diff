@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import struct
 import uuid
 from pathlib import Path
 from typing import Any
@@ -23,6 +24,7 @@ from core.loaders.model_loader import ModelLoader
 from core.security import SecurityPolicy, read_validated_json
 
 HASH_CHUNK_BYTES = 4 * 1024 * 1024  # 4 MiB streaming chunks
+MAX_SAFETENSORS_HEADER_BYTES = 100 * 1024 * 1024
 
 ARCHITECTURE_CONFIG_FILES = (
     "config.json",
@@ -42,6 +44,7 @@ TOKENIZER_ARTIFACT_FILES = (
     "merges.txt",
     "added_tokens.json",
     "chat_template.jinja",
+    "chat_template.json",
 )
 
 ADAPTER_ARTIFACT_FILES = (
@@ -51,14 +54,26 @@ ADAPTER_ARTIFACT_FILES = (
 )
 
 
-def _stream_hash_files(files: list[Path]) -> tuple[str | None, int]:
-    """Stream-hash an ordered list of files in 4 MiB chunks with filename delimiters."""
+def _rel_posix(fp: Path, base_dir: Path | None) -> str:
+    if base_dir is not None and base_dir.is_dir():
+        try:
+            return fp.relative_to(base_dir).as_posix()
+        except ValueError:
+            pass
+    return fp.name
+
+
+def _stream_hash_files(
+    files: list[Path], *, base_dir: Path | None = None
+) -> tuple[str | None, int]:
+    """Stream-hash an ordered list of non-tensor files in 4 MiB chunks with POSIX relative-path delimiters."""
     if not files:
         return None, 0
     hasher = hashlib.sha256()
     total_bytes = 0
     for fp in files:
-        hasher.update(fp.name.encode("utf-8") + b"\x00")
+        rel_name = _rel_posix(fp, base_dir)
+        hasher.update(rel_name.encode("utf-8") + b"\x00")
         with fp.open("rb") as fh:
             while True:
                 chunk = fh.read(HASH_CHUNK_BYTES)
@@ -69,29 +84,155 @@ def _stream_hash_files(files: list[Path]) -> tuple[str | None, int]:
     return hasher.hexdigest(), total_bytes
 
 
+def _hash_weight_or_adapter_files(
+    files: list[Path], *, base_dir: Path | None = None
+) -> tuple[str | None, list[dict[str, Any]], int]:
+    """Orthogonally separate raw tensor buffer SHA-256 from `.safetensors` header metadata.
+
+    For `.safetensors` files with valid headers:
+      * Raw tensor byte slices `(start..end)` in sorted tensor name order feed the weight/adapter hash.
+      * Canonicalized `(tensor_name, dtype, shape, byte_length)` descriptors + `__metadata__` feed
+        the returned header metadata records (used exclusively for `metadata_sha256`).
+    For `.pt` / `.pth` / `.bin` / `adapter_config.json` (or malformed files), streams raw file bytes.
+    """
+    if not files:
+        return None, [], 0
+
+    hasher = hashlib.sha256()
+    header_records: list[dict[str, Any]] = []
+    total_disk_bytes = 0
+
+    for fp in files:
+        rel_name = _rel_posix(fp, base_dir)
+        file_size = fp.stat().st_size
+        total_disk_bytes += file_size
+        hasher.update(rel_name.encode("utf-8") + b"\x00")
+
+        parsed_safetensors = False
+        if fp.name.lower().endswith(".safetensors") and file_size >= 8:
+            try:
+                with fp.open("rb") as fh:
+                    hdr_len = struct.unpack("<Q", fh.read(8))[0]
+                    if 0 < hdr_len <= MAX_SAFETENSORS_HEADER_BYTES and (8 + hdr_len) <= file_size:
+                        hdr_obj = json.loads(fh.read(hdr_len).decode("utf-8"))
+                        if isinstance(hdr_obj, dict):
+                            data_base = 8 + hdr_len
+                            custom_raw = hdr_obj.get("__metadata__")
+                            custom_meta = (
+                                {str(k): str(v) for k, v in sorted(custom_raw.items())}
+                                if isinstance(custom_raw, dict)
+                                else {}
+                            )
+                            tensor_keys = sorted(k for k in hdr_obj if k != "__metadata__")
+                            tensor_descs: list[dict[str, Any]] = []
+                            slices_to_read: list[tuple[int, int]] = []
+                            valid_slices = True
+                            for tname in tensor_keys:
+                                tinfo = hdr_obj[tname]
+                                if not isinstance(tinfo, dict):
+                                    valid_slices = False
+                                    break
+                                offsets = tinfo.get("data_offsets")
+                                shape = tinfo.get("shape")
+                                dtype = tinfo.get("dtype")
+                                if (
+                                    not isinstance(offsets, list)
+                                    or len(offsets) != 2
+                                    or not isinstance(shape, list)
+                                    or not isinstance(dtype, str)
+                                ):
+                                    valid_slices = False
+                                    break
+                                s_off, e_off = int(offsets[0]), int(offsets[1])
+                                if s_off < 0 or e_off < s_off or (data_base + e_off) > file_size:
+                                    valid_slices = False
+                                    break
+                                tensor_descs.append(
+                                    {
+                                        "name": tname,
+                                        "dtype": dtype,
+                                        "shape": [int(dim) for dim in shape],
+                                        "byte_length": e_off - s_off,
+                                    }
+                                )
+                                slices_to_read.append((data_base + s_off, e_off - s_off))
+
+                            if valid_slices:
+                                for abs_start, byte_len in slices_to_read:
+                                    hasher.update(struct.pack("<Q", byte_len))
+                                    fh.seek(abs_start)
+                                    remaining = byte_len
+                                    while remaining > 0:
+                                        chunk = fh.read(min(HASH_CHUNK_BYTES, remaining))
+                                        if not chunk:
+                                            break
+                                        hasher.update(chunk)
+                                        remaining -= len(chunk)
+                                header_records.append(
+                                    {
+                                        "file": rel_name,
+                                        "custom_metadata": custom_meta,
+                                        "tensors": tensor_descs,
+                                    }
+                                )
+                                parsed_safetensors = True
+            except Exception as exc:
+                _ = exc
+
+        if not parsed_safetensors:
+            with fp.open("rb") as fh:
+                while True:
+                    chunk = fh.read(HASH_CHUNK_BYTES)
+                    if not chunk:
+                        break
+                    hasher.update(chunk)
+
+    return hasher.hexdigest(), header_records, total_disk_bytes
+
+
 def compute_checkpoint_component_fingerprints(
     resolved_path: Path,
     *,
     tensor_metadata_hash: str = "",
     extracted_metadata: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, str | None], int]:
-    """Compute structured 5-domain SHA-256 fingerprints covering weights, architecture, tokenizer, adapter, and metadata.
+    """Compute orthogonal 5-domain SHA-256 fingerprints (`weights`, `architecture_config`, `tokenizer`, `adapter`, `metadata`).
 
-    Guarantees that any mutation to `tokenizer.json`, `vocab.json`, `merges.txt`, `special_tokens_map.json`,
-    `config.json`, or LoRA adapter weights produces a distinct composite `sha256_fingerprint` and invalidates
-    cached behavioral/representation evaluations.
+    Guarantees deterministic recursive directory traversal and strict component independence:
+    * Model weight edits mutate ONLY `weights_sha256`.
+    * `config.json` / `generation_config.json` edits mutate ONLY `architecture_config_sha256`.
+    * `tokenizer.json` / `chat_template.jinja` / `tokenizer_config.json` edits mutate ONLY `tokenizer_sha256`.
+    * `adapter_model.safetensors` / `adapter_config.json` edits mutate ONLY `adapter_sha256`.
+    * Safetensors `__metadata__` / tensor descriptor edits mutate ONLY `metadata_sha256`.
+    All 5 component hashes feed into the composite `sha256_fingerprint` and behavioral cache keys.
     """
+    _ = extracted_metadata  # Preserved for signature compatibility; kept out of metadata_sha256 for domain orthogonality.
+    if not resolved_path.exists():
+        raise FileNotFoundError(f"Checkpoint path does not exist: {resolved_path}")
+
     if resolved_path.is_file():
-        is_adapter_file = resolved_path.name.lower() in ADAPTER_ARTIFACT_FILES
-        w_sha, w_bytes = _stream_hash_files([] if is_adapter_file else [resolved_path])
-        a_sha, a_bytes = _stream_hash_files([resolved_path] if is_adapter_file else [])
+        is_adapter_file = resolved_path.name.lower() in {f.lower() for f in ADAPTER_ARTIFACT_FILES}
+        w_sha, w_hdrs, w_bytes = _hash_weight_or_adapter_files(
+            [] if is_adapter_file else [resolved_path], base_dir=None
+        )
+        a_sha, a_hdrs, a_bytes = _hash_weight_or_adapter_files(
+            [resolved_path] if is_adapter_file else [], base_dir=None
+        )
         cfg_sha: str | None = None
         tok_sha: str | None = None
         total_bytes = w_bytes + a_bytes
+        active_hdrs = w_hdrs if w_hdrs else a_hdrs
     else:
         weight_exts = (".safetensors", ".pt", ".pth", ".bin")
         adapter_set = {f.lower() for f in ADAPTER_ARTIFACT_FILES}
-        all_files = sorted((p for p in resolved_path.iterdir() if p.is_file()), key=lambda p: p.name)
+        cfg_set = set(ARCHITECTURE_CONFIG_FILES)
+        tok_set = set(TOKENIZER_ARTIFACT_FILES)
+
+        # Deterministic recursive walk sorted by normalized relative POSIX path
+        all_files = sorted(
+            (p for p in resolved_path.rglob("*") if p.is_file()),
+            key=lambda p: p.relative_to(resolved_path).as_posix(),
+        )
 
         weight_files = [
             p
@@ -99,24 +240,33 @@ def compute_checkpoint_component_fingerprints(
             if p.name.lower().endswith(weight_exts) and p.name.lower() not in adapter_set
         ]
         adapter_files = [p for p in all_files if p.name.lower() in adapter_set]
-        cfg_files = [p for p in all_files if p.name in ARCHITECTURE_CONFIG_FILES]
-        tok_files = [p for p in all_files if p.name in TOKENIZER_ARTIFACT_FILES]
+        cfg_files = [p for p in all_files if p.name in cfg_set]
+        tok_files = [p for p in all_files if p.name in tok_set]
 
-        w_sha, w_bytes = _stream_hash_files(weight_files)
-        cfg_sha, cfg_bytes = _stream_hash_files(cfg_files)
-        tok_sha, tok_bytes = _stream_hash_files(tok_files)
-        a_sha, a_bytes = _stream_hash_files(adapter_files)
+        w_sha, w_hdrs, w_bytes = _hash_weight_or_adapter_files(weight_files, base_dir=resolved_path)
+        cfg_sha, cfg_bytes = _stream_hash_files(cfg_files, base_dir=resolved_path)
+        tok_sha, tok_bytes = _stream_hash_files(tok_files, base_dir=resolved_path)
+        a_sha, a_hdrs, a_bytes = _hash_weight_or_adapter_files(adapter_files, base_dir=resolved_path)
         total_bytes = w_bytes + cfg_bytes + tok_bytes + a_bytes
+        active_hdrs = w_hdrs if w_hdrs else a_hdrs
 
-    meta_payload = json.dumps(
-        {
-            "tensor_metadata_hash": tensor_metadata_hash,
-            "extracted": extracted_metadata or {},
-        },
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    meta_sha = hashlib.sha256(meta_payload).hexdigest()
+    meta_sha: str | None
+    if active_hdrs:
+        meta_payload = json.dumps(
+            {"safetensors_headers": active_hdrs},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        meta_sha = hashlib.sha256(meta_payload).hexdigest()
+    elif tensor_metadata_hash:
+        meta_payload = json.dumps(
+            {"tensor_metadata_hash": tensor_metadata_hash},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        meta_sha = hashlib.sha256(meta_payload).hexdigest()
+    else:
+        meta_sha = None
 
     components: dict[str, str | None] = {
         "weights_sha256": w_sha,
@@ -127,13 +277,7 @@ def compute_checkpoint_component_fingerprints(
     }
 
     composite_payload = json.dumps(
-        {
-            "weights_sha256": w_sha,
-            "architecture_config_sha256": cfg_sha,
-            "tokenizer_sha256": tok_sha,
-            "adapter_sha256": a_sha,
-            "metadata_sha256": meta_sha if tensor_metadata_hash else None,
-        },
+        components,
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
@@ -439,28 +583,30 @@ def revalidate_checkpoint_health(
             if handle.metadata.architecture.tokenizer_vocab_size is not None:
                 tok_meta["vocab_size"] = handle.metadata.architecture.tokenizer_vocab_size
 
-            # Preserve any overrides recorded in ckpt.quantization_metadata during registration
-            merged_quant = {**quant_meta, **ckpt.quantization_metadata}
+            current_tensor_meta_hash = compute_tensor_metadata_hash(handle.tensors)
             sha_now, comp_now, _ = compute_checkpoint_component_fingerprints(
                 resolved,
-                tensor_metadata_hash=ckpt.tensor_metadata_hash,
-                extracted_metadata={
-                    "tokenizer": {k: v for k, v in tok_meta.items() if k != "tokenizer_sha256"},
-                    "quantization": merged_quant,
-                    "lora": lora_meta,
-                },
+                tensor_metadata_hash=current_tensor_meta_hash,
             )
             stored_comp = ckpt.component_fingerprints or {}
-            if stored_comp.get("weights_sha256"):
-                for key in ("weights_sha256", "architecture_config_sha256", "tokenizer_sha256", "adapter_sha256"):
+            if stored_comp:
+                for key in (
+                    "weights_sha256",
+                    "architecture_config_sha256",
+                    "tokenizer_sha256",
+                    "adapter_sha256",
+                    "metadata_sha256",
+                ):
                     if stored_comp.get(key) != comp_now.get(key):
                         return (
                             CheckpointValidationStatus.CORRUPTED_OR_MISSING,
                             f"SHA-256 mismatch ({key}): expected {str(stored_comp.get(key))[:12]}, got {str(comp_now.get(key))[:12]}.",
                         )
-            elif sha_now != ckpt.sha256_fingerprint:
-                # Backward-compatible check for legacy single-hash rows if any
-                pass
+            if sha_now != ckpt.sha256_fingerprint:
+                return (
+                    CheckpointValidationStatus.CORRUPTED_OR_MISSING,
+                    f"SHA-256 mismatch (composite): expected {ckpt.sha256_fingerprint[:12]}, got {sha_now[:12]}.",
+                )
             return ckpt.validation_status, None
     except Exception as exc:
         return CheckpointValidationStatus.CORRUPTED_OR_MISSING, str(exc)

@@ -151,6 +151,33 @@ class RegisteredCheckpoint:
 
 
 @dataclass
+class CausalInterventionProvenance:
+    """Strictly validated case-and-site counterfactual provenance record (Audit Item 1).
+
+    Missing evidence fields default strictly to `False` / `None` and NEVER elevate an event
+    to `CAUSALLY_VERIFIED`.
+    """
+
+    case_targeted: bool = False
+    target_vs_foil_verified: bool = False
+    negative_control_verified: bool = False
+    verification_scope: str | None = None
+    prompt_fingerprint: str | None = None
+    failed_case_id: str | None = None
+    layer_index: int | None = None
+    intervention_type: str | None = None
+    target_token: str | int | None = None
+    foil_token: str | int | None = None
+    negative_control_result: dict[str, Any] | float | None = None
+    recovery_measurement: float | None = None
+    clean_logit_diff: float | None = None
+    corrupted_logit_diff: float | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class EvolutionRelationship:
     """Directed edge `parent -> child` in an evolution DAG (supports multi-parent merges)."""
 

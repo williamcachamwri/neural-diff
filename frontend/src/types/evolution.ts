@@ -387,6 +387,10 @@ export interface RegressionOriginEvent {
   score_drop: number;
   failed_test_case_ids: string[];
   survives_to_leaf: boolean;
+  surviving_leaf_ids?: string[];
+  recovered_leaf_ids?: string[];
+  recovered_at_checkpoint_ids?: string[];
+  leaf_outcomes?: Record<string, string>;
   downstream_affected_checkpoints: string[];
   correlated_layers: Array<{
     layer_index: number;
@@ -411,14 +415,32 @@ export interface RegressionOriginEvent {
     min_required_sample_size?: number;
     is_exploratory?: boolean;
     statistically_significant?: boolean;
+    raw_p_value?: number;
     mcnemar_p_value: number;
+    adjusted_p_value?: number;
     holm_bonferroni_p_value?: number;
     confidence_level: string;
+    statistical_limitations?: string;
   };
   causal_verification: {
     causal_verification_exists: boolean;
     causal_support_exists?: boolean;
+    partially_verified?: boolean;
+    case_targeted?: boolean;
+    target_vs_foil_verified?: boolean;
+    negative_control_verified?: boolean;
+    verification_scope?: string | null;
+    verification_scope_valid?: boolean;
+    prompt_fingerprint?: string | null;
+    failed_case_id?: string | null;
+    layer_index?: number | null;
+    intervention_type?: string | null;
+    target_token?: string | number | null;
+    foil_token?: string | number | null;
+    negative_control_result?: Record<string, unknown> | number | null;
+    recovery_measurement?: number | null;
     verified_case_ids?: string[];
+    unverified_case_ids?: string[];
     epistemic_status: string;
     most_causal_layer: number | null;
     peak_recovery_fraction: number | null;

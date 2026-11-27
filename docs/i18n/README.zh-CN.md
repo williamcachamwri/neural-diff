@@ -147,10 +147,16 @@ flowchart TB
 * **8 个零 LLM 裁判的确定性评估器：** 覆盖越南语 NFC 声调密度（`vietnamese`）、Python `ast.parse` 语法树与函数签名保持（`code_preservation`）、严格 JSON 解析与类型校验（`json_reliability`）、精确数学答案提取（`math_reasoning`）、结构化指令约束（`instruction_following`）、篇幅精炼度（`conciseness`）、安全拒答与零误拒校验（`refusal_behavior`）及事实核验（`factual_accuracy`）。
 * **统计推断与回归门禁：** 计算 2,000 次配对 Bootstrap 95% 置信区间与精确双侧 McNemar $p$ 值；按阈值策略生成严重度分级报告、一键 CLI 复现指令、多轮 `diff-of-diffs` 趋势对比（`compare_run_history`），以及内嵌原生 SVG 图表的独立 HTML、Markdown 与 JSON 报告。
 
-### 第 7 层 — 任务编排、SQLite WAL 持久化、REST API 与单色工作室界面层（Layer 7）
-* **核心代码：** [`core/orchestrator.py`](../../core/orchestrator.py)、[`core/cli.py`](../../core/cli.py)、[`api/`](../../api/)、[`frontend/`](../../frontend/)
-* **编排与持久化：** `ComparisonOrchestrator` 串联各分析阶段并执行确定性显存回收；`ExperimentStore` 基于 WAL 模式 SQLite（`data/neural_diff.db`）持久化实验结果、回归基线与运行时配置。
-* **ComfyUI Nodes 2.0 单色工作室：** 基于 React 19、TypeScript、Vite 8（Rolldown 分包优化）、`@xyflow/react` 与 `framer-motion` 构建，将全部 12 个工作视图整合于单一顶部导航栏，提供支持 Bezier 曲线与正交 PCB 走线切换的 9 节点 DAG、GQA 比例分歧条、主从分栏行为对比工作台及实时 SVD 探测面板。
+### 第 7 层 — 多代神经演化有向无环图（DAG）与溯源引擎（Layer 7 · Module I）
+* **核心代码：** [`core/evolution/`](../../core/evolution/)（`dag.py`、`registry.py`、`store.py`、`tensor_evolution.py`、`layer_evolution.py`、`behavioral_evolution.py`、`representation_evolution.py`、`regression_origin.py`、`orchestrator.py`）
+* **分支合并 DAG 与截断安全的谱系动态规划：** 支持 14 种演化阶段、多父节点融合权重、Kahn 拓扑排序、最近公共祖先（LCA）、7 类对偶关系判定 `classify_pair_scope()` 及 3 色 DFS 防环（`CYCLIC_DEPENDENCY_ERROR`）。通过 $O(V+E)$ `count_total_branches()` 精确计数根到叶路径并配合惰性 `iter_branches(max_paths)`；当 `branch_count > max_branches` 时显式标记 `branches_truncated = true`，并由 `RegressionOriginEngine` 运行 $O(|V|\cdot|E|)$ 全图谱系状态动态规划回退，确保零遗漏边、零重复事件、跨合并点零分支历史污染。
+* **正交 5 域 SHA-256 指纹与缓存失效：** 独立流式计算 `weights_sha256`（纯张量数据片）、`architecture_config_sha256`（`config.json`、`generation_config.json`、`quantize_config.json`）、`tokenizer_sha256`（`tokenizer.json`、`tokenizer.model`、`spiece.model`、`tokenizer_config.json`、`vocab.json`、`merges.txt`、`special_tokens_map.json`、`added_tokens.json`、`chat_template.jinja`、`chat_template.json`）、`adapter_sha256`（`adapter_config.json`、`adapter_model.safetensors`）与 `metadata_sha256`（Safetensors 张量描述符与 `__metadata__`），五域共同汇入 `sha256_fingerprint` 与行为缓存键。
+* **4 级认识论分层与统计方法学：** 严格区分 `OBSERVED`、`CORRELATED`、`CAUSAL SUPPORT`（诊断提示词跨检查点修补恢复 $\ge 20\%$）与 `CAUSALLY VERIFIED`（要求 `case_targeted`、`target_vs_foil_verified`、`negative_control_verified` 与用例+层位级 `verification_scope` 四项独立证据全部显式为真，缺失项绝不默认为真）；结合 95% Wilson 二项区间、配对 Bootstrap 95% 区间、精确双侧 McNemar 原始 $p$ 值、逐步下降 **Holm-Bonferroni** 校正、`pass_rate_and_score` / `pass_rate_only` / `score_only` 分类及 `min_category_sample_size = 8` 探索性门禁。
+
+### 第 8 层 — 任务编排、SQLite WAL 持久化、37 端点 REST API、5 格式报告与工作室界面层（Layer 8）
+* **核心代码：** [`core/orchestrator.py`](../../core/orchestrator.py)、[`core/cli.py`](../../core/cli.py)、[`core/report_engine/visuals.py`](../../core/report_engine/visuals.py)、[`core/evolution/exporter.py`](../../core/evolution/exporter.py)、[`api/`](../../api/)、[`frontend/`](../../frontend/)
+* **编排与五格式导出：** 支持 `HTML`（内嵌 5 幅原生数据驱动 SVG）、`Markdown`（动态 `mermaid` DAG 与比例条）、零依赖 `%PDF-1.4`、`CSV` 与 `JSON` 导出，配合 WAL 模式 SQLite（`data/neural_diff.db`）持久化。
+* **ComfyUI Nodes 2.0 单色工作室：** 基于 React 19、TypeScript、Vite 8、`@xyflow/react` 与 `framer-motion` 构建，集成双模型 9 节点画布与 9 标签页多代神经演化工作室。
 
 ---
 
@@ -377,7 +383,7 @@ npm --prefix frontend run dev
 ## 11. 10 条多节点 CI/CD 流水线、`89%` 覆盖率与安全加固审计
 
 * **10 条多节点 GitHub Actions 流水线（[`.github/workflows/`](../../.github/workflows)）：** 覆盖 `Python 3.11 / 3.12` 矩阵、`Node.js 20 / 22 LTS` 矩阵、`ubuntu-latest` + `windows-latest` 跨平台验证、Playwright 分片并行 E2E、多代演化 DAG 与五格式报告门禁（`evolution-pipeline.yml`）、37 端点 OpenAPI 与 SQLite WAL 并发门禁（`api-contract-and-db.yml`）、CodeQL 静态污点分析、CVE/密钥扫描及隔离 `/tmp` Wheel 冒烟测试。
-* **静态检查与 Python 测试套件（`64 passed`）：** `ruff check`（`exit 0`）、全量 `86` 个源文件 `mypy` 检查（`exit 0`），核心语句覆盖率达 **`89%`**（共 `7,590` 条语句，见 [`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
+* **静态检查与 Python 测试套件（`69 passed`）：** `ruff check`（`exit 0`）、全量 `86` 个源文件 `mypy` 检查（`exit 0`），核心语句覆盖率达 **`89%`**（共 `8,149` 条语句，见 [`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
 * **前端与端到端测试：** `tsc --noEmit`（`exit 0`）、Vitest（`4 passed`）、Vite 8 生产构建（`exit 0`，单块 `< 500 KB`）及 Playwright Chromium 全栈 E2E（`2 passed`）。
 * **安全扫描与发布记录：** `pip-audit` 零漏洞、`npm audit` 零漏洞、仓库密钥扫描零发现；完整版本演进见 [`CHANGELOG.md`](../../CHANGELOG.md) 与 [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md)。
 
@@ -385,8 +391,8 @@ npm --prefix frontend run dev
 
 ## 12. SHA-256 证据完整性与已知工程边界
 
-* **SHA-256 校验：** 运行 `.\.venv\Scripts\python.exe scripts/verify_evidence.py` 可校验 [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json) 中全部 `73` 份证据文件的字节大小与 SHA-256 摘要。
-* **已知限制（[`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)）：** MLP/注意力头坐标偏移在叠加态下仍具多义性；`default_suite_v1` 包含 24 组确定性用例以保证本地执行效率；`run_residual_patching` 的因果验证结论严格限定于被测输入对与残差层位。
+* **SHA-256 校验：** 运行 `.\.venv\Scripts\python.exe scripts/verify_evidence.py` 可校验 [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json) 中全部 `99` 份证据文件的字节大小与 SHA-256 摘要。
+* **已知限制与统计边界（[`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)）：** MLP/注意力头坐标偏移在叠加态下仍具多义性；`default_suite_v1` 每类 $n=3$ 严格标记为探索性（`is_exploratory = true`、`statistically_significant = false`）；精确双侧 McNemar 离散下界为 $p_{\min}(n)=2^{1-n}$（`min_category_sample_size = 8` 时为 `0.0078125`，在 $m \ge 7$ 类 Holm-Bonferroni 校正下需 $n \ge 9$ 方可达到 $\alpha=0.05$ 显著性、需 $n \ge 30$ 获得 $\ge 80\%$ 统计检验力，且无二值翻转的 `score_only` 退化其 McNemar $p=1.0$）；`CAUSALLY VERIFIED` 结论严格限定于已验证的提示词指纹与层位干预点。
 
 ## 开源许可
 

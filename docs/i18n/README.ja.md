@@ -147,10 +147,16 @@ flowchart TB
 * **8 種の完全決定的評価器：** ベトナム語 NFC 声調検査（`vietnamese`）、Python `ast.parse` 構文・関数シグネチャ検証（`code_preservation`）、厳密 JSON スキーマ検査（`json_reliability`）、最終行数値抽出（`math_reasoning`）、構造制約追従（`instruction_following`）、語数・文数簡潔性（`conciseness`）、有害拒否と無害誤拒否防止（`refusal_behavior`）、事実一致検証（`factual_accuracy`）。
 * **統計検定＆リグレッションゲート：** ペアード・ブートストラップ 95% CI（2,000 回）と正確両側 McNemar $p$ 値を算出し、ポリシー閾値に基づく重大度判定、CLI 再現コマンド生成、複数実行推移比較（`compare_run_history`）、およびインライン SVG チャート付きスタンドアロン HTML / Markdown / JSON レポート出力を行います。
 
-### 第 7 層 — オーケストレーション・SQLite WAL 永続化・REST API・Studio UI 層（Layer 7）
-* **実装ファイル：** [`core/orchestrator.py`](../../core/orchestrator.py)、[`core/cli.py`](../../core/cli.py)、[`api/`](../../api/)、[`frontend/`](../../frontend/)
-* **バックエンド＆永続化：** `ComparisonOrchestrator` がステージ進行通知と VRAM 解放を管理し、`ExperimentStore` が WAL モード SQLite（`data/neural_diff.db`）に全実験・ベースライン・設定を永続化します。
-* **ComfyUI Nodes 2.0 モノクローム Studio：** React 19、TypeScript、Vite 8（ベンダーチャンク分割）、`@xyflow/react`、`framer-motion` で構築。単一トップバーに全 12 ビューを統合し、Bezier 曲線／直交 PCB 配線を切り替え可能な 9 ノード DAG、GQA ヘッド乖離バー、マスター・ディテール形式の行動比較ワークベンチ、オンデマンド SVD プローブを提供します。
+### 第 7 層 — 多世代ニューラル進化 DAG ＆プロベナンスエンジン層（Layer 7 · Module I）
+* **実装ファイル：** [`core/evolution/`](../../core/evolution/)（`dag.py`、`registry.py`、`store.py`、`tensor_evolution.py`、`layer_evolution.py`、`behavioral_evolution.py`、`representation_evolution.py`、`regression_origin.py`、`orchestrator.py`）
+* **分岐・マージ DAG ＆打ち切り安全な系譜 DP：** 14 種の変換ステージ、複数親マージ重み、Kahn トポロジカル順序、最小共通祖先（LCA）、7 分類 `classify_pair_scope()`、3 色 DFS 循環拒否を実装。$O(V+E)$ の `count_total_branches()` で全経路数を厳密計算し、`branch_count > max_branches` 時は `branches_truncated = true` を明示した上で `RegressionOriginEngine` が $O(|V|\cdot|E|)$ 全グラフ系譜状態 DP を実行し、遷移の見落とし・重複・マージ間の履歴混入を完全に防ぎます。
+* **直交 5 ドメイン SHA-256 指紋＆キャッシュ無効化：** `weights_sha256`（純テンソルデータスライス）、`architecture_config_sha256`（`config.json` 等）、`tokenizer_sha256`（`tokenizer.json`、`tokenizer.model`、`vocab.json`、`merges.txt`、`special_tokens_map.json`、`chat_template.jinja`、`chat_template.json` 等）、`adapter_sha256`（`adapter_config.json`、`adapter_model.safetensors`）、`metadata_sha256`（Safetensors 記述子＆`__metadata__`）を独立計算し、合成 `sha256_fingerprint` と行動評価キャッシュキーに反映します。
+* **4 段階の認識論階層＆統計手法：** `OBSERVED`、`CORRELATED`、`CAUSAL SUPPORT`（診断プロンプトでのパッチング回復 $\ge 20\%$）、`CAUSALLY VERIFIED`（`case_targeted`、`target_vs_foil_verified`、`negative_control_verified`、ケース＋介入層限定の `verification_scope` の全 4 条件が全失敗ケースで明示的に `true` の場合のみ。欠損値は決して `true` にならない）を厳密に分離。95% Wilson CI、ペアード・ブートストラップ 95% CI、正確両側 McNemar 生 $p$ 値、ステップダウン **Holm-Bonferroni** 補正、`pass_rate_and_score` / `pass_rate_only` / `score_only` 分類、および `min_category_sample_size = 8` ゲートを適用します。
+
+### 第 8 層 — オーケストレーション・SQLite WAL・37 REST API・5 形式レポート・Studio UI 層（Layer 8）
+* **実装ファイル：** [`core/orchestrator.py`](../../core/orchestrator.py)、[`core/cli.py`](../../core/cli.py)、[`core/report_engine/visuals.py`](../../core/report_engine/visuals.py)、[`core/evolution/exporter.py`](../../core/evolution/exporter.py)、[`api/`](../../api/)、[`frontend/`](../../frontend/)
+* **5 形式出力＆永続化：** データ駆動 5-SVG 埋め込み `HTML`、`mermaid` 付き `Markdown`、`%PDF-1.4`、`CSV`、`JSON` レポート出力および WAL モード SQLite（`data/neural_diff.db`）永続化を提供。
+* **ComfyUI Nodes 2.0 モノクローム Studio：** React 19、TypeScript、Vite 8、`@xyflow/react`、`framer-motion` で構築された 9 ノード比較キャンバスおよび 9 タブ進化 Studio を提供します。
 
 ---
 
@@ -377,7 +383,7 @@ npm --prefix frontend run dev
 ## 11. 10 系統マルチノード CI/CD・`89%` カバレッジ・セキュリティ監査
 
 * **10 系統マルチノード GitHub Actions（[`.github/workflows/`](../../.github/workflows)）：** `Python 3.11 / 3.12` マトリクス、`Node.js 20 / 22 LTS` マトリクス、`ubuntu-latest` + `windows-latest` 移植性検証、Playwright 並列シャーディング E2E、進化 DAG ＆ 5 形式レポート検証（`evolution-pipeline.yml`）、37 エンドポイント OpenAPI ＆ SQLite WAL 並行性検証（`api-contract-and-db.yml`）、CodeQL、CVE/シークレット監査、クリーンルーム `.whl` スモークテストを実行。
-* **静的解析＆Python テスト（`64 passed`）：** `ruff check`（`exit 0`）、全 `86` ファイルの `mypy` 型検査（`exit 0`）、ステートメントカバレッジ **`89%`**（`7,590` 文、[`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
+* **静的解析＆Python テスト（`69 passed`）：** `ruff check`（`exit 0`）、全 `86` ファイルの `mypy` 型検査（`exit 0`）、ステートメントカバレッジ **`89%`**（`8,149` 文、[`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
 * **フロントエンド＆E2E：** `tsc --noEmit`（`exit 0`）、Vitest（`4 passed`）、Vite 8 ビルド（`exit 0`、全 JS チャンク `< 500 KB`）、Playwright Chromium E2E（`2 passed`）。
 * **変更履歴＆技術ガイド：** [`CHANGELOG.md`](../../CHANGELOG.md) および [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md) を参照。
 
@@ -385,8 +391,8 @@ npm --prefix frontend run dev
 
 ## 12. SHA-256 証跡整合性と既知の技術的制約
 
-* **SHA-256 検証：** `.\.venv\Scripts\python.exe scripts/verify_evidence.py` により [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json) 内の全 `73` ファイルのサイズと SHA-256 ダイジェストを検証可能。
-* **既知の制約（[`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)）：** 基底座標シフトは重ね合わせの下で多義的であり、`default_suite_v1` はローカル実行時間とのバランスから 24 問で構成されています。また `run_residual_patching` の因果検証は検証したプロンプト対とブロック位置に厳密にスコープされます。
+* **SHA-256 検証：** `.\.venv\Scripts\python.exe scripts/verify_evidence.py` により [`evidence/EVIDENCE_MANIFEST.json`](../../evidence/EVIDENCE_MANIFEST.json) 内の全 `99` ファイルのサイズと SHA-256 ダイジェストを検証可能。
+* **既知の制約と統計的限界（[`docs/LIMITATIONS.md`](../../docs/LIMITATIONS.md)）：** 基底座標シフトは重ね合わせの下で多義的であり、`default_suite_v1`（各カテゴリ $n=3$）は `is_exploratory = true`・`statistically_significant = false` として扱われます。正確両側 McNemar 検定の離散下限は $p_{\min}(n)=2^{1-n}$（`min_category_sample_size = 8` で `0.0078125`）であり、$m \ge 7$ カテゴリの Holm-Bonferroni 補正下で $\alpha=0.05$ を棄却するには $n \ge 9$、中程度の低下に対し $\ge 80\%$ の検出力を得るには $n \ge 30$ が必要です（二値合否が反転しない `score_only` 低下では McNemar $p=1.0$）。また `CAUSALLY VERIFIED` は検証済みプロンプト指紋と介入層位置に厳密に限定されます。
 
 ## ライセンス
 

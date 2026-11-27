@@ -23,7 +23,7 @@ endobj
 stream
 0.08 0.08 0.10 rg 44.0 698.0 524.0 46.0 re f
 BT /F2 14 Tf 0.96 0.96 0.97 rg 56.0 724.0 Td (NEURAL DIFF  |  SmolLM2-135M Post-Training & Compression DAG) Tj ET
-BT /F1 8.5 Tf 0.72 0.72 0.76 rg 56.0 709.0 Td (Run evorun-real-smollm2  |  Checkpoints: 6  |  Branches: 2  |  Regressions: 13) Tj ET
+BT /F1 8.5 Tf 0.72 0.72 0.76 rg 56.0 709.0 Td (Run evorun-real-smollm2  |  Checkpoints: 6  |  Branches: 2  |  Regressions: 14) Tj ET
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 670.0 Td (Empirical Findings) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 666.0 m 568.0 666.0 l S
 0.92 0.92 0.94 rg 44.0 643.0 524.0 15.0 re f
@@ -64,40 +64,40 @@ BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 493.2 Td (v0 - SmolLM2-Base) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 493.2 Td (Base Model) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 493.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 493.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 493.2 Td (cff3853ede6018) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 493.2 Td (a8e73d9570a0d6) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 493.2 Td (Verified) Tj ET
 0.97 0.97 0.98 rg 44.0 474.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 478.2 Td (v1a - Instruct-SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 478.2 Td (Instruction Tuning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 478.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 478.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 478.2 Td (48511b85401c21) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 478.2 Td (400d22e7ec47ab) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 478.2 Td (Verified) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 463.2 Td (v1b - SFT-Conservative) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 463.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 463.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 463.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 463.2 Td (077d0e450295a0) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 463.2 Td (f6fc0f4bbc1371) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 463.2 Td (Verified) Tj ET
 0.97 0.97 0.98 rg 44.0 444.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 448.2 Td (v2 - Merged-AB) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 448.2 Td (Model Merging) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 448.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 448.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 448.2 Td (93376a898fcf24) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 448.2 Td (fa045e62f15dd0) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 448.2 Td (Verified) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 433.2 Td (v3 - Quantized-LowBit) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 433.2 Td (Quantization) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 433.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 433.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 433.2 Td (4d80198e87abfa) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 433.2 Td (420eeea0ed2117) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 433.2 Td (Verified) Tj ET
 0.97 0.97 0.98 rg 44.0 414.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 418.2 Td (v4 - Pruned-MLP) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 159.2 418.2 Td (Pruning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 262.4 418.2 Td (134,515,008) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 341.8 418.2 Td (30) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 418.2 Td (e8cab17c9e414f) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 389.4 418.2 Td (26e026a2fda19c) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 492.6 418.2 Td (Verified) Tj ET
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 392.0 Td (Direct Cumulative Weight Distance & Transitions) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 388.0 m 568.0 388.0 l S
@@ -218,7 +218,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
 endobj
 9 0 obj
-<< /Length 13427 >>
+<< /Length 13860 >>
 stream
 BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 728.0 Td (Behavioral Capability Trajectory) Tj ET
 0.78 0.78 0.82 RG 0.6 w 44.0 724.0 m 568.0 724.0 l S
@@ -345,7 +345,7 @@ BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 309.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj 
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 309.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 309.2 Td (conciseness) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 309.2 Td (48.6%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 309.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 309.2 Td (Correlated) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 309.2 Td (conc-03) Tj ET
 0.97 0.97 0.98 rg 44.0 290.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 294.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
@@ -358,77 +358,84 @@ BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 279.2 Td (v3 - Quantized-LowBit->v4 ..) Tj 
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 279.2 Td (Pruning) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 279.2 Td (Factual accuracy) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 279.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 279.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 279.2 Td (Correlated) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 279.2 Td (fact-01) Tj ET
 0.97 0.97 0.98 rg 44.0 260.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 264.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 264.2 Td (Pruning) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 264.2 Td (Refusal behavior) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 264.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 264.2 Td (Quantization) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 264.2 Td (Json reliability) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 264.2 Td (33.3%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 264.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 264.2 Td (ref-02) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 249.2 Td (v0 - SmolLM2-Base->v1a - I..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 249.2 Td (Instruction Tu..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 249.2 Td (conciseness) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 264.2 Td (json-01,json-03) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 249.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 249.2 Td (Pruning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 249.2 Td (Refusal behavior) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 249.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 249.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 249.2 Td (conc-03) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 249.2 Td (Correlated) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 249.2 Td (ref-02) Tj ET
 0.97 0.97 0.98 rg 44.0 230.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 234.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 234.2 Td (Pruning) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 234.2 Td (Instruction fo..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 234.2 Td (v0 - SmolLM2-Base->v1a - I..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 234.2 Td (Instruction Tu..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 234.2 Td (conciseness) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 234.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 234.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 234.2 Td (inst-02) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 219.2 Td (v1b - SFT-Conservative->v2..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 219.2 Td (Model Merging) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 219.2 Td (Math reasoning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 234.2 Td (Correlated) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 234.2 Td (conc-03) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 219.2 Td (v3 - Quantized-LowBit->v4 ..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 219.2 Td (Pruning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 219.2 Td (Instruction fo..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 219.2 Td (33.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 219.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 219.2 Td (math-02) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 219.2 Td (Correlated) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 219.2 Td (inst-02) Tj ET
 0.97 0.97 0.98 rg 44.0 200.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 204.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 204.2 Td (SFT) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 204.2 Td (Json reliability) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 204.2 Td (28.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 204.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 204.2 Td (-) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 189.2 Td (v1a - Instruct-SFT->v2 - M..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 189.2 Td (Model Merging) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 204.2 Td (v1b - SFT-Conservative->v2..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 204.2 Td (Model Merging) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 204.2 Td (Math reasoning) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 204.2 Td (33.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 204.2 Td (Correlated) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 204.2 Td (math-02) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 189.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 189.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 189.2 Td (Json reliability) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 189.2 Td (28.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 189.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 189.2 Td (Correlated) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 189.2 Td (-) Tj ET
 0.97 0.97 0.98 rg 44.0 170.0 524.0 15.0 re f
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 174.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 174.2 Td (SFT) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 174.2 Td (vietnamese) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 174.2 Td (16.7%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 174.2 Td (v1a - Instruct-SFT->v2 - M..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 174.2 Td (Model Merging) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 174.2 Td (Json reliability) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 174.2 Td (28.3%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 174.2 Td (Causal support) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 174.2 Td (-) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 159.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 159.2 Td (Quantization) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 159.2 Td (overall) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 159.2 Td (13.4%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 159.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 159.2 Td (code-01,json-01,..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 159.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 159.2 Td (SFT) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 159.2 Td (vietnamese) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 159.2 Td (16.7%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 159.2 Td (Correlated) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 159.2 Td (-) Tj ET
 0.97 0.97 0.98 rg 44.0 140.0 524.0 15.0 re f
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 144.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 144.2 Td (Quantization) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 144.2 Td (vietnamese) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 144.2 Td (13.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 144.2 Td (overall) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 144.2 Td (13.4%) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 144.2 Td (Causal support) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 144.2 Td (-) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 144.2 Td (code-01,json-01,..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 129.2 Td (v0 - SmolLM2-Base->v1b - S..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 129.2 Td (SFT) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 129.2 Td (Code preservat..) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 129.2 Td (13.3%) Tj ET
-BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 129.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 129.2 Td (Correlated) Tj ET
 BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 129.2 Td (-) Tj ET
-BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 103.0 Td (Provenance) Tj ET
-0.78 0.78 0.82 RG 0.6 w 44.0 99.0 m 568.0 99.0 l S
-BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 83.0 Td (Cache Key: 4559df78467d3d57b19923b50757c2fab67c6488216c560dfb3d7a1a8b6f50c2  |  Seed: 42  |  Device: cuda:0) Tj ET
-BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 71.5 Td (|  Dataset SHA-256: af4eb4452a640ee386ca8921) Tj ET
+0.97 0.97 0.98 rg 44.0 110.0 524.0 15.0 re f
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 48.0 114.2 Td (v2 - Merged-AB->v3 - Quant..) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 182.7 114.2 Td (Quantization) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 265.1 114.2 Td (vietnamese) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 347.4 114.2 Td (13.3%) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 399.8 114.2 Td (Causal support) Tj ET
+BT /F3 7.6 Tf 0.18 0.18 0.22 rg 482.2 114.2 Td (-) Tj ET
+BT /F2 11 Tf 0.10 0.10 0.12 rg 44.0 88.0 Td (Provenance) Tj ET
+0.78 0.78 0.82 RG 0.6 w 44.0 84.0 m 568.0 84.0 l S
+BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 68.0 Td (Cache Key: dcd6008e81cb40878e7168a29bf55ae192d58708ba57dec6a2889ec47bf705c8  |  Seed: 42  |  Device: cuda:0) Tj ET
+BT /F3 8.0 Tf 0.16 0.16 0.19 rg 44.0 56.5 Td (|  Dataset SHA-256: af4eb4452a640ee386ca8921) Tj ET
 BT /F1 7.5 Tf 0.45 0.45 0.50 rg 44.0 24.0 Td (NEURAL DIFF Evolution - SmolLM2-135M Post-Training & Compression DAG  |  Page 2 of 2) Tj ET
 endstream
 endobj
@@ -447,9 +454,9 @@ xref
 0000000569 00000 n 
 0000013422 00000 n 
 0000013568 00000 n 
-0000027047 00000 n 
+0000027480 00000 n 
 trailer
 << /Size 11 /Root 1 0 R /Info 10 0 R >>
 startxref
-27188
+27621
 %%EOF

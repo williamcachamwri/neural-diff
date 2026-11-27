@@ -52,15 +52,15 @@ project = evo_store.create_project(
 
 ## 2. Registering Checkpoints & Supported Transformations
 
-Every registered checkpoint is validated through `ModelLoader` and `SecurityPolicy` (`trust_remote_code=False`, Safetensors binary header verification, and `weights_only=True` + `pickletools` opcode whitelist for `.pt`/`.bin` archives). Registration computes a **5-domain SHA-256 fingerprint hierarchy** (4 MiB streaming chunks):
+Every registered checkpoint is validated through `ModelLoader` and `SecurityPolicy` (`trust_remote_code=False`, Safetensors binary header verification, and `weights_only=True` + `pickletools` opcode whitelist for `.pt`/`.bin` archives). Registration computes an **orthogonal 5-domain SHA-256 fingerprint hierarchy** (4 MiB streaming chunks over deterministically sorted POSIX relative paths):
 
-- `weights_sha256`: Primary tensor shards (`.safetensors`, `.pt`, `.pth`, `.bin`).
-- `architecture_config_sha256`: `config.json`, `generation_config.json`, shard index manifests, and `quantize_config.json`.
-- `tokenizer_sha256`: `tokenizer.json`, `tokenizer.model`, `spiece.model`, `tokenizer_config.json`, `special_tokens_map.json`, `vocab.json`, `merges.txt`, `added_tokens.json`, and `chat_template.jinja`.
-- `adapter_sha256`: `adapter_config.json`, `adapter_model.safetensors`, and `adapter_model.bin`.
-- `metadata_sha256`: Canonical hash over sorted tensor `(name, shape, dtype)` descriptors and extracted config metadata.
+1. `weights_sha256`: Raw tensor byte slices of primary weight shards (`.safetensors`, `.pt`, `.pth`, `.bin` excluding PEFT adapter files), keeping pure parameter buffer hashes orthogonal to `.safetensors` JSON headers.
+2. `architecture_config_sha256`: `config.json`, `generation_config.json`, `model.safetensors.index.json`, `pytorch_model.bin.index.json`, and `quantize_config.json`.
+3. `tokenizer_sha256`: `tokenizer.json`, `tokenizer.model`, `spiece.model`, `tokenizer_config.json`, `special_tokens_map.json`, `vocab.json`, `merges.txt`, `added_tokens.json`, `chat_template.jinja`, and `chat_template.json`.
+4. `adapter_sha256`: `adapter_config.json`, `adapter_model.safetensors` (raw tensor slices), and `adapter_model.bin`.
+5. `metadata_sha256`: Canonical JSON SHA-256 over sorted `.safetensors` `(tensor_name, dtype, shape, byte_length)` descriptors and `__metadata__` key-value headers (or `tensor_metadata_hash` for non-Safetensors archives).
 
-All five domains feed into the composite `sha256_fingerprint` and behavioral evaluation cache keys, guaranteeing that mutating tokenizer files while keeping weights identical invalidates stale behavioral caches and records `identical_weights_to` provenance. Exact composite duplicates are flagged as `DUPLICATE_CONTENT` and PEFT adapter directories as `ADAPTER_ONLY`.
+All five domains feed into both the composite `sha256_fingerprint` and `build_behavioral_checkpoint_cache_key()`, guaranteeing that mutating any single artifact (model weights, `config.json`, `tokenizer.json`, `chat_template.jinja`, LoRA adapter weights, or tensor metadata) mutates its exact domain fingerprint, invalidates stale behavioral cache entries, and triggers `CORRUPTED_OR_MISSING` on `revalidate_checkpoint_health()` if tampered in place. Exact composite duplicates are flagged as `DUPLICATE_CONTENT` and PEFT adapter directories as `ADAPTER_ONLY`.
 
 Supported transformation types (`TransformationType`):
 `Base Model`, `Fine-Tuning`, `Instruction Tuning`, `SFT`, `DPO`, `RLHF`, `LoRA`, `QLoRA`, `Model Merging`, `Quantization`, `Pruning`, `Distillation`, `Weight Modification`, and `Unknown Transformation`.
@@ -91,7 +91,7 @@ neural-diff evolution register \
 - **Branching:** Register two or more child checkpoints referencing the same parent checkpoint ID (`parent_checkpoint_ids: ["ckpt-base"]`).
 - **Model Merging:** Supply multiple parent IDs (`parent_checkpoint_ids: ["ckpt-dpo-a", "ckpt-sft-b"]`) with optional `merge_weights` (`{"ckpt-dpo-a": 0.75, "ckpt-sft-b": 0.25}`).
 - **Cycle Prevention:** `EvolutionDAG` runs 3-color depth-first cycle detection before persisting any checkpoint or edge mutation. Self-loops (`A -> A`) and ancestor cycles (`A -> B -> C -> A`) are rejected with `CYCLIC_DEPENDENCY_ERROR` (`HTTP 422`) and the exact offending cycle path.
-- **Exact Branch Counting, Lazy Traversal & Truncation Transparency:** `EvolutionDAG.count_total_branches()` computes the exact total root-to-leaf path count in $O(V + E)$ reverse-topological dynamic programming, while `iter_branches(max_paths=...)` lazily yields paths without unbounded memory growth. Whenever `total_branch_count > max_branches`, the graph payload and run bundle explicitly set `branches_truncated = true` (`analyzed_branch_count` vs `branch_count`) and `RegressionOriginEngine` executes a complete topological edge fallback so zero DAG transitions are ever skipped.
+- **Exact Branch Counting, Lazy Traversal & Truncation-Safe Lineage DP:** `EvolutionDAG.count_total_branches()` computes the exact total root-to-leaf path count in $O(V + E)$ reverse-topological dynamic programming, while `iter_branches(max_paths=...)` lazily yields paths without unbounded memory allocation. Whenever `total_branch_count > max_branches`, the graph payload and run bundle explicitly set `branches_truncated = true` (`analyzed_branch_count` vs `branch_count`) and emit a truncation warning. Simultaneously, `RegressionOriginEngine` executes an exact $O(|V| \cdot |E|)$ topological lineage-state dynamic program across all roots, branch points, merge nodes, and recovery transitions so zero transitions are ever missed, zero shared-edge events are duplicated, and unrelated branch histories never contaminate across merges.
 
 ---
 
@@ -151,20 +151,25 @@ Long-running jobs support background execution (`async_job: true`), live step te
 When evaluating a lineage such as `Base (92%) -> SFT (95%) -> DPO (91%) -> Quantized (78%) -> Pruned (76%)`, `RegressionOriginEngine` walks each root-to-leaf branch and pinpoints **the first transition** (`DPO -> Quantized`) where pass-rate or category score degradation breached policy thresholds, while tracking whether downstream stages (`Pruned`) inherited or recovered from those failures.
 
 > [!WARNING]
-> **Strict 4-Tier Epistemic Hierarchy (`OBSERVED` · `CORRELATED` · `CAUSAL SUPPORT` · `CAUSALLY VERIFIED`):**
+> **Strict 4-Tier Epistemic Hierarchy & Validated Causal Provenance (`OBSERVED` · `CORRELATED` · `CAUSAL SUPPORT` · `CAUSALLY VERIFIED`):**
 > - **`OBSERVED`:** Behavioral pass-rate/score drops measured directly on deterministic rubrics with no aligned weight or activation covariates.
 > - **`CORRELATED`:** Behavioral regression co-occurring with measured layer weight `Relative L2` or Linear CKA shifts on the same transition. Weight modification or CKA drift alone **never** proves causation.
-> - **`CAUSAL SUPPORT`:** Transition-level cross-checkpoint residual-stream patching on a generic diagnostic prompt restores `>= 20%` of the clean target-vs-foil logit margin. This supports a mechanistic transition locus **without** claiming causal verification for unpatched category rubric cases.
-> - **`CAUSALLY VERIFIED`:** Reserved **exclusively** for case-targeted counterfactual interventions executed directly on the failed behavioral case prompt(s), with verified target/foil logit margin and negative-control checks — and strictly scoped to those tested prompts and intervention layer sites.
+> - **`CAUSAL SUPPORT`:** Transition-level cross-checkpoint residual-stream patching on a generic diagnostic prompt restores `>= 20%` of the clean target-vs-foil logit margin (`case_targeted = false`, `verification_scope = "diagnostic_prompt_transition_only"`). Supports a mechanistic transition locus without claiming causal verification for unpatched rubric cases.
+> - **`CAUSALLY VERIFIED`:** Requires **all four** independent provenance conditions to be explicitly `true` / valid for **every** failed test case in the event (missing fields **never** default to `true`):
+>   1. `case_targeted is True` — backed by `failed_case_id` matching the regressed case ID and `prompt_fingerprint` matching the SHA-256 digest of the tested prompt.
+>   2. `target_vs_foil_verified is True` — backed by distinct `target_token` and `foil_token`, positive clean-over-corrupted margin, and `recovery_measurement >= 0.20`.
+>   3. `negative_control_verified is True` — backed by explicit `negative_control_result` showing bounded control-site recovery (`< 0.15` and `< recovery_measurement`).
+>   4. `verification_scope` — explicit non-empty case-and-site scope string paired with `layer_index` and `intervention_type`, strictly bounding the claim to the tested case and intervention site. If only a subset of failed cases in an aggregate event (`overall` or multi-failure category) is verified, the event stays at `CAUSAL SUPPORT` with `partially_verified = true`.
 
 ---
 
-## 8. Statistical Rigor & Small-Sample Safeguards
+## 8. Statistical Methodology, Rigor & Sample-Threshold Limitations
 
-- **Sample Size Floors & Exploratory Flagging:** Every regression event records `sample_size`, `min_required_sample_size` (`default = 8` per category, `20` overall), `is_exploratory`, and `statistically_significant`. Whenever `n < min_required_sample_size` (for example `n = 3` per category in `default_suite_v1`), `is_exploratory` is forced to `true` and `statistically_significant` is strictly `false` regardless of raw $p$-values.
-- **Holm-Bonferroni Multiple-Comparison Adjustment:** Within each transition, raw per-category and overall two-sided McNemar $p$-values undergo step-down Holm-Bonferroni family-wise error adjustment (`holm_bonferroni_p_value`).
-- **Score vs. Pass-Rate Separation:** Every regression event classifies `regression_kind` into `pass_rate_and_score`, `pass_rate_only`, or `score_only`, preventing continuous rubric score shifts from being conflated with binary pass-rate collapses.
-- **Extended Evaluation Suites:** Pass `benchmark_suite_path` in `EvolutionAnalysisConfig` / `POST /analyze` to evaluate checkpoints against larger custom deterministic suites (`n >= 30` per category).
+- **Confidence Intervals & Paired Tests:** Checkpoint pass rates report exact 95% Wilson binomial score CIs; consecutive and ancestor transitions report 2,000-resample paired score bootstrap 95% CIs (`seed = 42`) and exact two-sided binomial McNemar raw $p$-values (`raw_p_value = 2 * sum_{k=0}^{min(b,c)} C(b+c, k) * 0.5^(b+c)`).
+- **Holm-Bonferroni Step-Down Family-Wise Adjustment:** Across the $m$-category hypothesis family on each transition, raw McNemar $p$-values are sorted deterministically with index tie-breaking `(p_i, i)` and adjusted via $p^{\text{Holm}}_{(r)} = \max_{j \le r} \min\!\big(1, (m - j) p_{(j)}\big)$, guaranteeing identical monotonic adjusted values across tied raw $p$-values (`adjusted_p_value` / `holm_bonferroni_p_value`).
+- **Sample-Size Floors & Statistical Power Limitations:** Every regression event records `sample_size`, `min_required_sample_size` (`default = 8` per category, `20` overall), `is_exploratory`, and `statistically_significant`. Whenever `n < min_required_sample_size` (e.g., `n = 3` per category in `default_suite_v1`), `is_exploratory` is forced to `true` and `statistically_significant` is strictly `false`.
+  - **Discrete Binomial Floor Limitation:** Under exact two-sided McNemar, the smallest attainable raw $p$-value for $n$ cases is $p_{\min}(n) = 2^{1-n}$. At `min_category_sample_size = 8`, $p_{\min}(8) = 2^{-7} = 0.0078125$. When testing $m \ge 7$ categories simultaneously under Holm-Bonferroni (e.g., $m = 8$), even an $8/8$ pass-to-fail collapse yields a rank-1 adjusted $p$-value of $8 \times 0.0078125 = 0.0625 > 0.05$ (`moderate_observed_effect`). Achieving non-zero rejection power at $\alpha = 0.05$ for $m = 8$ requires $n \ge 9$ ($8 \times 2^{-8} = 0.03125 < 0.05$), and achieving $\ge 80\%$ statistical power for moderate ($25\text{--}30\%$) drops requires $n \ge 30$ per category via `benchmark_suite_path`.
+  - **Score-Only vs. Pass-Rate Separation:** Regression events are classified into `pass_rate_and_score`, `pass_rate_only`, and `score_only`. Because McNemar's test inspects binary discordant flips only, continuous `score_only` degradations with zero binary pass/fail flips yield `mcnemar_p_value = 1.0` and rely on paired score bootstrap CIs rather than binary binomial $p$-values.
 
 ---
 
