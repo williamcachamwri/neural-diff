@@ -1,13 +1,15 @@
 === NEURAL DIFF GIT VERIFICATION ===
-Captured (UTC): 2026-11-27T07:32:43.827892+00:00
+Captured (UTC): 2026-11-27T07:38:53.805866+00:00
 
 $ git rev-list --count HEAD (rc=0)
-123
+125
 
 $ git status --short (rc=0)
 (clean working tree)
 
 $ git log --oneline (rc=0)
+b7264b7 fix(ci): resolve lazy loader package cycle and align sharded E2E & evolution factory imports
+0933929 docs(evidence): update git history log and SHA-256 manifest
 d8704c5 ci(workflows): expand into 10 practical multi-node DAG pipelines with Node/Python/OS matrices
 b3d7881 docs(readme): update 5-language READMEs and CHANGELOG with 8-layer architecture and 27 live screenshots
 3604b0f docs(evidence): archive 27 live screenshots, SmolLM2 DAG reports, and verified SHA-256 manifest

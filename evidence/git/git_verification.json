@@ -1,9 +1,11 @@
 {
-  "captured_at_utc": "2026-11-27T07:32:43.827892+00:00",
-  "commit_count": 123,
+  "captured_at_utc": "2026-11-27T07:38:53.805866+00:00",
+  "commit_count": 125,
   "clean_working_tree": true,
   "status_short": [],
   "recent_commits": [
+    "b7264b7 fix(ci): resolve lazy loader package cycle and align sharded E2E & evolution factory imports",
+    "0933929 docs(evidence): update git history log and SHA-256 manifest",
     "d8704c5 ci(workflows): expand into 10 practical multi-node DAG pipelines with Node/Python/OS matrices",
     "b3d7881 docs(readme): update 5-language READMEs and CHANGELOG with 8-layer architecture and 27 live screenshots",
     "3604b0f docs(evidence): archive 27 live screenshots, SmolLM2 DAG reports, and verified SHA-256 manifest",
@@ -26,8 +28,6 @@
     "064f446 docs(readme): publish comprehensive 5-language documentation with 15 screenshots and full benchmarks",
     "1e5645a test(evidence): capture final anti-slop studio screenshots and 55-test coverage logs",
     "2547e85 docs(examples): add reproducible LoRA vs full-rank SFT SVD effective-rank script",
-    "c228949 feat(frontend): wire live SVD effective-rank and sparsity probe into Tensor Explorer",
-    "adbdf20 test(behavior): add Hypothesis Unicode boundedness property tests across all 8 evaluators",
-    "074f395 feat(cli): add suites and svd effective-rank subcommands with unit tests"
+    "c228949 feat(frontend): wire live SVD effective-rank and sparsity probe into Tensor Explorer"
   ]
 }

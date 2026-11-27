@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-11-27T07:32:44.230905+00:00",
+  "generated_at_utc": "2026-11-27T07:38:54.246822+00:00",
   "integrity_scope_notice": "This manifest records post-capture SHA-256 hashes and byte sizes to detect silent file modification or truncation. It establishes post-capture file integrity, not independent cryptographic proof of the underlying execution event.",
   "artifact_count": 99,
   "artifacts": [
@@ -496,9 +496,9 @@
     },
     {
       "relative_path": "evidence/git/git-history.log",
-      "sha256": "c3faff8ca64c0a7fd157654f5b1582220e5bbdd2e757a82265451a2d46812d24",
-      "size_bytes": 11664,
-      "captured_timestamp_utc": "2026-11-27T07:32:44.007716+00:00",
+      "sha256": "3439b31313dcf5e87d4b9d06e0d465195bae8b22ca14ffa699f7d34fa47060c9",
+      "size_bytes": 11835,
+      "captured_timestamp_utc": "2026-11-27T07:38:54.008191+00:00",
       "category": "git",
       "related_feature": "Repository Commit History & Working Tree Verification",
       "related_test_or_experiment": "git log / git rev-list",
@@ -506,9 +506,9 @@
     },
     {
       "relative_path": "evidence/git/git_verification.json",
-      "sha256": "b8bb9ba30485836abbe1fd6e4702231bac99f3b7f3ce2b175e781cd9c36e0e1c",
-      "size_bytes": 2916,
-      "captured_timestamp_utc": "2026-11-27T07:32:44.007716+00:00",
+      "sha256": "72d8fadd83874de1aa5fd68786984b1c082044922235c29d6ff4276b5ef910ff",
+      "size_bytes": 2906,
+      "captured_timestamp_utc": "2026-11-27T07:38:54.008757+00:00",
       "category": "git",
       "related_feature": "Repository Commit History & Working Tree Verification",
       "related_test_or_experiment": "git log / git rev-list",
