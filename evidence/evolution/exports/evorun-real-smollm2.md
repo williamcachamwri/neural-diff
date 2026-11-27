@@ -28,7 +28,7 @@ flowchart LR
 | Weight evolution | Observed | Direct cumulative L2 distance from v0 · SmolLM2-Base to v4 · Pruned-MLP is 264.216986 versus 518.110991 summed across individual transitions (direct/sum ratio = 0.5100), reflecting non-collinear multi-stage parameter updates. | `2 checkpoints` |
 | Representation evolution | Observed | Most representation drift occurred between v1b · SFT-Conservative and v2 · Merged-AB (Model Merging: mean Linear CKA = 0.835273, drift = 0.164727). | `2 checkpoints` |
 | Behavioral evolution | Observed | Rubric 'instruction_following' mean score increased after Instruction Tuning (v0 · SmolLM2-Base → v1a · Instruct-SFT, Δ=+0.278) and decreased downstream after Model Merging (v1a · Instruct-SFT → v2 · Merged-AB, Δ=-0.056, n=3 (exploratory small sample)). | `3 checkpoints` |
-| Regression origin | Causal support | Quantization (v2 · Merged-AB → v3 · Quantized-LowBit) is the first observed transition associated with regression in 'overall' (pass rate 37.5% → 33.3%, score 0.559 → 0.425, n=24, Holm p=1.000, failed cases: code-01, json-01, json-03, inst-01). | `code-01, json-01, json-03, inst-01` |
+| Regression origin | Correlated | SFT (v0 · SmolLM2-Base → v1b · SFT-Conservative) is the first observed transition associated with regression in 'conciseness' (pass rate 33.3% → 0.0%, score 0.608 → 0.122, exploratory n=3, Holm p=1.000, failed cases: conc-03). | `conc-03` |
 | Layer evolution | Observed | Layer 0 exhibited an unusually concentrated weight modification (peak Relative L2 = 0.138055, z-score = +5.03). | `0 checkpoints` |
 
 ## Direct Cumulative Weight Trajectory (`Base → Current`)
@@ -66,22 +66,22 @@ flowchart LR
 
 ## Regression Origin Pinpointing
 
-| Transition | Stage | Category | Pass Shift | Evidence | Failed Cases |
-| :--- | :--- | :--- | ---: | :--- | :--- |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | conciseness | `33.3% → 0.0%` | Correlated | `conc-03` |
-| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | Code preservation | `66.7% → 33.3%` | Causal support | `code-01` |
-| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Factual accuracy | `66.7% → 33.3%` | Correlated | `fact-01` |
-| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | Json reliability | `66.7% → 33.3%` | Causal support | `json-01, json-03` |
-| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Refusal behavior | `66.7% → 33.3%` | Correlated | `ref-02` |
-| `v0 · SmolLM2-Base → v1a · Instruct-SFT` | Instruction Tuning | conciseness | `33.3% → 0.0%` | Correlated | `conc-03` |
-| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Instruction following | `33.3% → 0.0%` | Correlated | `inst-02` |
-| `v1b · SFT-Conservative → v2 · Merged-AB` | Model Merging | Math reasoning | `33.3% → 0.0%` | Correlated | `math-02` |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Json reliability | `0.0% → 0.0%` | Correlated | `—` |
-| `v1a · Instruct-SFT → v2 · Merged-AB` | Model Merging | Json reliability | `66.7% → 66.7%` | Causal support | `—` |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | vietnamese | `0.0% → 0.0%` | Correlated | `—` |
-| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | overall | `37.5% → 33.3%` | Causal support | `code-01, json-01, json-03, inst-01` |
-| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Code preservation | `0.0% → 0.0%` | Correlated | `—` |
-| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | vietnamese | `0.0% → 0.0%` | Causal support | `—` |
+| Transition | Stage | Category | Pass-Rate Reg | Score Reg | Causal Verified | Pass / Score Shift | Evidence |
+| :--- | :--- | :--- | :---: | :---: | :---: | ---: | :--- |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | conciseness | `Yes` | `Yes` | `No` | `33.3% → 0.0%` · `0.61→0.12` | Correlated |
+| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | Code preservation | `Yes` | `Yes` | `No` | `66.7% → 33.3%` · `0.70→0.47` | Causal support |
+| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Factual accuracy | `Yes` | `Yes` | `No` | `66.7% → 33.3%` · `0.67→0.33` | Correlated |
+| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | Json reliability | `Yes` | `Yes` | `No` | `66.7% → 33.3%` · `0.64→0.34` | Causal support |
+| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Refusal behavior | `Yes` | `Yes` | `No` | `66.7% → 33.3%` · `0.80→0.53` | Correlated |
+| `v0 · SmolLM2-Base → v1a · Instruct-SFT` | Instruction Tuning | conciseness | `Yes` | `No` | `No` | `33.3% → 0.0%` · `0.61→0.78` | Correlated |
+| `v3 · Quantized-LowBit → v4 · Pruned-MLP` | Pruning | Instruction following | `Yes` | `Yes` | `No` | `33.3% → 0.0%` · `0.61→0.39` | Correlated |
+| `v1b · SFT-Conservative → v2 · Merged-AB` | Model Merging | Math reasoning | `Yes` | `Yes` | `No` | `33.3% → 0.0%` · `0.33→0.00` | Correlated |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Json reliability | `No` | `Yes` | `No` | `0.0% → 0.0%` · `0.32→0.03` | Correlated |
+| `v1a · Instruct-SFT → v2 · Merged-AB` | Model Merging | Json reliability | `No` | `Yes` | `No` | `66.7% → 66.7%` · `0.93→0.64` | Correlated |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | vietnamese | `No` | `Yes` | `No` | `0.0% → 0.0%` · `0.32→0.15` | Correlated |
+| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | overall | `No` | `Yes` | `No` | `37.5% → 33.3%` · `0.56→0.43` | Correlated |
+| `v0 · SmolLM2-Base → v1b · SFT-Conservative` | SFT | Code preservation | `No` | `Yes` | `No` | `0.0% → 0.0%` · `0.20→0.07` | Correlated |
+| `v2 · Merged-AB → v3 · Quantized-LowBit` | Quantization | vietnamese | `No` | `Yes` | `No` | `0.0% → 0.0%` · `0.28→0.15` | Correlated |
 
 ## Provenance
 

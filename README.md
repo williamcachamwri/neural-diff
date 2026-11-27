@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](LICENSE)
 
 ---
@@ -50,14 +50,15 @@
 
 ## 1. Epistemic & Provenance Discipline
 
-NEURAL DIFF encodes explicit epistemic status labels in its domain types (`core/types.py`) and JSON/HTML/Markdown reports so observational correlation is never conflated with causal mechanism:
+NEURAL DIFF encodes explicit epistemic status labels in its domain types ([`core/types.py`](core/types.py)) and JSON/HTML/Markdown/PDF reports so observational correlation, diagnostic transition patching, and case-targeted causal verification are never conflated:
 
 | Epistemic Status | Mathematical & Scientific Criteria | Producing Subsystems |
 | :--- | :--- | :--- |
-| **`OBSERVED`** | Direct deterministic functional of checkpoint weights, forward-hook activations, or greedy decoded token sequences. | `TensorDiffEngine`, `NeuronAttentionAnalyzer`, `ActivationDiffEngine`, `LogitLens`, `BehavioralDiffEngine`, `SparsityAnalyzer` |
+| **`OBSERVED`** | Direct deterministic functional of checkpoint weights, forward-hook activations, or greedy decoded token sequences (separately recording `behavioral_regression_observed` for binary pass-rate drops and `score_regression_observed` for continuous rubric drops). | `TensorDiffEngine`, `NeuronAttentionAnalyzer`, `ActivationDiffEngine`, `LogitLens`, `BehavioralDiffEngine`, `SparsityAnalyzer` |
 | **`INFERRED`** | Deduction under explicit, auditable mathematical thresholds that could admit alternative explanations without training provenance. | Bipartite tensor rename matching ($\cos \ge 0.985$ on identical shapes); SVD update regime classification (`low_rank_adapter` vs `full_rank_update`) |
-| **`CORRELATED`** | Co-occurring parameter-level divergence and behavioral score shifts observed in the same checkpoint pair without interventional isolation. | Cross-stage summary linking peak relative-$L_2$ layers to behavioral suite changes |
-| **`CAUSALLY VERIFIED`** | Verified via direct counterfactual intervention $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ during forward execution, scoped strictly to the tested prompt pair and site. | `run_residual_patching` (`core/activation_analysis/patching.py`) |
+| **`CORRELATED`** | Co-occurring parameter/CKA divergence and behavioral or `score_only` shifts observed without case-targeted counterfactual isolation. Score-only drops (`behavioral_regression_observed = false`) are capped at `CORRELATED` because single-token logit patching does not test multi-token rubric scores. | Cross-stage layer/CKA summaries; `RegressionOriginEngine` covariates |
+| **`CAUSAL SUPPORT`** | Cross-checkpoint single-layer residual patching on a generic diagnostic prompt restoring $\ge 20\%$ positive target-over-foil logit margin (`case_targeted = false`), or partial case verification on a multi-failure event—supporting a transition locus without claiming case-complete or rubric-score causation. | `run_cross_checkpoint_layer_patching`, `RegressionOriginEngine` |
+| **`CAUSALLY VERIFIED`** | Direct counterfactual intervention $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ where `behavioral_regression_observed = true` and **all four** independent provenance checks (`case_targeted`, `target_vs_foil_verified`, `negative_control_verified`, and case+site `verification_scope`) are explicitly `true` across 100% of failed cases in the event (`causal_intervention_verified = true`)—strictly scoped to next-token logit recovery on the tested prompt(s) and layer site(s). | `run_residual_patching` ([`core/activation_analysis/patching.py`](core/activation_analysis/patching.py)); validated `case_interventions` in `RegressionOriginEngine` |
 | **`NOT VERIFIED` / `BLOCKED`** | Unexecuted path or externally gated artifact preserved with full diagnostic HTTP/runtime evidence. | Gated Hugging Face Hub probe for `google/gemma-3-270m` (`HTTP 401`) |
 
 Every comparison bundle also carries an immutable provenance tag—either **`REAL MODEL EXPERIMENT`** (pretrained checkpoints with recorded Hugging Face commit hashes) or **`SYNTHETIC FIXTURE EXPERIMENT`** (controlled test/microbenchmark fixtures)—enforced automatically at both the API and UI layers.
@@ -461,7 +462,7 @@ npm --prefix frontend run dev
 Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\python.exe scripts/run_security_audit.py`:
 
 * **Static Analysis:** `ruff check` (`exit 0`) and `mypy` across `86` Python source files (`exit 0`).
-* **Python Test Suites (`69 passed`):** Unit (`47`), Hypothesis property-based invariant (`7`), multi-checkpoint & Evolution REST API integration (`6`), golden regression (`1`), and adversarial security (`8`) suites—achieving **`89%` statement coverage** across `8,149` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
+* **Python Test Suites (`71 passed`):** Unit (`49`), Hypothesis property-based invariant (`7`), multi-checkpoint & Evolution REST API integration (`6`), golden regression (`1`), and adversarial security (`8`) suites—achieving **`89%` statement coverage** across `8,168` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
 * **Frontend & Live E2E:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 production build (`exit 0`), and live Playwright Chromium full-stack E2E (`2 passed`, `exit 0`).
 * **Vulnerability & Secret Audits:** `pip-audit` (`0` vulnerabilities), `npm audit` (`0` vulnerabilities), and secret scanner (`0` findings).
 

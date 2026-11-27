@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
@@ -49,14 +49,15 @@
 
 ## 1. Kỷ Luật Nhận Thức Luận & Nguồn Gốc Dữ Liệu
 
-NEURAL DIFF định nghĩa tường minh các nhãn nhận thức luận ngay trong kiểu dữ liệu lõi (`core/types.py`) để không bao giờ đánh đồng tương quan quan sát với cơ chế nhân quả:
+NEURAL DIFF định nghĩa tường minh các nhãn nhận thức luận ngay trong kiểu dữ liệu lõi ([`core/types.py`](../../core/types.py)) và mọi định dạng báo cáo để không bao giờ đánh đồng tương quan quan sát, hỗ trợ nhân quả trên câu chẩn đoán hay biến thiên điểm số với bằng chứng nhân quả trực tiếp:
 
 | Nhãn Nhận Thức Luận | Tiêu Chuẩn Toán Học & Khoa Học | Các Phân Hệ Sản Sinh |
 | :--- | :--- | :--- |
-| **`OBSERVED`** | Hàm tất định tính trực tiếp từ trọng số checkpoint, kích hoạt forward-hook hoặc chuỗi token giải mã tham lam. | `TensorDiffEngine`, `NeuronAttentionAnalyzer`, `ActivationDiffEngine`, `LogitLens`, `BehavioralDiffEngine`, `SparsityAnalyzer` |
+| **`OBSERVED`** | Hàm tất định tính trực tiếp từ trọng số checkpoint, kích hoạt forward-hook hoặc chuỗi token giải mã tham lam (ghi nhận tách biệt `behavioral_regression_observed` cho sụt giảm tỷ lệ đỗ nhị phân và `score_regression_observed` cho sụt giảm điểm thang chấm liên tục). | `TensorDiffEngine`, `NeuronAttentionAnalyzer`, `ActivationDiffEngine`, `LogitLens`, `BehavioralDiffEngine`, `SparsityAnalyzer` |
 | **`INFERRED`** | Suy diễn dựa trên ngưỡng toán học tường minh, có thể kiểm toán (không ngầm coi là chân lý tuyệt đối). | Ghép cặp đổi tên tensor cùng shape ($\cos \ge 0.985$); phân loại chế độ cập nhật SVD (`low_rank_adapter` vs `full_rank_update`) |
-| **`CORRELATED`** | Độ lệch trọng số và biến thiên điểm hành vi xuất hiện đồng thời trên cùng cặp mô hình khi chưa tách biệt bằng can thiệp. | Liên kết tầng có Relative $L_2$ đỉnh với biến thiên điểm miền hành vi |
-| **`CAUSALLY VERIFIED`** | Được chứng minh thông qua can thiệp phản thực tế trực tiếp $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ trong quá trình lan truyền tiến, giới hạn chặt trong cặp prompt và vị trí được thử. | `run_residual_patching` (`core/activation_analysis/patching.py`) |
+| **`CORRELATED`** | Độ lệch trọng số/CKA và biến thiên hành vi hoặc `score_only` xuất hiện đồng thời khi chưa có can thiệp phản thực tế đúng ca lỗi. Các sự kiện `score_only` (`behavioral_regression_observed = false`) luôn dừng tối đa ở `CORRELATED` vì vá logit một token không kiểm chứng nguyên nhân sụt giảm điểm thang chấm đa token. | Tổng hợp liên tầng Relative $L_2$/CKA; `RegressionOriginEngine` |
+| **`CAUSAL SUPPORT`** | Vá dòng dư liên checkpoint trên câu lệnh chẩn đoán tổng quát phục hồi $\ge 20\%$ biên logit dương (`case_targeted = false`), hoặc chỉ xác minh được một phần tập ca lỗi trong sự kiện đa lỗi — hỗ trợ giả thuyết vị trí chuyển tiếp nhưng chưa phải bằng chứng nhân quả trọn vẹn cho ca lỗi hay điểm số. | `run_cross_checkpoint_layer_patching`, `RegressionOriginEngine` |
+| **`CAUSALLY VERIFIED`** | Can thiệp phản thực tế trực tiếp $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ khi `behavioral_regression_observed = true` và **cả 4 điều kiện độc lập** (`case_targeted`, `target_vs_foil_verified`, `negative_control_verified`, `verification_scope` theo đúng ca & tầng) đều tường minh `true` trên 100% ca lỗi của sự kiện (`causal_intervention_verified = true`) — giới hạn chặt ở phục hồi biên logit token trên câu lệnh và tầng được kiểm chứng. | `run_residual_patching` ([`patching.py`](../../core/activation_analysis/patching.py)); `case_interventions` trong `RegressionOriginEngine` |
 | **`NOT VERIFIED` / `BLOCKED`** | Luồng chưa chạy hoặc bị chặn bởi cổng xác thực bên ngoài, giữ nguyên bằng chứng HTTP/log gốc. | Probe kho có cổng cấp phép `google/gemma-3-270m` (`HTTP 401`) |
 
 ---
@@ -250,7 +251,7 @@ Toàn bộ 27 ảnh chụp dưới đây (`01`..`27`) được ghi lại tự đ
 #### 11. Xem Trước Trực Tiếp Báo Cáo Trực Quan HTML Tối Giản (`.html`, `.md`, `.json`)
 ![11 — Report Export](../../evidence/frontend/11-report-export.png)
 
-#### 12. Sổ Cái Kiểm Thử Tự Động & Độ Bao Phủ Câu Lệnh `89%` (69 Test Python)
+#### 12. Sổ Cái Kiểm Thử Tự Động & Độ Bao Phủ Câu Lệnh `89%` (71 Test Python)
 ![12 — Test Execution Summary](../../evidence/frontend/12-test-execution-summary.png)
 
 #### 13. Chặn Tấn Công Leo Thang Đường Dẫn Trực Tiếp (`HTTP 403`)
@@ -425,7 +426,7 @@ npm --prefix frontend run dev
 ## 11. Kiến Trúc CI/CD Đa Node, Kiểm Thử (`89%` Độ Phủ) & Kiểm Toán Bảo Mật
 
 * **10 Quy Trình GitHub Actions Đa Node ([`.github/workflows/`](../../.github/workflows)):** Bao gồm ma trận `Python 3.11 / 3.12`, ma trận `Node.js 20 / 22 LTS`, kiểm chứng chéo `ubuntu-latest` + `windows-latest` (kiểm định an toàn mmap Safetensors & khóa SQLite WAL trên Windows), phân mảnh song song Playwright E2E (`e2e.spec.ts` $\parallel$ `evolution.e2e.spec.ts`), quy trình kiểm định đồ thị tiến hóa & 5 định dạng báo cáo (`evolution-pipeline.yml`), cổng kiểm tra hợp đồng 37 REST OpenAPI & đồng thời SQLite (`api-contract-and-db.yml`), CodeQL, quét CVE/bí mật, kiểm chứng toán học Hypothesis và cài đặt sạch `.whl` tại `/tmp`.
-* **Phân tích tĩnh & Kiểm thử Python (`69 passed`):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `8,149` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
+* **Phân tích tĩnh & Kiểm thử Python (`71 passed`):** `ruff check` (`exit 0`), `mypy` trên `86` tệp nguồn (`exit 0`), đạt **`89%` độ bao phủ câu lệnh** trên `8,168` dòng lệnh ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
 * **Frontend & E2E thực tế:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 build (`exit 0`, mọi JS chunk `< 500 KB`) và Playwright Chromium E2E (`2 passed`, `exit 0`).
 * **Kiểm toán lỗ hổng & bí mật:** `pip-audit` (`0` lỗ hổng), `npm audit` (`0` lỗ hổng) và trình quét khóa bí mật (`0` phát hiện).
 

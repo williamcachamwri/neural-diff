@@ -308,7 +308,8 @@ def build_evolution_router(
             base_checkpoint_id=proj.base_checkpoint_id,
         )
 
-        lca_id = dag.lowest_common_ancestor(ca.checkpoint_id, cb.checkpoint_id)
+        mca_ids = dag.maximal_common_ancestors(ca.checkpoint_id, cb.checkpoint_id)
+        lca_id = mca_ids[0] if mca_ids else None
         engine = MultiGenTensorEvolutionEngine(
             policy=policy_provider(),
             tolerances=DiffTolerances(
@@ -326,6 +327,7 @@ def build_evolution_router(
             "lowest_common_ancestor_label": (
                 dag.checkpoints_by_id[lca_id].version_label if lca_id else None
             ),
+            "maximal_common_ancestor_ids": mca_ids,
             "directed_path": dag.shortest_directed_path(ca.checkpoint_id, cb.checkpoint_id),
             "comparison": tr.to_dict(),
         }

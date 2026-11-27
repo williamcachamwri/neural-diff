@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
@@ -33,44 +33,51 @@
 ## 目录
 
 1. [认识论分级与实验溯源准则](#1-认识论分级与实验溯源准则)
-2. [七层解耦系统架构深度解析](#2-七层解耦系统架构深度解析)
+2. [八层解耦系统架构深度解析](#2-八层解耦系统架构深度解析)
 3. [端到端执行管线与数据流序列](#3-端到端执行管线与数据流序列)
 4. [核心数学与统计公式体系](#4-核心数学与统计公式体系)
-5. [完整实机运行图集（100% 全部 15 张实拍截图）](#5-完整实机运行图集100-全部-15-张实拍截图)
+5. [完整实机运行图集（100% 全部 27 张实拍截图）](#5-完整实机运行图集100-全部-27-张实拍截图)
 6. [真实公开模型基准测试（`REAL MODEL EXPERIMENT`）](#6-真实公开模型基准测试real-model-experiment)
 7. [分块流式吞吐量与内存开销基准（`SYNTHETIC FIXTURE EXPERIMENT`）](#7-分块流式吞吐量与内存开销基准synthetic-fixture-experiment)
 8. [安装部署与可复现快速启动](#8-安装部署与可复现快速启动)
 9. [CLI 命令行参考手册（`neural-diff`）](#9-cli-命令行参考手册neural-diff)
-10. [REST API 接口参考手册（17 个端点）](#10-rest-api-接口参考手册17-个端点)
-11. [自动化测试、`90%` 覆盖率与安全加固审计](#11-自动化测试90-覆盖率与安全加固审计)
+10. [REST API 接口参考手册（37 个端点）](#10-rest-api-接口参考手册37-个端点)
+11. [10 条多节点 CI/CD 流水线、`89%` 覆盖率与安全加固审计](#11-10-条多节点-cicd-流水线89-覆盖率与安全加固审计)
 12. [SHA-256 证据完整性与已知工程边界](#12-sha-256-证据完整性与已知工程边界)
 
 ---
 
 ## 1. 认识论分级与实验溯源准则
 
-NEURAL DIFF 在核心领域模型（`core/types.py`）与导出报告中强制编码认识论标签，严禁将观测相关性夸大为因果机制：
+NEURAL DIFF 在核心领域模型（[`core/types.py`](../../core/types.py)）与五格式导出报告中强制编码认识论标签，严禁将观测相关性、诊断提示词修补或分数波动夸大为完整因果证明：
 
 | 认识论状态 | 数学与科学判定标准 | 对应生成子系统 |
 | :--- | :--- | :--- |
-| **`OBSERVED`** | 直接由检查点权重、前向钩子激活或贪婪解码词元序列确定性计算得到的观测函数值。 | `TensorDiffEngine`、`NeuronAttentionAnalyzer`、`ActivationDiffEngine`、`LogitLens`、`BehavioralDiffEngine`、`SparsityAnalyzer` |
+| **`OBSERVED`** | 直接由检查点权重、前向钩子激活或贪婪解码词元序列确定性计算得到的观测函数值（独立记录二值通过率退化 `behavioral_regression_observed` 与连续评分退化 `score_regression_observed`）。 | `TensorDiffEngine`、`NeuronAttentionAnalyzer`、`ActivationDiffEngine`、`LogitLens`、`BehavioralDiffEngine`、`SparsityAnalyzer` |
 | **`INFERRED`** | 在显式数学阈值下得出的高置信度结构或谱推断，不静默等同于训练真值。 | 同形状张量二分图重命名匹配（$\cos \ge 0.985$）；SVD 更新形态判别（`low_rank_adapter` vs `full_rank_update`） |
-| **`CORRELATED`** | 同一检查点对中同时出现的参数偏移与行为得分变化，尚未经反事实干预隔离。 | 峰值相对 $L_2$ 层与行为评测得分变化的跨阶段汇总 |
-| **`CAUSALLY VERIFIED`** | 在前向传播中通过直接反事实干预 $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ 验证的因果恢复率，严格限定于被测输入对与残差位点。 | `run_residual_patching`（`core/activation_analysis/patching.py`） |
+| **`CORRELATED`** | 同一检查点对中同时出现的参数/CKA 偏移与行为或纯评分变化，未经用例级反事实干预隔离。纯评分退化（`behavioral_regression_observed = false`）上限严格锁定为 `CORRELATED`，防止将单 token Logit 修补误读为连续评分退化的因果证明。 | 峰值相对 $L_2$/CKA 跨阶段汇总；`RegressionOriginEngine` |
+| **`CAUSAL SUPPORT`** | 通用诊断提示词跨检查点单层残差修补恢复 $\ge 20\%$ 正向目标/干扰词元 Logit 边界（`case_targeted = false`），或多失败事件中仅部分失败用例通过验证——支持过渡位点假设，但不等同于全用例或评分退化的因果证明。 | `run_cross_checkpoint_layer_patching`、`RegressionOriginEngine` |
+| **`CAUSALLY VERIFIED`** | 仅当 `behavioral_regression_observed = true` 且事件内 100% 失败用例同时显式满足 `case_targeted`、`target_vs_foil_verified`、`negative_control_verified` 与用例+层位级 `verification_scope` 四项独立证据时成立（`causal_intervention_verified = true`），严格限定于被测提示词指纹与层位的词元 Logit 恢复。 | `run_residual_patching`（[`patching.py`](../../core/activation_analysis/patching.py)）；`RegressionOriginEngine` |
 | **`NOT VERIFIED` / `BLOCKED`** | 未执行路径或受外部权限门禁拦截的资源，完整保留原始 HTTP/运行时错误证据。 | `google/gemma-3-270m` 门禁仓库匿名探测（`HTTP 401`） |
 
 ---
 
-## 2. 七层解耦系统架构深度解析
+## 2. 八层解耦系统架构深度解析
 
-NEURAL DIFF 采用严格的 **七层水平分层架构**，核心数学层与 Web 框架完全零耦合，可在 Python 库、`neural-diff` CLI、CI 流水线或 Studio Web 界面中一致运行。
+NEURAL DIFF 采用严格的 **八层水平分层架构**，核心数学与演化谱系层与 Web 框架完全零耦合，可在 Python 库、`neural-diff` CLI、CI 流水线或 Studio Web 界面中一致运行。
 
 ```mermaid
 flowchart TB
-    subgraph L7["第 7 层 · 节点图工作室界面、REST API 与任务编排层"]
-        UI["ComfyUI Nodes 2.0 单色工作室 (React 19 · TypeScript · XYFlow · Framer Motion)"]
-        API["FastAPI 应用 + 数学诊断路由 + WAL 模式 SQLite 存储"]
-        CLI["neural-diff 命令行与 ComparisonOrchestrator 编排器"]
+    subgraph L8["第 8 层 · 单色节点图工作室、37 端点 REST API 与五格式可视化报告层"]
+        UI["ComfyUI Nodes 2.0 单色工作室 + StudioVisuals SVG (React 19 · TypeScript · XYFlow)"]
+        API["FastAPI 应用 + 演化与诊断路由 + WAL 模式 SQLite 存储"]
+        CLI["极简五格式报告引擎 (5-SVG HTML · Mermaid+进度条 MD · PDF 1.4 · CSV · JSON)"]
+    end
+
+    subgraph L7["第 7 层 · 多代神经演化 DAG 与溯源引擎 (Module I)"]
+        DAG["分支合并 EvolutionDAG · 3 色 DFS 防环 · MCA/LCA · 14 类演化阶段"]
+        REG_CKPT["正交 5 域 SHA-256 指纹注册表 · 重复与 PEFT LoRA 识别 · 内容寻址缓存"]
+        EVO_ENG["直接基座累积 L2 · 层矩阵 · CKA 漂移 · 全图谱系 DP 退化起源定位"]
     end
 
     subgraph L6["第 6 层 · 确定性行为评测、回归门禁与多格式报告层"]
@@ -109,7 +116,8 @@ flowchart TB
     end
 
     UI --> API --> CLI
-    CLI --> L6 & L5 & L4 & L3
+    API --> L7 & L6 & L5 & L4 & L3
+    L7 --> L6 & L5 & L4 & L3
     L6 & L5 & L4 --> L3 --> L2 --> L1
 ```
 
@@ -204,9 +212,9 @@ sequenceDiagram
 
 ---
 
-## 5. 完整实机运行图集（100% 全部 15 张实拍截图）
+## 5. 完整实机运行图集（100% 全部 27 张实拍截图）
 
-全部 15 张 PNG 均由 [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) 通过无头 Playwright Chromium（`1600×980 @ 1.5x`）对实时运行的 FastAPI（`127.0.0.1:8000`）与 Vite（`127.0.0.1:4173`）服务器自动采集。
+全部 27 张 PNG（双模型画布 `01`..`15` 与多代神经演化追踪 `16`..`27`）均由 [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) 与 [`scripts/capture_evolution_evidence.py`](../../scripts/capture_evolution_evidence.py) 通过无头 Playwright Chromium 对实时运行的 FastAPI（`127.0.0.1:8000`）与 Vite（`127.0.0.1:4173`）服务器自动采集。
 
 ### 01. 9 节点交互式工作流图画布（Bezier 曲线模式）
 ![01 — Dashboard Graph Canvas](../../evidence/frontend/01-dashboard.png)
@@ -241,7 +249,7 @@ sequenceDiagram
 ### 11. 多格式独立报告预览与下载（`.html`、`.md`、`.json`）
 ![11 — Report Export](../../evidence/frontend/11-report-export.png)
 
-### 12. 自动化测试与 `90%` 语句覆盖率验证台账（55 项 Python 测试）
+### 12. 自动化测试与 `89%` 语句覆盖率验证台账（71 项 Python 测试）
 ![12 — Test Execution Summary](../../evidence/frontend/12-test-execution-summary.png)
 
 ### 13. 实时路径穿越安全拦截提示（`HTTP 403`）
@@ -383,7 +391,7 @@ npm --prefix frontend run dev
 ## 11. 10 条多节点 CI/CD 流水线、`89%` 覆盖率与安全加固审计
 
 * **10 条多节点 GitHub Actions 流水线（[`.github/workflows/`](../../.github/workflows)）：** 覆盖 `Python 3.11 / 3.12` 矩阵、`Node.js 20 / 22 LTS` 矩阵、`ubuntu-latest` + `windows-latest` 跨平台验证、Playwright 分片并行 E2E、多代演化 DAG 与五格式报告门禁（`evolution-pipeline.yml`）、37 端点 OpenAPI 与 SQLite WAL 并发门禁（`api-contract-and-db.yml`）、CodeQL 静态污点分析、CVE/密钥扫描及隔离 `/tmp` Wheel 冒烟测试。
-* **静态检查与 Python 测试套件（`69 passed`）：** `ruff check`（`exit 0`）、全量 `86` 个源文件 `mypy` 检查（`exit 0`），核心语句覆盖率达 **`89%`**（共 `8,149` 条语句，见 [`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
+* **静态检查与 Python 测试套件（`71 passed`）：** `ruff check`（`exit 0`）、全量 `86` 个源文件 `mypy` 检查（`exit 0`），核心语句覆盖率达 **`89%`**（共 `8,168` 条语句，见 [`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
 * **前端与端到端测试：** `tsc --noEmit`（`exit 0`）、Vitest（`4 passed`）、Vite 8 生产构建（`exit 0`，单块 `< 500 KB`）及 Playwright Chromium 全栈 E2E（`2 passed`）。
 * **安全扫描与发布记录：** `pip-audit` 零漏洞、`npm audit` 零漏洞、仓库密钥扫描零发现；完整版本演进见 [`CHANGELOG.md`](../../CHANGELOG.md) 与 [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md)。
 

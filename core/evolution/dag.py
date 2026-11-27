@@ -234,15 +234,29 @@ class EvolutionDAG:
                 stack.extend(self.children_of.get(cur, []))
         return visited
 
-    def lowest_common_ancestor(self, id_a: str, id_b: str) -> str | None:
-        """Find deepest shared ancestor of `id_a` and `id_b` (including self if one is ancestor)."""
+    def maximal_common_ancestors(self, id_a: str, id_b: str) -> list[str]:
+        """Return all maximal (un-dominated) common ancestors of `id_a` and `id_b` in a general DAG.
+
+        In multi-parent merge DAGs, two checkpoints may share multiple incomparable lowest common
+        ancestors (e.g., `p1` and `p2` both merged into `m1` and `m2`). An ancestor `u` in the shared
+        ancestor set `S` is maximal iff no proper descendant of `u` is also in `S`.
+        Sorted deterministically by `(-generation_depth, checkpoint_id)`.
+        """
         anc_a = self.ancestors_of(id_a) | {id_a}
         anc_b = self.ancestors_of(id_b) | {id_b}
         shared = anc_a & anc_b
         if not shared:
-            return None
+            return []
         depths = self.generation_depths()
-        return max(shared, key=lambda cid: (depths.get(cid, 0), cid))
+        maximal = [
+            cid for cid in shared if not (self.descendants_of(cid) & shared)
+        ]
+        return sorted(maximal, key=lambda cid: (-depths.get(cid, 0), cid))
+
+    def lowest_common_ancestor(self, id_a: str, id_b: str) -> str | None:
+        """Select canonical deterministic LCA from `maximal_common_ancestors(id_a, id_b)`."""
+        mcas = self.maximal_common_ancestors(id_a, id_b)
+        return mcas[0] if mcas else None
 
     def classify_pair_scope(
         self,

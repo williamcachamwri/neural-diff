@@ -45,18 +45,18 @@ ckpt-smol-03-quant,v3 · Quantized-LowBit,0.855345,0.144655,0.976667,0.652708,0.
 ckpt-smol-04-pruned,v4 · Pruned-MLP,0.84808,0.15192,0.976667,0.652708,0.610219,0.609484,0.606459,0.60764,0.608362,0.601308,0.585219,0.61568,0.904326,0.999411,0.999411,0.999411,0.999409,0.999409,0.999408,0.999406,0.999405,0.999402,0.999401,0.999397,0.999394,0.999383,0.999373,0.999367,0.999362,0.999366,0.995387,0.079222
 
 [REGRESSION_ORIGIN_EVENTS]
-event_id,previous_label,first_affected_label,transformation_type,affected_category,pass_rate_before,pass_rate_after,score_drop,failed_cases,epistemic_status,causal_verification_exists
-reg-orig-36c24645,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,conciseness,0.333333,0.0,0.485642,conc-03,CORRELATED,False
-reg-orig-c1a5e712,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,code_preservation,0.666667,0.333333,0.333334,code-01,CAUSAL SUPPORT,False
-reg-orig-d46ba416,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,factual_accuracy,0.666667,0.333333,0.333334,fact-01,CORRELATED,False
-reg-orig-bcd276f4,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,json_reliability,0.666667,0.333333,0.333334,json-01;json-03,CAUSAL SUPPORT,False
-reg-orig-ef8fb4e3,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,refusal_behavior,0.666667,0.333333,0.333334,ref-02,CORRELATED,False
-reg-orig-48705c9a,v0 · SmolLM2-Base,v1a · Instruct-SFT,Instruction Tuning,conciseness,0.333333,0.0,0.333333,conc-03,CORRELATED,False
-reg-orig-061c82a1,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,instruction_following,0.333333,0.0,0.333333,inst-02,CORRELATED,False
-reg-orig-199308fe,v1b · SFT-Conservative,v2 · Merged-AB,Model Merging,math_reasoning,0.333333,0.0,0.333333,math-02,CORRELATED,False
-reg-orig-18bbfb6c,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,json_reliability,0.0,0.0,0.283334,,CORRELATED,False
-reg-orig-9606d5bc,v1a · Instruct-SFT,v2 · Merged-AB,Model Merging,json_reliability,0.666667,0.666667,0.283333,,CAUSAL SUPPORT,False
-reg-orig-7734b45e,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,vietnamese,0.0,0.0,0.166667,,CORRELATED,False
-reg-orig-25bff788,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,overall,0.375,0.333333,0.134032,code-01;json-01;json-03;inst-01,CAUSAL SUPPORT,False
-reg-orig-1faaa522,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,code_preservation,0.0,0.0,0.133333,,CORRELATED,False
-reg-orig-927919c1,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,vietnamese,0.0,0.0,0.133333,,CAUSAL SUPPORT,False
+event_id,previous_label,first_affected_label,transformation_type,affected_category,regression_kind,behavioral_regression_observed,score_regression_observed,causal_intervention_verified,pass_rate_before,pass_rate_after,score_drop,failed_cases,epistemic_status,causal_verification_exists
+reg-orig-8e936f97,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,conciseness,pass_rate_and_score,True,True,False,0.333333,0.0,0.485642,conc-03,CORRELATED,False
+reg-orig-36e2d084,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,code_preservation,pass_rate_and_score,True,True,False,0.666667,0.333333,0.333334,code-01,CAUSAL SUPPORT,False
+reg-orig-50c7d4d2,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,factual_accuracy,pass_rate_and_score,True,True,False,0.666667,0.333333,0.333334,fact-01,CORRELATED,False
+reg-orig-b82be838,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,json_reliability,pass_rate_and_score,True,True,False,0.666667,0.333333,0.333334,json-01;json-03,CAUSAL SUPPORT,False
+reg-orig-ba4010ae,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,refusal_behavior,pass_rate_and_score,True,True,False,0.666667,0.333333,0.333334,ref-02,CORRELATED,False
+reg-orig-79580b0f,v0 · SmolLM2-Base,v1a · Instruct-SFT,Instruction Tuning,conciseness,pass_rate_only,True,False,False,0.333333,0.0,0.333333,conc-03,CORRELATED,False
+reg-orig-e3aa7477,v3 · Quantized-LowBit,v4 · Pruned-MLP,Pruning,instruction_following,pass_rate_and_score,True,True,False,0.333333,0.0,0.333333,inst-02,CORRELATED,False
+reg-orig-c7bb4380,v1b · SFT-Conservative,v2 · Merged-AB,Model Merging,math_reasoning,pass_rate_and_score,True,True,False,0.333333,0.0,0.333333,math-02,CORRELATED,False
+reg-orig-751b8d45,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,json_reliability,score_only,False,True,False,0.0,0.0,0.283334,,CORRELATED,False
+reg-orig-dcbc9f24,v1a · Instruct-SFT,v2 · Merged-AB,Model Merging,json_reliability,score_only,False,True,False,0.666667,0.666667,0.283333,,CORRELATED,False
+reg-orig-4437ed03,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,vietnamese,score_only,False,True,False,0.0,0.0,0.166667,,CORRELATED,False
+reg-orig-38a78dae,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,overall,score_only,False,True,False,0.375,0.333333,0.134032,code-01;json-01;json-03;inst-01,CORRELATED,False
+reg-orig-f6780e93,v0 · SmolLM2-Base,v1b · SFT-Conservative,SFT,code_preservation,score_only,False,True,False,0.0,0.0,0.133333,,CORRELATED,False
+reg-orig-c0427d2b,v2 · Merged-AB,v3 · Quantized-LowBit,Quantization,vietnamese,score_only,False,True,False,0.0,0.0,0.133333,,CORRELATED,False

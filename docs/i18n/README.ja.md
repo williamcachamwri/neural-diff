@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
@@ -33,44 +33,51 @@
 ## 目次
 
 1. [認識論的規律とデータ来歴管理](#1-認識論的規律とデータ来歴管理)
-2. [7 層システムアーキテクチャ詳細解説](#2-7-層システムアーキテクチャ詳細解説)
+2. [8 層システムアーキテクチャ詳細解説](#2-8-層システムアーキテクチャ詳細解説)
 3. [エンドツーエンド実行パイプラインとデータフロー](#3-エンドツーエンド実行パイプラインとデータフロー)
 4. [数学的・統計的定式化](#4-数学的統計的定式化)
-5. [全画面ライブスクリーンショット集（全 15 枚・100% 実機撮影）](#5-全画面ライブスクリーンショット集全-15-枚100-実機撮影)
+5. [全画面ライブスクリーンショット集（全 27 枚・100% 実機撮影）](#5-全画面ライブスクリーンショット集全-27-枚100-実機撮影)
 6. [公開実モデルベンチマーク（`REAL MODEL EXPERIMENT`）](#6-公開実モデルベンチマークreal-model-experiment)
 7. [チャンクストリーミング性能・メモリベンチマーク（`SYNTHETIC FIXTURE EXPERIMENT`）](#7-チャンクストリーミング性能メモリベンチマークsynthetic-fixture-experiment)
 8. [インストールと再現可能なクイックスタート](#8-インストールと再現可能なクイックスタート)
 9. [CLI リファレンス（`neural-diff`）](#9-cli-リファレンスneural-diff)
-10. [REST API リファレンス（全 17 エンドポイント）](#10-rest-api-リファレンス全-17-エンドポイント)
-11. [自動テスト・`90%` カバレッジ・セキュリティ監査](#11-自動テスト90-カバレッジセキュリティ監査)
+10. [REST API リファレンス（全 37 エンドポイント）](#10-rest-api-リファレンス全-37-エンドポイント)
+11. [10 系統マルチノード CI/CD・`89%` カバレッジ・セキュリティ監査](#11-10-系統マルチノード-cicd89-カバレッジセキュリティ監査)
 12. [SHA-256 証跡整合性と既知の技術的制約](#12-sha-256-証跡整合性と既知の技術的制約)
 
 ---
 
 ## 1. 認識論的規律とデータ来歴管理
 
-NEURAL DIFF はドメイン型（`core/types.py`）および全レポート形式に明示的な認識論ラベルを付与し、観測上の相関と因果的メカニズムを決して混同しません：
+NEURAL DIFF はドメイン型（[`core/types.py`](../../core/types.py)）および全 5 形式レポートに明示的な認識論ラベルを付与し、観測上の相関・診断パッチング・連続スコア変動を因果的証明と決して混同しません：
 
 | 認識論ステータス | 数学的・科学的定義 | 生成サブシステム |
 | :--- | :--- | :--- |
-| **`OBSERVED`** | チェックポイント重み、順伝播フック活性化、または貪欲デコード出力から直接計算された決定的観測値。 | `TensorDiffEngine`、`NeuronAttentionAnalyzer`、`ActivationDiffEngine`、`LogitLens`、`BehavioralDiffEngine`、`SparsityAnalyzer` |
+| **`OBSERVED`** | チェックポイント重み、順伝播フック活性化、または貪欲デコード出力から直接計算された決定的観測値（二値合格率低下 `behavioral_regression_observed` と連続ルーブリックスコア低下 `score_regression_observed` を独立記録）。 | `TensorDiffEngine`、`NeuronAttentionAnalyzer`、`ActivationDiffEngine`、`LogitLens`、`BehavioralDiffEngine`、`SparsityAnalyzer` |
 | **`INFERRED`** | 監査可能な明示的閾値に基づく構造・スペクトル推論（無断で真値と同一視しない）。 | 同一形状テンソルの二部グラフ・リネーム推論（$\cos \ge 0.985$）、SVD 更新レジーム分類 |
-| **`CORRELATED`** | 反事実介入による分離を行っていない、パラメータ変動と行動スコア変化の共起関係。 | 相対 $L_2$ 上位層と行動スイート変動の横断サマリー |
-| **`CAUSALLY VERIFIED`** | 順伝播中の直接的な反事実介入 $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ により検証された因果回復効果（対象プロンプト対・サイトに限定）。 | `run_residual_patching`（`core/activation_analysis/patching.py`） |
+| **`CORRELATED`** | ケース単位の反事実介入を行っていないパラメータ/CKA 変動と行動・スコア変化の共起関係。スコアのみの低下（`behavioral_regression_observed = false`）は単一トークンパッチングでは検証できないため上限を `CORRELATED` に制限します。 | 相対 $L_2$/CKA 上位層サマリー、`RegressionOriginEngine` |
+| **`CAUSAL SUPPORT`** | 汎用診断プロンプト上の残差パッチングで正のロジット差を $\ge 20\%$ 回復（`case_targeted = false`）、または複数失敗ケースの一部のみが検証済みの状態——遷移部位仮説を支持しますが、全ケースやスコア低下の因果証明ではありません。 | `run_cross_checkpoint_layer_patching`、`RegressionOriginEngine` |
+| **`CAUSALLY VERIFIED`** | `behavioral_regression_observed = true` かつイベント内の全失敗ケースで 4 条件（`case_targeted`、`target_vs_foil_verified`、`negative_control_verified`、ケース＋層限定の `verification_scope`）が明示的に `true` の場合のみ成立（`causal_intervention_verified = true`）。検証済みプロンプト指紋と層位置の次トークン回復に厳密に限定されます。 | `run_residual_patching`（[`patching.py`](../../core/activation_analysis/patching.py)）、`RegressionOriginEngine` |
 | **`NOT VERIFIED` / `BLOCKED`** | 未実行経路または外部認可ゲートにより遮断された対象（HTTP/実行ログ証跡をそのまま保持）。 | `google/gemma-3-270m` ゲート付きリポジトリ検証（`HTTP 401`） |
 
 ---
 
-## 2. 7 層システムアーキテクチャ詳細解説
+## 2. 8 層システムアーキテクチャ詳細解説
 
-NEURAL DIFF は Web フレームワークへの依存を持たないコア数学エンジンを中心に、**疎結合な 7 つの水平レイヤー** で構成されています。
+NEURAL DIFF は Web フレームワークへの依存を持たないコア数学・進化系譜エンジンを中心に、**疎結合な 8 つの水平レイヤー** で構成されています。
 
 ```mermaid
 flowchart TB
-    subgraph L7["第 7 層 · ノードグラフ Studio UI・REST API・オーケストレーション層"]
-        UI["ComfyUI Nodes 2.0 モノクローム Studio (React 19 · TypeScript · XYFlow · Framer Motion)"]
-        API["FastAPI サーバー + 診断ルーター + WAL SQLite ストア"]
-        CLI["neural-diff CLI & ComparisonOrchestrator"]
+    subgraph L8["第 8 層 · ノードグラフ Studio UI・37 REST API・5 形式ビジュアルレポート層"]
+        UI["ComfyUI Nodes 2.0 モノクローム Studio + StudioVisuals SVG (React 19 · TypeScript · XYFlow)"]
+        API["FastAPI サーバー + 進化＆診断ルーター + WAL SQLite ストア"]
+        CLI["5 形式レポートエンジン (5-SVG HTML · Mermaid+ゲージ MD · PDF 1.4 · CSV · JSON)"]
+    end
+
+    subgraph L7["第 7 層 · 多世代ニューラル進化 DAG ＆プロベナンスエンジン層 (Module I)"]
+        DAG["分岐・マージ EvolutionDAG · 3 色 DFS 循環防止 · MCA/LCA · 14 変換種別"]
+        REG_CKPT["直交 5 ドメイン SHA-256 指紋台帳 · 重複＆PEFT LoRA 検出 · 内容キャッシュ"]
+        EVO_ENG["直接 Base 累積 L2 · 層行列 · CKA ドリフト · 全グラフ系譜 DP 劣化起点特定"]
     end
 
     subgraph L6["第 6 層 · 決定的行動評価・リグレッションゲート・レポート出力層"]
@@ -109,7 +116,8 @@ flowchart TB
     end
 
     UI --> API --> CLI
-    CLI --> L6 & L5 & L4 & L3
+    API --> L7 & L6 & L5 & L4 & L3
+    L7 --> L6 & L5 & L4 & L3
     L6 & L5 & L4 --> L3 --> L2 --> L1
 ```
 
@@ -204,9 +212,9 @@ sequenceDiagram
 
 ---
 
-## 5. 全画面ライブスクリーンショット集（全 15 枚・100% 実機撮影）
+## 5. 全画面ライブスクリーンショット集（全 27 枚・100% 実機撮影）
 
-全 15 枚の PNG は [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) により稼働中の FastAPI（`127.0.0.1:8000`）および Vite（`127.0.0.1:4173`）に対してヘッドレス Playwright Chromium（`1600×980 @ 1.5x`）から自動撮影されました。
+全 27 枚の PNG（ペア比較 `01`..`15` および多世代進化追跡 `16`..`27`）は [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) および [`scripts/capture_evolution_evidence.py`](../../scripts/capture_evolution_evidence.py) により稼働中の FastAPI（`127.0.0.1:8000`）と Vite（`127.0.0.1:4173`）に対してヘッドレス Playwright Chromium から自動撮影されました。
 
 ### 01. 9 ノード・ワークフローグラフ（Bezier 配線モード）
 ![01 — Dashboard Graph Canvas](../../evidence/frontend/01-dashboard.png)
@@ -241,7 +249,7 @@ sequenceDiagram
 ### 11. マルチフォーマットレポートプレビュー＆ダウンロード（`.html` / `.md` / `.json`）
 ![11 — Report Export](../../evidence/frontend/11-report-export.png)
 
-### 12. 自動テスト＆`90%` ステートメントカバレッジ台帳（Python 55 テスト）
+### 12. 自動テスト＆`89%` ステートメントカバレッジ台帳（Python 71 テスト）
 ![12 — Test Execution Summary](../../evidence/frontend/12-test-execution-summary.png)
 
 ### 13. パストラバーサル遮断・セキュリティエラー表示（`HTTP 403`）
@@ -383,7 +391,7 @@ npm --prefix frontend run dev
 ## 11. 10 系統マルチノード CI/CD・`89%` カバレッジ・セキュリティ監査
 
 * **10 系統マルチノード GitHub Actions（[`.github/workflows/`](../../.github/workflows)）：** `Python 3.11 / 3.12` マトリクス、`Node.js 20 / 22 LTS` マトリクス、`ubuntu-latest` + `windows-latest` 移植性検証、Playwright 並列シャーディング E2E、進化 DAG ＆ 5 形式レポート検証（`evolution-pipeline.yml`）、37 エンドポイント OpenAPI ＆ SQLite WAL 並行性検証（`api-contract-and-db.yml`）、CodeQL、CVE/シークレット監査、クリーンルーム `.whl` スモークテストを実行。
-* **静的解析＆Python テスト（`69 passed`）：** `ruff check`（`exit 0`）、全 `86` ファイルの `mypy` 型検査（`exit 0`）、ステートメントカバレッジ **`89%`**（`8,149` 文、[`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
+* **静的解析＆Python テスト（`71 passed`）：** `ruff check`（`exit 0`）、全 `86` ファイルの `mypy` 型検査（`exit 0`）、ステートメントカバレッジ **`89%`**（`8,168` 文、[`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)）。
 * **フロントエンド＆E2E：** `tsc --noEmit`（`exit 0`）、Vitest（`4 passed`）、Vite 8 ビルド（`exit 0`、全 JS チャンク `< 500 KB`）、Playwright Chromium E2E（`2 passed`）。
 * **変更履歴＆技術ガイド：** [`CHANGELOG.md`](../../CHANGELOG.md) および [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md) を参照。
 

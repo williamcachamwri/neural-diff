@@ -379,6 +379,9 @@ export interface RegressionOriginEvent {
   transformation_type: string;
   affected_category: string;
   regression_kind?: string;
+  behavioral_regression_observed?: boolean;
+  score_regression_observed?: boolean;
+  causal_intervention_verified?: boolean;
   pass_rate_before: number;
   pass_rate_after: number;
   pass_rate_drop: number;

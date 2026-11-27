@@ -1,7 +1,7 @@
 === Suite: property_tests ===
 Command: D:\LLM\.venv\Scripts\python.exe -m pytest -m property -v
-Started (UTC): 2026-11-27T10:27:39.060270+00:00
-Completed (UTC): 2026-11-27T10:27:47.792214+00:00
+Started (UTC): 2026-11-27T11:43:35.509735+00:00
+Completed (UTC): 2026-11-27T11:43:46.396881+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -14,7 +14,7 @@ configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.16.0, hypothesis-6.170.17, platformdirs-4.14.8, asyncio-1.5.0, cov-7.1.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
-collecting ... collected 69 items / 62 deselected / 7 selected
+collecting ... collected 71 items / 64 deselected / 7 selected
 
 tests/property/test_evaluator_properties.py::test_all_eight_evaluators_never_raise_and_bound_scores_in_unit_interval PASSED [ 14%]
 tests/property/test_tensor_properties.py::test_tensor_reflexivity_identity PASSED [ 28%]
@@ -24,7 +24,7 @@ tests/property/test_tensor_properties.py::test_l2_triangle_inequality PASSED [ 7
 tests/property/test_tensor_properties.py::test_chunk_partition_invariance PASSED [ 85%]
 tests/property/test_tensor_properties.py::test_linear_cka_planar_rotation_invariance PASSED [100%]
 
-====================== 7 passed, 62 deselected in 7.29s =======================
+====================== 7 passed, 64 deselected in 9.17s =======================
 
 --- STDERR ---
 

@@ -1,7 +1,7 @@
 === Suite: frontend_production_build ===
 Command: C:\Program Files\nodejs\npm.CMD --prefix frontend run build
-Started (UTC): 2026-11-27T10:28:59.160728+00:00
-Completed (UTC): 2026-11-27T10:29:02.195094+00:00
+Started (UTC): 2026-11-27T11:45:21.484877+00:00
+Completed (UTC): 2026-11-27T11:45:25.734585+00:00
 Exit Code: 0
 
 --- STDOUT ---
@@ -19,10 +19,10 @@ dist/assets/index-kOj4BP_q.css             35.74 kB │ gzip:   6.70 kB
 dist/assets/vendor-react-M-Te7Owu.js        0.19 kB │ gzip:   0.15 kB
 dist/assets/rolldown-runtime-Dl_DZoUm.js    0.59 kB │ gzip:   0.35 kB
 dist/assets/vendor-motion-BCUR3MO3.js     142.73 kB │ gzip:  48.15 kB
-dist/assets/index-CDdsJFHF.js             187.43 kB │ gzip:  42.50 kB
+dist/assets/index-DfeNA54P.js             188.25 kB │ gzip:  42.65 kB
 dist/assets/vendor-xyflow-D1izoad-.js     387.14 kB │ gzip: 129.91 kB
 
-[32m✓ built in 363ms[39m
+[32m✓ built in 489ms[39m
 
 --- STDERR ---
 [33m[MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use no memo" in "node_modules/react-compiler-runtime/dist/index.js" may not be preserved when bundling.

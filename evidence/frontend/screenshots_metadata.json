@@ -1,7 +1,7 @@
 [
   {
     "filename": "evidence/frontend/01-dashboard.png",
-    "timestamp_utc": "2026-11-27T10:29:20.177991+00:00",
+    "timestamp_utc": "2026-11-27T11:47:17.835614+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Application dashboard displaying RTX 5050 CUDA:0 status, memory telemetry, real vs synthetic experiment counts, and recent runs.",
@@ -11,7 +11,7 @@
   },
   {
     "filename": "evidence/frontend/02-model-selection.png",
-    "timestamp_utc": "2026-11-27T10:29:21.029781+00:00",
+    "timestamp_utc": "2026-11-27T11:47:18.709343+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Model A and Model B selection form with verified open-access presets, tolerances, baseline gate selector, and analysis module checkboxes.",
@@ -21,7 +21,7 @@
   },
   {
     "filename": "evidence/frontend/03-compatibility-validation.png",
-    "timestamp_utc": "2026-11-27T10:29:22.190601+00:00",
+    "timestamp_utc": "2026-11-27T11:47:19.833825+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Live compatibility validation of Qwen/Qwen2.5-0.5B vs Qwen/Qwen2.5-0.5B-Instruct (290 aligned tensors, 494,032,768 parameters).",
@@ -31,7 +31,7 @@
   },
   {
     "filename": "evidence/frontend/04-tensor-diff.png",
-    "timestamp_utc": "2026-11-27T10:29:23.192969+00:00",
+    "timestamp_utc": "2026-11-27T11:47:20.927190+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Tensor Explorer displaying float64-accumulated cosine, relative L2, RMSE, max abs diff, and quantile distribution shifts across Qwen2.5-0.5B weights.",
@@ -41,7 +41,7 @@
   },
   {
     "filename": "evidence/frontend/05-structural-diff.png",
-    "timestamp_utc": "2026-11-27T10:29:24.437479+00:00",
+    "timestamp_utc": "2026-11-27T11:47:22.242118+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Git-style Structural Diff view comparing Qwen2.5-0.5B-Instruct (24 layers, 494M params) vs SmolLM2-135M-Instruct (30 layers, 134.5M params), highlighting added/removed keys, shape changes, and layer deltas.",
@@ -51,7 +51,7 @@
   },
   {
     "filename": "evidence/frontend/06-layer-analysis.png",
-    "timestamp_utc": "2026-11-27T10:29:25.730166+00:00",
+    "timestamp_utc": "2026-11-27T11:47:23.521690+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "24-layer submodule Relative L2 heatmap with GQA Attention Head slicing (14 Q heads, 2 KV heads), MLP basis shifts, embedding drift, and polysemanticity caution.",
@@ -61,7 +61,7 @@
   },
   {
     "filename": "evidence/frontend/07-activation-comparison.png",
-    "timestamp_utc": "2026-11-27T10:29:26.545905+00:00",
+    "timestamp_utc": "2026-11-27T11:47:24.425727+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Observational forward-hook Activation Diff across 24 Qwen2.5 layers showing Hidden Cosine, Linear CKA, Attention/MLP alignment, and Top-5 next-token logit probabilities.",
@@ -71,7 +71,7 @@
   },
   {
     "filename": "evidence/frontend/08-behavioral-diff.png",
-    "timestamp_utc": "2026-11-27T10:29:27.438317+00:00",
+    "timestamp_utc": "2026-11-27T11:47:25.397554+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "8-suite deterministic Behavioral Diff showing pass-rate improvement, 95% bootstrap CI, McNemar p-value, domain breakdown, and side-by-side paired model outputs.",
@@ -81,7 +81,7 @@
   },
   {
     "filename": "evidence/frontend/09-regression-report.png",
-    "timestamp_utc": "2026-11-27T10:29:28.686250+00:00",
+    "timestamp_utc": "2026-11-27T11:47:26.856916+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Regression Gate Dashboard demonstrating FAILED_REGRESSION detection, severity badges, deterministic CLI reproduction commands, and versioned baseline management.",
@@ -91,7 +91,7 @@
   },
   {
     "filename": "evidence/frontend/10-benchmark-results.png",
-    "timestamp_utc": "2026-11-27T10:29:29.825137+00:00",
+    "timestamp_utc": "2026-11-27T11:47:28.159517+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Persisted Experiment & Benchmark History distinguishing REAL MODEL EXPERIMENT runs (SmolLM2-135M, Qwen2.5-0.5B, Cross-Arch) from SYNTHETIC FIXTURE runs with wall-clock durations.",
@@ -101,7 +101,7 @@
   },
   {
     "filename": "evidence/frontend/11-report-export.png",
-    "timestamp_utc": "2026-11-27T10:29:31.424854+00:00",
+    "timestamp_utc": "2026-11-27T11:47:29.945714+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Report Viewer rendering the standalone SVG-equipped HTML report preview alongside .html, .md, and .json export controls.",
@@ -111,7 +111,7 @@
   },
   {
     "filename": "evidence/frontend/12-test-execution-summary.png",
-    "timestamp_utc": "2026-11-27T10:29:32.089527+00:00",
+    "timestamp_utc": "2026-11-27T11:47:30.637469+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Rendered summary of actual executed static analysis, unit, Hypothesis property, integration, regression, security, coverage, and Vitest logs.",
@@ -121,7 +121,7 @@
   },
   {
     "filename": "evidence/frontend/13-error-handling.png",
-    "timestamp_utc": "2026-11-27T10:29:34.374755+00:00",
+    "timestamp_utc": "2026-11-27T11:47:33.016042+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Structured application error banner displaying [SECURITY_VALIDATION_ERROR \u2022 HTTP 403] when a disallowed path-traversal checkpoint path is submitted.",
@@ -131,7 +131,7 @@
   },
   {
     "filename": "evidence/frontend/14-settings.png",
-    "timestamp_utc": "2026-11-27T10:29:35.233263+00:00",
+    "timestamp_utc": "2026-11-27T11:47:33.866486+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Runtime & Security Settings view displaying persisted compute device, streaming chunk size, tolerances, and weights_only serialization policy.",
@@ -141,7 +141,7 @@
   },
   {
     "filename": "evidence/frontend/15-final-application-state.png",
-    "timestamp_utc": "2026-11-27T10:29:36.812670+00:00",
+    "timestamp_utc": "2026-11-27T11:47:35.444643+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "demonstrates": "Final ComfyUI Nodes 2.0 Studio canvas in Orthogonal PCB cable-routing mode with active Qwen2.5-0.5B real model DAG, embedded micro-scopes, and MiniMap.",
@@ -151,7 +151,7 @@
   },
   {
     "filename": "evidence/frontend/16-evolution-dashboard.png",
-    "timestamp_utc": "2026-11-27T10:37:42.789458+00:00",
+    "timestamp_utc": "2026-11-27T11:56:09.830414+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Evolution Dashboard & Insights",
@@ -161,7 +161,7 @@
   },
   {
     "filename": "evidence/frontend/17-evolution-timeline.png",
-    "timestamp_utc": "2026-11-27T10:37:54.877804+00:00",
+    "timestamp_utc": "2026-11-27T11:56:20.357370+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Evolution Lineage Timeline & Pair Comparator",
@@ -171,7 +171,7 @@
   },
   {
     "filename": "evidence/frontend/18-evolution-branched-graph.png",
-    "timestamp_utc": "2026-11-27T10:37:43.512645+00:00",
+    "timestamp_utc": "2026-11-27T11:56:10.548867+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Branched & Merged Evolution Graph",
@@ -181,7 +181,7 @@
   },
   {
     "filename": "evidence/frontend/19-evolution-checkpoint-registry.png",
-    "timestamp_utc": "2026-11-27T10:37:55.559421+00:00",
+    "timestamp_utc": "2026-11-27T11:56:21.025830+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Checkpoint Registry",
@@ -191,7 +191,7 @@
   },
   {
     "filename": "evidence/frontend/20-evolution-checkpoint-details.png",
-    "timestamp_utc": "2026-11-27T10:37:56.259218+00:00",
+    "timestamp_utc": "2026-11-27T11:56:21.702945+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Checkpoint Provenance & Details",
@@ -201,7 +201,7 @@
   },
   {
     "filename": "evidence/frontend/21-evolution-tensor-comparison.png",
-    "timestamp_utc": "2026-11-27T10:37:56.905435+00:00",
+    "timestamp_utc": "2026-11-27T11:56:22.314160+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Multi-Gen & Cumulative Tensor Evolution",
@@ -211,7 +211,7 @@
   },
   {
     "filename": "evidence/frontend/22-evolution-layer-heatmap.png",
-    "timestamp_utc": "2026-11-27T10:37:57.573742+00:00",
+    "timestamp_utc": "2026-11-27T11:56:22.911484+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Layer Evolution Heatmap",
@@ -221,7 +221,7 @@
   },
   {
     "filename": "evidence/frontend/23-evolution-behavioral-chart.png",
-    "timestamp_utc": "2026-11-27T10:37:58.235946+00:00",
+    "timestamp_utc": "2026-11-27T11:56:23.538782+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Behavioral Evolution Chart",
@@ -231,7 +231,7 @@
   },
   {
     "filename": "evidence/frontend/24-evolution-representation-matrix.png",
-    "timestamp_utc": "2026-11-27T10:37:58.850641+00:00",
+    "timestamp_utc": "2026-11-27T11:56:24.153670+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Representation CKA Evolution Matrix",
@@ -241,7 +241,7 @@
   },
   {
     "filename": "evidence/frontend/25-evolution-regression-origin.png",
-    "timestamp_utc": "2026-11-27T10:37:59.538384+00:00",
+    "timestamp_utc": "2026-11-27T11:56:24.747532+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Regression Origin Analysis",
@@ -251,7 +251,7 @@
   },
   {
     "filename": "evidence/frontend/26-evolution-experiment-details.png",
-    "timestamp_utc": "2026-11-27T10:38:00.243557+00:00",
+    "timestamp_utc": "2026-11-27T11:56:25.406019+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Experiment Reproducibility Details",
@@ -261,7 +261,7 @@
   },
   {
     "filename": "evidence/frontend/27-evolution-exported-report.png",
-    "timestamp_utc": "2026-11-27T10:38:00.808202+00:00",
+    "timestamp_utc": "2026-11-27T11:56:25.942715+00:00",
     "app_version": "0.1.0",
     "browser_version": "Chromium 159.0.8154.6",
     "scenario": "Exported Standalone Evolution Report",

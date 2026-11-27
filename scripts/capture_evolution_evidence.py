@@ -362,6 +362,28 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
             for r in ((bundle.get("representation_evolution") or {}).get("evolution_matrix") or {}).get("rows", [])
         ],
         "regression_events_count": len(bundle["regression_events"]),
+        "regression_summary": {
+            "total_events": len(bundle["regression_events"]),
+            "behavioral_regression_observed_count": sum(
+                1 for r in bundle["regression_events"] if r.get("behavioral_regression_observed")
+            ),
+            "score_regression_observed_count": sum(
+                1 for r in bundle["regression_events"] if r.get("score_regression_observed")
+            ),
+            "causal_intervention_verified_count": sum(
+                1 for r in bundle["regression_events"] if r.get("causal_intervention_verified")
+            ),
+            "exploratory_count": sum(
+                1
+                for r in bundle["regression_events"]
+                if r["statistical_confidence"].get("is_exploratory")
+            ),
+            "statistically_significant_count": sum(
+                1
+                for r in bundle["regression_events"]
+                if r["statistical_confidence"].get("statistically_significant")
+            ),
+        },
         "regression_origins": [
             {
                 "previous_label": r["previous_label"],
@@ -369,6 +391,9 @@ def seed_and_run_real_evolution_project() -> dict[str, Any]:
                 "transformation_type": r["transformation_type"],
                 "affected_category": r["affected_category"],
                 "regression_kind": r.get("regression_kind"),
+                "behavioral_regression_observed": r.get("behavioral_regression_observed"),
+                "score_regression_observed": r.get("score_regression_observed"),
+                "causal_intervention_verified": r.get("causal_intervention_verified"),
                 "pass_rate_before": r["pass_rate_before"],
                 "pass_rate_after": r["pass_rate_after"],
                 "score_before": r["score_before"],

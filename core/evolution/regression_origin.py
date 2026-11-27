@@ -581,6 +581,8 @@ class RegressionOriginEngine:
             if m_key == "overall":
                 pr_drop = round(float(prev_ev["pass_rate"]) - float(curr_ev["pass_rate"]), 6)
                 sc_drop = round(float(prev_ev["mean_score"]) - float(curr_ev["mean_score"]), 6)
+                beh_reg_obs = bool(pr_drop >= self.overall_pass_rate_drop_threshold)
+                score_reg_obs = bool(sc_drop >= self.category_score_drop_threshold)
                 reg_kind = _classify_regression_kind(
                     pr_drop,
                     sc_drop,
@@ -601,6 +603,8 @@ class RegressionOriginEngine:
                 ev_causal, ev_status, interp = self._resolve_event_epistemic_status(
                     prev_id=prev_id,
                     curr_id=curr_id,
+                    behavioral_regression_observed=beh_reg_obs,
+                    score_regression_observed=score_reg_obs,
                     failed_case_ids=failed_ids,
                     case_prompt_hashes=case_prompt_hashes,
                     correlated_layers=ctx["correlated_layers"],
@@ -625,6 +629,11 @@ class RegressionOriginEngine:
                         "transformation_type": beh_tr["transformation_type"],
                         "affected_category": "overall",
                         "regression_kind": reg_kind,
+                        "behavioral_regression_observed": beh_reg_obs,
+                        "score_regression_observed": score_reg_obs,
+                        "causal_intervention_verified": bool(
+                            ev_causal["causal_intervention_verified"]
+                        ),
                         "pass_rate_before": prev_ev["pass_rate"],
                         "pass_rate_after": curr_ev["pass_rate"],
                         "pass_rate_drop": pr_drop,
@@ -680,6 +689,8 @@ class RegressionOriginEngine:
                 c_pr_drop = round(
                     float(c_delta["pass_rate_before"]) - float(c_delta["pass_rate_after"]), 6
                 )
+                c_beh_reg_obs = bool(c_pr_drop >= self.category_score_drop_threshold)
+                c_score_reg_obs = bool(c_sc_drop >= self.category_score_drop_threshold)
                 c_reg_kind = _classify_regression_kind(
                     c_pr_drop,
                     c_sc_drop,
@@ -712,6 +723,8 @@ class RegressionOriginEngine:
                 c_causal, c_status, c_interp = self._resolve_event_epistemic_status(
                     prev_id=prev_id,
                     curr_id=curr_id,
+                    behavioral_regression_observed=c_beh_reg_obs,
+                    score_regression_observed=c_score_reg_obs,
                     failed_case_ids=cat_failed_ids,
                     case_prompt_hashes=case_prompt_hashes,
                     correlated_layers=ctx["correlated_layers"],
@@ -736,6 +749,11 @@ class RegressionOriginEngine:
                         "transformation_type": beh_tr["transformation_type"],
                         "affected_category": m_key,
                         "regression_kind": c_reg_kind,
+                        "behavioral_regression_observed": c_beh_reg_obs,
+                        "score_regression_observed": c_score_reg_obs,
+                        "causal_intervention_verified": bool(
+                            c_causal["causal_intervention_verified"]
+                        ),
                         "pass_rate_before": c_delta["pass_rate_before"],
                         "pass_rate_after": c_delta["pass_rate_after"],
                         "pass_rate_drop": c_pr_drop,
@@ -781,6 +799,7 @@ class RegressionOriginEngine:
 
         events.sort(
             key=lambda e: (
+                0 if e["behavioral_regression_observed"] else 1,
                 0 if e["affected_category"] == "overall" else 1,
                 -float(e["score_drop"]),
             )
@@ -792,6 +811,8 @@ class RegressionOriginEngine:
         *,
         prev_id: str,
         curr_id: str,
+        behavioral_regression_observed: bool,
+        score_regression_observed: bool,
         failed_case_ids: list[str],
         case_prompt_hashes: dict[str, set[str]],
         correlated_layers: list[dict[str, Any]],
@@ -804,7 +825,14 @@ class RegressionOriginEngine:
         sample_size: int,
         min_required: int,
     ) -> tuple[dict[str, Any], str, str]:
-        """Classify event into OBSERVED, CORRELATED, CAUSAL SUPPORT, or CAUSALLY VERIFIED."""
+        """Classify event into OBSERVED, CORRELATED, CAUSAL SUPPORT, or CAUSALLY VERIFIED.
+
+        Strictly separates `behavioral_regression_observed` (binary pass-rate drop),
+        `score_regression_observed` (continuous rubric score drop), and
+        `causal_intervention_verified` (token-logit counterfactual provenance).
+        When `behavioral_regression_observed` is False (`score_only`), token-logit
+        patching never elevates the event to `CAUSAL SUPPORT` or `CAUSALLY VERIFIED`.
+        """
         verified_cases: list[str] = []
         unverified_cases: list[str] = []
         case_provenance_records: list[dict[str, Any]] = []
@@ -836,10 +864,99 @@ class RegressionOriginEngine:
             else ""
         )
 
-        # Tier 4: CAUSALLY VERIFIED — requires non-empty `failed_case_ids` AND 100% of failed cases
-        # in this event passing all 4 independent provenance checks (strictly scoped to tested case & site).
+        # Score-only safeguard (Audit HIGH-A): when binary pass rate did not breach the regression
+        # threshold (`behavioral_regression_observed is False`), single-token logit patching cannot
+        # test continuous multi-token rubric score degradation, so causal tiers are never claimed.
+        if not behavioral_regression_observed:
+            has_cov = bool(
+                correlated_layers
+                or weight_summary
+                or act_summary
+                or base_causal["transition_patching_support"]
+            )
+            if has_cov:
+                scope_msg = (
+                    "Score-only regression observed (binary pass rate did not breach threshold); "
+                    "single-token logit patching does not test continuous rubric scores, so weight/CKA covariates are strictly CORRELATED."
+                )
+                return (
+                    {
+                        "behavioral_regression_observed": False,
+                        "score_regression_observed": score_regression_observed,
+                        "causal_intervention_verified": False,
+                        "causal_verification_exists": False,
+                        "causal_support_exists": False,
+                        "transition_diagnostic_patching_available": bool(
+                            base_causal["transition_patching_support"]
+                        ),
+                        "partially_verified": False,
+                        "case_targeted": False,
+                        "target_vs_foil_verified": False,
+                        "negative_control_verified": False,
+                        "verification_scope": None,
+                        "verification_scope_valid": False,
+                        "prompt_fingerprint": base_causal.get("prompt_fingerprint"),
+                        "failed_case_id": None,
+                        "layer_index": base_causal["most_causal_layer"],
+                        "intervention_type": base_causal.get("intervention_type"),
+                        "target_token": base_causal.get("target_token"),
+                        "foil_token": base_causal.get("foil_token"),
+                        "negative_control_result": base_causal.get("negative_control_result"),
+                        "recovery_measurement": base_causal["peak_recovery_fraction"],
+                        "verified_case_ids": verified_cases,
+                        "unverified_case_ids": unverified_cases,
+                        "case_provenance_records": case_provenance_records,
+                        "epistemic_status": EpistemicStatus.CORRELATED.value,
+                        "most_causal_layer": base_causal["most_causal_layer"],
+                        "peak_recovery_fraction": base_causal["peak_recovery_fraction"],
+                        "scope_disclaimer": scope_msg,
+                    },
+                    EpistemicStatus.CORRELATED.value,
+                    expl_prefix + scope_msg,
+                )
+            scope_msg = (
+                "Score-only regression directly OBSERVED on deterministic rubric evaluation "
+                "(binary pass rate did not breach threshold); no weight or activation covariates recorded."
+            )
+            return (
+                {
+                    "behavioral_regression_observed": False,
+                    "score_regression_observed": score_regression_observed,
+                    "causal_intervention_verified": False,
+                    "causal_verification_exists": False,
+                    "causal_support_exists": False,
+                    "transition_diagnostic_patching_available": False,
+                    "partially_verified": False,
+                    "case_targeted": False,
+                    "target_vs_foil_verified": False,
+                    "negative_control_verified": False,
+                    "verification_scope": None,
+                    "verification_scope_valid": False,
+                    "prompt_fingerprint": None,
+                    "failed_case_id": None,
+                    "layer_index": None,
+                    "intervention_type": None,
+                    "target_token": None,
+                    "foil_token": None,
+                    "negative_control_result": None,
+                    "recovery_measurement": None,
+                    "verified_case_ids": [],
+                    "unverified_case_ids": unverified_cases,
+                    "case_provenance_records": case_provenance_records,
+                    "epistemic_status": EpistemicStatus.OBSERVED.value,
+                    "most_causal_layer": None,
+                    "peak_recovery_fraction": None,
+                    "scope_disclaimer": scope_msg,
+                },
+                EpistemicStatus.OBSERVED.value,
+                expl_prefix + scope_msg,
+            )
+
+        # Tier 4: CAUSALLY VERIFIED — requires `behavioral_regression_observed is True`, non-empty
+        # `failed_case_ids`, AND 100% of failed cases passing all 4 independent provenance checks.
         all_failed_cases_verified = (
-            len(failed_case_ids) > 0
+            behavioral_regression_observed
+            and len(failed_case_ids) > 0
             and len(verified_cases) == len(failed_case_ids)
             and len(unverified_cases) == 0
             and best_verified_record is not None
@@ -855,13 +972,21 @@ class RegressionOriginEngine:
                 for r in case_provenance_records
                 if r.get("is_causally_verified")
             )
+            score_caveat = (
+                " Does not prove the causal mechanism of continuous multi-token rubric score shifts."
+                if score_regression_observed
+                else ""
+            )
             scope_msg = (
-                f"Causally verified strictly on failed case(s) [{', '.join(verified_cases)}] "
+                f"Causally verified strictly for next-token logit recovery on failed case(s) [{', '.join(verified_cases)}] "
                 f"at layer L{layer_idx} ({itype}) with target/foil and negative-control provenance; "
-                "does not generalize to untested prompts."
+                "does not generalize to untested prompts." + score_caveat
             )
             return (
                 {
+                    "behavioral_regression_observed": True,
+                    "score_regression_observed": score_regression_observed,
+                    "causal_intervention_verified": True,
                     "causal_verification_exists": True,
                     "causal_support_exists": True,
                     "partially_verified": False,
@@ -915,11 +1040,14 @@ class RegressionOriginEngine:
             )
             scope_msg = (
                 f"Residual patching at L{layer_idx} recovered {float(rec_val or 0.0) * 100:.1f}% "
-                "logit margin (CAUSAL SUPPORT for transition locus; not complete case-specific causal proof for all failed cases in this event)."
+                "logit margin (CAUSAL SUPPORT for transition locus; not case-specific proof or score-regression proof)."
                 + partial_note
             )
             return (
                 {
+                    "behavioral_regression_observed": True,
+                    "score_regression_observed": score_regression_observed,
+                    "causal_intervention_verified": False,
                     "causal_verification_exists": False,
                     "causal_support_exists": True,
                     "partially_verified": partially_verified,
@@ -963,6 +1091,9 @@ class RegressionOriginEngine:
             )
             return (
                 {
+                    "behavioral_regression_observed": True,
+                    "score_regression_observed": score_regression_observed,
+                    "causal_intervention_verified": False,
                     "causal_verification_exists": False,
                     "causal_support_exists": False,
                     "partially_verified": False,
@@ -995,6 +1126,9 @@ class RegressionOriginEngine:
         scope_msg = "Behavioral regression directly OBSERVED on deterministic rubric evaluation; no weight or activation covariates recorded."
         return (
             {
+                "behavioral_regression_observed": True,
+                "score_regression_observed": score_regression_observed,
+                "causal_intervention_verified": False,
                 "causal_verification_exists": False,
                 "causal_support_exists": False,
                 "partially_verified": False,

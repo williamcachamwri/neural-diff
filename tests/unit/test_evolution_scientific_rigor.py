@@ -909,6 +909,31 @@ def test_filesystem_5_component_fingerprints_cache_invalidation_missing_duplicat
         "tensor_shape_metadata", _mut_tensor_shape_metadata, "metadata_sha256"
     )
 
+    # (g) Coexisting model weights + adapter Safetensors: mutating adapter tensor metadata or adapter
+    #     tensor shapes MUST update `metadata_sha256` (while keeping `weights_sha256` & `adapter_sha256` intact!)
+    def _mut_adapter_metadata_header(d: Path) -> None:
+        ats = load_file(str(d / "adapter_model.safetensors"))
+        save_file(
+            ats,
+            str(d / "adapter_model.safetensors"),
+            metadata={"peft_stage": "qlora_recalibrated_v2"},
+        )
+
+    _clone_and_verify_single_component_change(
+        "adapter_metadata_header", _mut_adapter_metadata_header, "metadata_sha256"
+    )
+
+    def _mut_adapter_tensor_shape(d: Path) -> None:
+        ats = load_file(str(d / "adapter_model.safetensors"))
+        ats["base_model.model.layers.0.mlp.down_proj.lora_A.weight"] = ats[
+            "base_model.model.layers.0.mlp.down_proj.lora_A.weight"
+        ].reshape(1, 8)
+        save_file(ats, str(d / "adapter_model.safetensors"))
+
+    _clone_and_verify_single_component_change(
+        "adapter_tensor_shape", _mut_adapter_tensor_shape, "metadata_sha256"
+    )
+
     # --- Missing optional files tests ---
     bare_dir = tmp_path / "bare_dir"
     bare_dir.mkdir(parents=True, exist_ok=True)
@@ -924,7 +949,9 @@ def test_filesystem_5_component_fingerprints_cache_invalidation_missing_duplicat
     assert bare_rec.component_fingerprints["architecture_config_sha256"] is None
     assert bare_rec.component_fingerprints["tokenizer_sha256"] is None
     assert bare_rec.component_fingerprints["adapter_sha256"] is None
-    assert bare_rec.component_fingerprints["metadata_sha256"] == base_comp["metadata_sha256"]
+    # `bare_dir` lacks `adapter_model.safetensors`, so its `metadata_sha256` differs from `base_comp`
+    assert bare_rec.component_fingerprints["metadata_sha256"] is not None
+    assert bare_rec.component_fingerprints["metadata_sha256"] != base_comp["metadata_sha256"]
 
     with pytest.raises(FileNotFoundError):
         compute_checkpoint_component_fingerprints(tmp_path / "does_not_exist_dir")
@@ -1233,3 +1260,205 @@ def test_7_way_pair_scope_classification() -> None:
     assert dag2.classify_pair_scope("pruned", "sft_a", "base") == "descendant_to_ancestor"
     assert dag2.classify_pair_scope("sft_a", "sft_b", "base") == "branch_to_branch"
     assert dag2.classify_pair_scope("sft_a", "ext_root", "base") == "unrelated"
+
+
+@pytest.mark.unit
+def test_score_only_regression_never_claims_causal_status_and_separates_three_flags() -> None:
+    """Audit HIGH-A: Separate `behavioral_regression_observed`, `score_regression_observed`, and `causal_intervention_verified`."""
+    c0 = _dummy_ckpt("c0", "v1a-SFT", 0)
+    c1 = _dummy_ckpt("c1", "v2-Merged", 1)
+    dag = EvolutionDAG(
+        [c0, c1],
+        [EvolutionRelationship("r01", "proj-rigor", "c0", "c1", TransformationType.MODEL_MERGING)],
+    )
+
+    json_p = "Return valid JSON with keys name and count."
+    inst_p = "Answer in exactly two bullet points."
+    json_fp = hashlib.sha256(json_p.encode("utf-8")).hexdigest()
+    inst_fp = hashlib.sha256(inst_p.encode("utf-8")).hexdigest()
+
+    # `json_reliability`: pass rate unchanged (`66.7% -> 66.7%`, `json-01` failed while `json-02` passed),
+    # while rubric mean_score dropped `0.925 -> 0.641667` (`score_only`).
+    # `instruction_following`: pass rate dropped `66.7% -> 0.0%` (`inst-01` failed), mean_score `0.81 -> 0.78` (`pass_rate_only`).
+    beh_payload = {
+        "checkpoint_evaluations": [
+            {
+                "checkpoint_id": "c0",
+                "version_label": "v1a-SFT",
+                "pass_rate": 0.666667,
+                "mean_score": 0.8675,
+                "categories": {
+                    "json_reliability": {"pass_rate": 0.666667, "mean_score": 0.925, "sample_size": 3},
+                    "instruction_following": {"pass_rate": 0.666667, "mean_score": 0.81, "sample_size": 3},
+                },
+                "case_results": [
+                    {"case_id": "json-01", "category": "json_reliability", "prompt": json_p, "passed": True, "score": 1.0},
+                    {"case_id": "inst-01", "category": "instruction_following", "prompt": inst_p, "passed": True, "score": 0.81},
+                ],
+            },
+            {
+                "checkpoint_id": "c1",
+                "version_label": "v2-Merged",
+                "pass_rate": 0.333333,
+                "mean_score": 0.710833,
+                "categories": {
+                    "json_reliability": {"pass_rate": 0.666667, "mean_score": 0.641667, "sample_size": 3},
+                    "instruction_following": {"pass_rate": 0.0, "mean_score": 0.78, "sample_size": 3},
+                },
+                "case_results": [
+                    {"case_id": "json-01", "category": "json_reliability", "prompt": json_p, "passed": False, "score": 0.25},
+                    {"case_id": "inst-01", "category": "instruction_following", "prompt": inst_p, "passed": False, "score": 0.78},
+                ],
+            },
+        ],
+        "consecutive_transitions": [
+            {
+                "source_checkpoint_id": "c0",
+                "target_checkpoint_id": "c1",
+                "transformation_type": "Model Merging",
+                "sample_size": 6,
+                "newly_introduced_failures": ["json-01", "inst-01"],
+                "paired_statistics": {
+                    "mcnemar_p_value": 0.5,
+                    "bootstrap_ci95_low": -0.35,
+                    "bootstrap_ci95_high": -0.05,
+                },
+                "category_deltas": [
+                    {
+                        "category": "json_reliability",
+                        "sample_size": 3,
+                        "mean_score_before": 0.925,
+                        "mean_score_after": 0.641667,
+                        "pass_rate_before": 0.666667,
+                        "pass_rate_after": 0.666667,
+                        "mcnemar_p_value": 1.0,
+                        "wilson_ci95_after": [0.20, 0.93],
+                    },
+                    {
+                        "category": "instruction_following",
+                        "sample_size": 3,
+                        "mean_score_before": 0.81,
+                        "mean_score_after": 0.78,
+                        "pass_rate_before": 0.666667,
+                        "pass_rate_after": 0.0,
+                        "mcnemar_p_value": 0.5,
+                        "wilson_ci95_after": [0.0, 0.56],
+                    },
+                ],
+            }
+        ],
+    }
+
+    rep_payload = {
+        "consecutive_transitions": [
+            {
+                "source_checkpoint_id": "c0",
+                "target_checkpoint_id": "c1",
+                "mean_cka": 0.85,
+                "mean_drift": 0.15,
+                "cka_by_layer": {"0": 0.9, "1": 0.8},
+                "causal_patching": {
+                    "case_targeted": False,
+                    "verification_scope": "diagnostic_prompt_transition_only",
+                    "most_causal_layer": 1,
+                    "peak_recovery_fraction": 0.82,
+                },
+            }
+        ]
+    }
+
+    # Supply valid 4-condition counterfactual provenance on BOTH `json-01` and `inst-01`
+    interventions = {
+        ("c0", "c1", "json-01"): {
+            "case_targeted": True,
+            "target_vs_foil_verified": True,
+            "negative_control_verified": True,
+            "verification_scope": "case_and_intervention_site",
+            "prompt_fingerprint": json_fp,
+            "failed_case_id": "json-01",
+            "layer_index": 1,
+            "intervention_type": "residual_stream_patch",
+            "target_token": "{",
+            "foil_token": "Sure",
+            "negative_control_result": {"control_layer_index": 0, "control_recovery_fraction": 0.02},
+            "recovery_measurement": 0.88,
+            "clean_logit_diff": 5.0,
+            "corrupted_logit_diff": -0.8,
+        },
+        ("c0", "c1", "inst-01"): {
+            "case_targeted": True,
+            "target_vs_foil_verified": True,
+            "negative_control_verified": True,
+            "verification_scope": "case_and_intervention_site",
+            "prompt_fingerprint": inst_fp,
+            "failed_case_id": "inst-01",
+            "layer_index": 1,
+            "intervention_type": "residual_stream_patch",
+            "target_token": "-",
+            "foil_token": "1",
+            "negative_control_result": {"control_layer_index": 0, "control_recovery_fraction": 0.03},
+            "recovery_measurement": 0.79,
+            "clean_logit_diff": 3.5,
+            "corrupted_logit_diff": -0.4,
+        },
+    }
+
+    evs = RegressionOriginEngine().detect(
+        dag=dag,
+        behavioral_evolution=beh_payload,
+        tensor_transitions=[],
+        representation_evolution=rep_payload,
+        case_interventions=interventions,
+    )
+    by_cat = {e["affected_category"]: e for e in evs}
+
+    # 1. `json_reliability` (`66.7% -> 66.7%`, `score_only`):
+    #    `behavioral_regression_observed` is False -> MUST NEVER claim CAUSALLY VERIFIED or CAUSAL SUPPORT!
+    j_ev = by_cat["json_reliability"]
+    assert j_ev["regression_kind"] == "score_only"
+    assert j_ev["behavioral_regression_observed"] is False
+    assert j_ev["score_regression_observed"] is True
+    assert j_ev["causal_intervention_verified"] is False
+    assert j_ev["epistemic_status"] == EpistemicStatus.CORRELATED.value
+    assert j_ev["causal_verification"]["causal_verification_exists"] is False
+    assert j_ev["causal_verification"]["causal_support_exists"] is False
+
+    # 2. `instruction_following` (`66.7% -> 0.0%`, `pass_rate_only`):
+    #    `behavioral_regression_observed` is True, `score_regression_observed` is False, `causal_intervention_verified` is True
+    i_ev = by_cat["instruction_following"]
+    assert i_ev["regression_kind"] == "pass_rate_only"
+    assert i_ev["behavioral_regression_observed"] is True
+    assert i_ev["score_regression_observed"] is False
+    assert i_ev["causal_intervention_verified"] is True
+    assert i_ev["epistemic_status"] == EpistemicStatus.CAUSALLY_VERIFIED.value
+
+    # 3. `overall` (`66.7% -> 33.3%`, `0.8675 -> 0.7108`, `pass_rate_and_score`):
+    #    All 3 flags True, AND disclaimer explicitly warns against equating logit patching with rubric score causation!
+    o_ev = by_cat["overall"]
+    assert o_ev["regression_kind"] == "pass_rate_and_score"
+    assert o_ev["behavioral_regression_observed"] is True
+    assert o_ev["score_regression_observed"] is True
+    assert o_ev["causal_intervention_verified"] is True
+    assert "continuous multi-token rubric score" in o_ev["causal_verification"]["scope_disclaimer"]
+
+
+@pytest.mark.unit
+def test_maximal_common_ancestors_vs_tie_broken_lca_in_bowtie_merge_dag() -> None:
+    """Section 3 DAG note: Bowtie multi-parent merge DAG distinguishes full MCA set from tie-broken LCA."""
+    r0 = _dummy_ckpt("r0", "Root", 0)
+    p1 = _dummy_ckpt("p1", "Branch-P1", 1)
+    p2 = _dummy_ckpt("p2", "Branch-P2", 2)
+    m1 = _dummy_ckpt("m1", "Merge-1", 3)
+    m2 = _dummy_ckpt("m2", "Merge-2", 4)
+    rels = [
+        EvolutionRelationship("e1", "p", "r0", "p1", TransformationType.SFT),
+        EvolutionRelationship("e2", "p", "r0", "p2", TransformationType.DPO),
+        EvolutionRelationship("e3", "p", "p1", "m1", TransformationType.MODEL_MERGING),
+        EvolutionRelationship("e4", "p", "p2", "m1", TransformationType.MODEL_MERGING),
+        EvolutionRelationship("e5", "p", "p1", "m2", TransformationType.MODEL_MERGING),
+        EvolutionRelationship("e6", "p", "p2", "m2", TransformationType.MODEL_MERGING),
+    ]
+    dag = EvolutionDAG([r0, p1, p2, m1, m2], rels)
+    # Both `p1` and `p2` (depth 1) are incomparable maximal common ancestors of `m1` and `m2`; `r0` is dominated!
+    assert dag.maximal_common_ancestors("m1", "m2") == ["p1", "p2"]
+    assert dag.lowest_common_ancestor("m1", "m2") == "p1"

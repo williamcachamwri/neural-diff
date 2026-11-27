@@ -203,6 +203,10 @@ class EvolutionReportExporter:
                 "first_affected_label",
                 "transformation_type",
                 "affected_category",
+                "regression_kind",
+                "behavioral_regression_observed",
+                "score_regression_observed",
+                "causal_intervention_verified",
                 "pass_rate_before",
                 "pass_rate_after",
                 "score_drop",
@@ -219,6 +223,13 @@ class EvolutionReportExporter:
                     ev["first_affected_label"],
                     ev["transformation_type"],
                     ev["affected_category"],
+                    ev.get("regression_kind", ""),
+                    ev.get("behavioral_regression_observed", False),
+                    ev.get("score_regression_observed", False),
+                    ev.get(
+                        "causal_intervention_verified",
+                        ev["causal_verification"]["causal_verification_exists"],
+                    ),
                     ev["pass_rate_before"],
                     ev["pass_rate_after"],
                     ev["score_drop"],
@@ -371,17 +382,20 @@ class EvolutionReportExporter:
                     "",
                     "## Regression Origin Pinpointing",
                     "",
-                    "| Transition | Stage | Category | Pass Shift | Evidence | Failed Cases |",
-                    "| :--- | :--- | :--- | ---: | :--- | :--- |",
+                    "| Transition | Stage | Category | Pass-Rate Reg | Score Reg | Causal Verified | Pass / Score Shift | Evidence |",
+                    "| :--- | :--- | :--- | :---: | :---: | :---: | ---: | :--- |",
                 ]
             )
             for ev in regs:
-                cases_str = ", ".join(ev.get("failed_test_case_ids", [])[:5]) or "—"
+                beh_flag = "Yes" if ev.get("behavioral_regression_observed") else "No"
+                sc_flag = "Yes" if ev.get("score_regression_observed") else "No"
+                cv_flag = "Yes" if ev.get("causal_intervention_verified") else "No"
                 lines.append(
                     f"| `{ev['previous_label']} → {ev['first_affected_label']}` "
                     f"| {ev['transformation_type']} | {human_label(ev['affected_category'])} "
-                    f"| `{_fmt_pct(ev['pass_rate_before'])} → {_fmt_pct(ev['pass_rate_after'])}` "
-                    f"| {human_label(ev['epistemic_status'])} | `{cases_str}` |"
+                    f"| `{beh_flag}` | `{sc_flag}` | `{cv_flag}` "
+                    f"| `{_fmt_pct(ev['pass_rate_before'])} → {_fmt_pct(ev['pass_rate_after'])}` · `{float(ev['score_before']):.2f}→{float(ev['score_after']):.2f}` "
+                    f"| {human_label(ev['epistemic_status'])} |"
                 )
 
         lines.extend(
@@ -572,7 +586,7 @@ class EvolutionReportExporter:
             f"<tr>"
             f"<td class='mono'>{esc(ev['previous_label'])} → {esc(ev['first_affected_label'])}</td>"
             f"<td>{esc(ev['transformation_type'])}</td>"
-            f"<td>{esc(human_label(ev['affected_category']))} <span class='muted'>({esc(human_label(ev.get('regression_kind', 'pass_rate_and_score')))})</span></td>"
+            f"<td>{esc(human_label(ev['affected_category']))} <div class='mono muted' style='font-size:10.5px'>beh={str(bool(ev.get('behavioral_regression_observed'))).lower()} · score={str(bool(ev.get('score_regression_observed'))).lower()} · causal={str(bool(ev.get('causal_intervention_verified'))).lower()}</div></td>"
             f"<td class='num mono' style='color:#f87171'>{_fmt_pct(ev['pass_rate_before'])} → {_fmt_pct(ev['pass_rate_after'])} · {float(ev['score_before']):.2f}→{float(ev['score_after']):.2f}</td>"
             f"<td class='mono muted'>n={ev.get('statistical_confidence', {}).get('sample_size', '—')} · Holm p={_fmt_num(ev.get('statistical_confidence', {}).get('holm_bonferroni_p_value', ev.get('statistical_confidence', {}).get('mcnemar_p_value')), 3)}"
             f"{' (exploratory)' if ev.get('statistical_confidence', {}).get('is_exploratory') else ''}</td>"

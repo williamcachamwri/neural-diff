@@ -13,7 +13,7 @@
 [![Node 20 | 22 LTS](https://img.shields.io/badge/Node.js-20%20%C2%B7%2022%20LTS-18181b?style=flat-square)](../../frontend/package.json)
 [![PyTorch CUDA](https://img.shields.io/badge/PyTorch-2.10%2Bcu128-18181b?style=flat-square)](../../uv.lock)
 [![React 19 + XYFlow](https://img.shields.io/badge/Studio-React%2019%20%C2%B7%20XYFlow%20%C2%B7%20Vite%208-18181b?style=flat-square)](../../frontend/package.json)
-[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(68%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
+[![Coverage 89%](https://img.shields.io/badge/Core%20Coverage-89%25%20(71%20Tests)-18181b?style=flat-square)](../../evidence/tests/coverage.log)
 [![License: MIT](https://img.shields.io/badge/License-MIT-18181b?style=flat-square)](../../LICENSE)
 
 ---
@@ -33,44 +33,51 @@
 ## Table des Matières
 
 1. [Discipline Épistémique et Traçabilité](#1-discipline-épistémique-et-traçabilité)
-2. [Architecture Détaillée en 7 Couches](#2-architecture-détaillée-en-7-couches)
+2. [Architecture Détaillée en 8 Couches](#2-architecture-détaillée-en-8-couches)
 3. [Pipeline d'Exécution de Bout en Bout et Flux de Données](#3-pipeline-dexécution-de-bout-en-bout-et-flux-de-données)
 4. [Formulations Mathématiques et Statistiques](#4-formulations-mathématiques-et-statistiques)
-5. [Galerie Complète du Studio (100 % des 15 Captures Réelles)](#5-galerie-complète-du-studio-100--des-15-captures-réelles)
+5. [Galerie Complète du Studio (100 % des 27 Captures Réelles)](#5-galerie-complète-du-studio-100--des-27-captures-réelles)
 6. [Benchmarks sur Modèles Réels (`REAL MODEL EXPERIMENT`)](#6-benchmarks-sur-modèles-réels-real-model-experiment)
 7. [Benchmarks de Débit Streaming et Mémoire (`SYNTHETIC FIXTURE EXPERIMENT`)](#7-benchmarks-de-débit-streaming-et-mémoire-synthetic-fixture-experiment)
 8. [Installation et Démarrage Rapide Reproductible](#8-installation-et-démarrage-rapide-reproductible)
 9. [Référence CLI (`neural-diff`)](#9-référence-cli-neural-diff)
-10. [Référence REST API (17 Endpoints)](#10-référence-rest-api-17-endpoints)
-11. [Tests Automatisés, Couverture à `90 %` et Sécurité](#11-tests-automatisés-couverture-à-90--et-sécurité)
+10. [Référence REST API (37 Endpoints)](#10-référence-rest-api-37-endpoints)
+11. [10 Pipelines CI/CD Multi-Nœuds, Couverture à `89 %` et Sécurité](#11-10-pipelines-cicd-multi-nœuds-couverture-à-89--et-sécurité)
 12. [Intégrité SHA-256 des Preuves et Limites Connues](#12-intégrité-sha-256-des-preuves-et-limites-connues)
 
 ---
 
 ## 1. Discipline Épistémique et Traçabilité
 
-NEURAL DIFF encode explicitement le statut épistémique de chaque mesure dans `core/types.py` afin de ne jamais confondre corrélation observée et causalité mécaniste :
+NEURAL DIFF encode explicitement le statut épistémique de chaque mesure dans [`core/types.py`](../../core/types.py) et dans les 5 formats de rapport afin de ne jamais confondre corrélation observée, patching diagnostique, variation de score et preuve causale :
 
 | Statut Épistémique | Critère Mathématique et Scientifique | Sous-systèmes Producteurs |
 | :--- | :--- | :--- |
-| **`OBSERVED`** | Fonctionnelle déterministe calculée directement sur les poids, les activations ou les séquences décodées. | `TensorDiffEngine`, `NeuronAttentionAnalyzer`, `ActivationDiffEngine`, `LogitLens`, `BehavioralDiffEngine`, `SparsityAnalyzer` |
+| **`OBSERVED`** | Fonctionnelle déterministe calculée directement sur les poids, les activations ou les séquences décodées (en séparant explicitement `behavioral_regression_observed` pour le taux de réussite binaire et `score_regression_observed` pour le score continu). | `TensorDiffEngine`, `NeuronAttentionAnalyzer`, `ActivationDiffEngine`, `LogitLens`, `BehavioralDiffEngine`, `SparsityAnalyzer` |
 | **`INFERRED`** | Déduction sous seuil mathématique explicite et auditable (jamais assimilée silencieusement à une vérité terrain). | Couplage biparti de renommage ($\cos \ge 0.985$) ; classification spectrale SVD (`low_rank_adapter` vs `full_rank_update`) |
-| **`CORRELATED`** | Co-variation observée entre dérive de paramètres et écart de score comportemental sans isolation interventionnelle. | Synthèse croisant les couches à fort $L_2$ relatif et les suites comportementales |
-| **`CAUSALLY VERIFIED`** | Effet causal vérifié par intervention contrefactuelle directe $\text{do}(h_\ell^{\text{corr}} \leftarrow h_\ell^{\text{clean}})$ lors de l'exécution, strictement circonscrit à la paire d'invites et au bloc testés. | `run_residual_patching` (`core/activation_analysis/patching.py`) |
+| **`CORRELATED`** | Co-variation entre dérive de paramètres/CKA et écart comportemental ou de score sans isolation contrefactuelle par cas. Les baisses de score seul (`behavioral_regression_observed = false`) sont plafonnées à `CORRELATED` car le patching sur un jeton unique ne teste pas les scores continus multi-jetons. | Synthèses couches/CKA ; `RegressionOriginEngine` |
+| **`CAUSAL SUPPORT`** | Patching résiduel inter-checkpoints sur une invite diagnostique générique restaurant $\ge 20\,\%$ de marge de logits positive (`case_targeted = false`), ou vérification partielle sur un sous-ensemble de cas échoués — soutenant une hypothèse de transition sans prouver la causalité complète ni celle du score. | `run_cross_checkpoint_layer_patching`, `RegressionOriginEngine` |
+| **`CAUSALLY VERIFIED`** | Établi uniquement lorsque `behavioral_regression_observed = true` et que 100 % des cas échoués de l'événement valident explicitement les 4 preuves indépendantes (`case_targeted`, `target_vs_foil_verified`, `negative_control_verified` et `verification_scope` ciblé cas+couche, soit `causal_intervention_verified = true`), strictement circonscrit à la récupération de marge du jeton suivant sur l'invite et la couche testées. | `run_residual_patching` ([`patching.py`](../../core/activation_analysis/patching.py)) ; `RegressionOriginEngine` |
 | **`NOT VERIFIED` / `BLOCKED`** | Chemin non exécuté ou ressource soumise à un contrôle d'accès externe, archivé avec sa preuve HTTP exacte. | Sonde du dépôt restreint `google/gemma-3-270m` (`HTTP 401`) |
 
 ---
 
-## 2. Architecture Détaillée en 7 Couches
+## 2. Architecture Détaillée en 8 Couches
 
-L'architecture de NEURAL DIFF s'organise en **sept couches horizontales strictement découplées** : les moteurs mathématiques n'ont aucune dépendance envers la couche web et s'exécutent à l'identique en Python pur, via le CLI `neural-diff`, en CI ou depuis le Studio React.
+L'architecture de NEURAL DIFF s'organise en **huit couches horizontales strictement découplées** : les moteurs mathématiques et d'évolution DAG n'ont aucune dépendance envers la couche web et s'exécutent à l'identique en Python pur, via le CLI `neural-diff`, en CI ou depuis le Studio React.
 
 ```mermaid
 flowchart TB
-    subgraph L7["Couche 7 · Studio Nodal ComfyUI, API REST et Orchestration"]
-        UI["ComfyUI Nodes 2.0 Monochrome Studio (React 19 · TypeScript · XYFlow · Framer Motion)"]
-        API["Serveur FastAPI + Routeur de Diagnostics + Stockage SQLite WAL"]
-        CLI["CLI neural-diff & ComparisonOrchestrator"]
+    subgraph L8["Couche 8 · Studio Nodal ComfyUI, 37 Endpoints REST et Rapports 5 Formats"]
+        UI["ComfyUI Nodes 2.0 Monochrome Studio + StudioVisuals SVG (React 19 · TypeScript · XYFlow)"]
+        API["Serveur FastAPI + Routeurs Évolution & Diagnostics + SQLite WAL"]
+        CLI["Moteur de Rapports 5 Formats (5-SVG HTML · Mermaid+Jauges MD · PDF 1.4 · CSV · JSON)"]
+    end
+
+    subgraph L7["Couche 7 · Moteur DAG d'Évolution Multi-Générationnelle et Provenance (Module I)"]
+        DAG["EvolutionDAG Ramifié/Fusionné · Anti-Cycle DFS 3 Couleurs · MCA/LCA · 14 Étapes"]
+        REG_CKPT["Registre SHA-256 Orthogonal 5 Domaines · Détecteur Doublons & PEFT LoRA · Cache"]
+        EVO_ENG["L2 Cumulée Directe · Matrice Couches · Dérive CKA · Origine DP des Régressions"]
     end
 
     subgraph L6["Couche 6 · Évaluation Comportementale, Porte de Régression et Rapports"]
@@ -109,7 +116,8 @@ flowchart TB
     end
 
     UI --> API --> CLI
-    CLI --> L6 & L5 & L4 & L3
+    API --> L7 & L6 & L5 & L4 & L3
+    L7 --> L6 & L5 & L4 & L3
     L6 & L5 & L4 --> L3 --> L2 --> L1
 ```
 
@@ -204,9 +212,9 @@ sequenceDiagram
 
 ---
 
-## 5. Galerie Complète du Studio (100 % des 15 Captures Réelles)
+## 5. Galerie Complète du Studio (100 % des 27 Captures Réelles)
 
-Toutes les captures ci-dessous ont été prises automatiquement par [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) via Playwright Chromium (`1600×980 @ 1.5x`) sur les serveurs FastAPI (`127.0.0.1:8000`) et Vite (`127.0.0.1:4173`) actifs.
+Les 27 captures ci-dessous (`01`..`15` Studio de comparaison et `16`..`27` Atelier d'évolution) ont été prises automatiquement par [`scripts/capture_screenshots.py`](../../scripts/capture_screenshots.py) et [`scripts/capture_evolution_evidence.py`](../../scripts/capture_evolution_evidence.py) via Playwright Chromium sur les serveurs FastAPI (`127.0.0.1:8000`) et Vite (`127.0.0.1:4173`) actifs.
 
 ### 01. Canevas Nodal à 9 Modules (Mode Courbes de Bézier)
 ![01 — Dashboard Graph Canvas](../../evidence/frontend/01-dashboard.png)
@@ -241,7 +249,7 @@ Toutes les captures ci-dessous ont été prises automatiquement par [`scripts/ca
 ### 11. Aperçu et Téléchargement Multi-Formats (`.html`, `.md`, `.json`)
 ![11 — Report Export](../../evidence/frontend/11-report-export.png)
 
-### 12. Synthèse des Vérifications Automatisées et Couverture à `90 %` (55 Tests Python)
+### 12. Synthèse des Vérifications Automatisées et Couverture à `89 %` (71 Tests Python)
 ![12 — Test Execution Summary](../../evidence/frontend/12-test-execution-summary.png)
 
 ### 13. Rejet en Direct d'une Traversée de Chemin (`HTTP 403`)
@@ -383,7 +391,7 @@ npm --prefix frontend run dev
 ## 11. 10 Pipelines CI/CD Multi-Nœuds, Couverture à `89 %` et Sécurité
 
 * **10 Workflows GitHub Actions Multi-Nœuds ([`.github/workflows/`](../../.github/workflows)) :** Matrices `Python 3.11 / 3.12`, matrices `Node.js 20 / 22 LTS`, portabilité `ubuntu-latest` + `windows-latest`, E2E Playwright parallélisés, validation DAG & 5 formats d'export (`evolution-pipeline.yml`), contrat OpenAPI 37 routes & concurrence SQLite WAL (`api-contract-and-db.yml`), CodeQL, audits CVE/secrets et test `.whl` isolé dans `/tmp`.
-* **Analyse statique & Suites Python (`69 passed`) :** `ruff check` (`exit 0`), `mypy` sur `86` fichiers (`exit 0`), **`89 %` de couverture d'instructions** sur `8 149` instructions ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
+* **Analyse statique & Suites Python (`71 passed`) :** `ruff check` (`exit 0`), `mypy` sur `86` fichiers (`exit 0`), **`89 %` de couverture d'instructions** sur `8 168` instructions ([`evidence/tests/coverage.log`](../../evidence/tests/coverage.log)).
 * **Frontend et E2E réel :** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), build Vite 8 (`exit 0`, chunks `< 500 Ko`) et Playwright Chromium E2E (`2 passed`).
 * **Journal des versions & Documentation :** Voir [`CHANGELOG.md`](../../CHANGELOG.md) et [`docs/NEURAL_EVOLUTION_TRACKING.md`](../NEURAL_EVOLUTION_TRACKING.md).
 

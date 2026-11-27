@@ -4,8 +4,8 @@
     "name": "SmolLM2-135M Post-Training & Compression DAG",
     "description": "Real 6-checkpoint branched & merged lifecycle: Base -> Instruct-A / SFT-B -> Merged-AB -> LowBit-Quantized -> MLP-Pruned",
     "base_checkpoint_id": "ckpt-smol-00-base",
-    "created_at_utc": "2026-11-27T10:29:40.785915+00:00",
-    "updated_at_utc": "2026-11-27T10:37:21.660037+00:00",
+    "created_at_utc": "2026-11-27T11:47:39.843318+00:00",
+    "updated_at_utc": "2026-11-27T11:55:23.478501+00:00",
     "tags": [
       "real-model",
       "smollm2-135m",
@@ -136,9 +136,9 @@
       "safetensors": "0.8.0"
     },
     "hardware": {
-      "timestamp_monotonic": 18849.7978123,
-      "process_rss_mb": 568.27,
-      "system_available_ram_mb": 5230.48,
+      "timestamp_monotonic": 649.9214559,
+      "process_rss_mb": 567.69,
+      "system_available_ram_mb": 5703.8,
       "system_total_ram_mb": 16088.54,
       "cuda_available": true,
       "cuda_allocated_mb": 0.0,
@@ -148,7 +148,7 @@
     },
     "selected_device": "cuda:0",
     "device_reason": "Verified CUDA kernel execution on NVIDIA GeForce RTX 5050 Laptop GPU (7062 MB free VRAM).",
-    "started_at_utc": "2026-11-27T10:29:42.458511+00:00",
-    "completed_at_utc": "2026-11-27T10:37:21.660037+00:00"
+    "started_at_utc": "2026-11-27T11:47:41.852977+00:00",
+    "completed_at_utc": "2026-11-27T11:55:23.478501+00:00"
   }
 }

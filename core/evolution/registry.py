@@ -221,7 +221,7 @@ def compute_checkpoint_component_fingerprints(
         cfg_sha: str | None = None
         tok_sha: str | None = None
         total_bytes = w_bytes + a_bytes
-        active_hdrs = w_hdrs if w_hdrs else a_hdrs
+        active_hdrs = [*w_hdrs, *a_hdrs]
     else:
         weight_exts = (".safetensors", ".pt", ".pth", ".bin")
         adapter_set = {f.lower() for f in ADAPTER_ARTIFACT_FILES}
@@ -248,7 +248,7 @@ def compute_checkpoint_component_fingerprints(
         tok_sha, tok_bytes = _stream_hash_files(tok_files, base_dir=resolved_path)
         a_sha, a_hdrs, a_bytes = _hash_weight_or_adapter_files(adapter_files, base_dir=resolved_path)
         total_bytes = w_bytes + cfg_bytes + tok_bytes + a_bytes
-        active_hdrs = w_hdrs if w_hdrs else a_hdrs
+        active_hdrs = [*w_hdrs, *a_hdrs]
 
     meta_sha: str | None
     if active_hdrs:

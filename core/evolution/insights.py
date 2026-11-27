@@ -237,6 +237,14 @@ def generate_evolution_insights(
                 "evaluation_cases": list(top_reg["failed_test_case_ids"]),
                 "supporting_measurements": {
                     "regression_kind": top_reg.get("regression_kind"),
+                    "behavioral_regression_observed": top_reg.get(
+                        "behavioral_regression_observed", True
+                    ),
+                    "score_regression_observed": top_reg.get("score_regression_observed", False),
+                    "causal_intervention_verified": top_reg.get(
+                        "causal_intervention_verified",
+                        top_reg["causal_verification"]["causal_verification_exists"],
+                    ),
                     "pass_rate_before": top_reg["pass_rate_before"],
                     "pass_rate_after": top_reg["pass_rate_after"],
                     "score_drop": top_reg["score_drop"],

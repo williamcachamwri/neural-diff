@@ -748,6 +748,36 @@ export const RegressionOriginSection: React.FC<{ bundle: EvolutionRunBundle }> =
                   {ev.previous_label} → {ev.first_affected_label} ({ev.transformation_type})
                 </h3>
                 <div className="panel-subtitle">{ev.interpretation_note}</div>
+                <div
+                  className="mono"
+                  style={{
+                    marginTop: 6,
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 14,
+                    fontSize: 11.5,
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  <span>
+                    behavioral_regression_observed:{" "}
+                    <strong style={{ color: ev.behavioral_regression_observed ? "var(--danger)" : "var(--text-muted)" }}>
+                      {String(Boolean(ev.behavioral_regression_observed))}
+                    </strong>
+                  </span>
+                  <span>
+                    score_regression_observed:{" "}
+                    <strong style={{ color: ev.score_regression_observed ? "var(--text-primary)" : "var(--text-muted)" }}>
+                      {String(Boolean(ev.score_regression_observed))}
+                    </strong>
+                  </span>
+                  <span>
+                    causal_intervention_verified:{" "}
+                    <strong style={{ color: ev.causal_intervention_verified ? "var(--ok)" : "var(--text-muted)" }}>
+                      {String(Boolean(ev.causal_intervention_verified))}
+                    </strong>
+                  </span>
+                </div>
               </div>
               <span className="status-inline">
                 <span

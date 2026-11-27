@@ -4,6 +4,14 @@ All measurements, exit codes, file paths, and status classifications in this rep
 
 Status labels used strictly per Section 1.1: `VERIFIED`, `PARTIALLY VERIFIED`, `NOT VERIFIED`, `BLOCKED`, `FAILED`, `NOT IMPLEMENTED`.
 
+### Verification Provenance & Audit Scope Distinction
+
+To prevent conflating archived repository logs, hosted CI runs, and independent third-party reproduction, every verification claim in this report belongs to one of three explicit provenance tiers:
+
+1. **`AUTHOR_WORKSTATION_EVIDENCE` (Archived Local Execution Artifacts under `evidence/`):** Executed on the author workstation (`Windows 11 10.0.26320 · NVIDIA GeForce RTX 5050 Laptop GPU 8 GB VRAM · CPython 3.12.16`) and sealed in [`evidence/EVIDENCE_MANIFEST.json`](EVIDENCE_MANIFEST.json). SHA-256 digests guarantee post-capture file integrity (detecting truncation or silent edits) but are **not** a substitute for independent third-party re-execution.
+2. **`AUTOMATED_GITHUB_ACTIONS_CI` (Public Cleanroom Multi-Node CI Runs):** Executed automatically on fresh GitHub-hosted `ubuntu-latest` and `windows-latest` CPU runners across all **10 workflows** under [`.github/workflows/`](../.github/workflows) (`Python 3.11/3.12`, `Node.js 20/22 LTS`, sharded Playwright Chromium E2E, OpenAPI/SQLite WAL concurrency, Evolution DAG + 5-format exports, CodeQL, CVE/secret audits, and isolated `/tmp` wheel smoke tests). Hosted CI does **not** re-run multi-hundred-MB CUDA Hugging Face model downloads (`Qwen2.5-0.5B`, `SmolLM2-135M`).
+3. **`INDEPENDENT_EXTERNAL_REPRODUCTION` (Auditor Runtime Protocol):** External reviewers independently verify test, E2E, and real-model GPU benchmark claims on their own hardware by executing the commands in **Section J** (`scripts/run_all_tests.py`, `scripts/run_benchmarks.py`, `scripts/capture_evolution_evidence.py --recompute`).
+
 ---
 
 ## A. Environment (`VERIFIED`)
@@ -46,12 +54,12 @@ Executed via `.venv\Scripts\python.exe scripts/run_all_tests.py` and `.venv\Scri
 | :--- | :--- | ---: | :--- | :--- |
 | Ruff Linting | `python -m ruff check core adapters benchmarks api tests scripts` | `0` | **PASS** | [`evidence/tests/ruff-lint.log`](tests/ruff-lint.log) |
 | MyPy Typecheck | `python -m mypy core adapters benchmarks api` (`86` files) | `0` | **PASS** | [`evidence/tests/mypy-typecheck.log`](tests/mypy-typecheck.log) |
-| Unit Tests | `python -m pytest -m unit -v` | `0` | **47 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
+| Unit Tests | `python -m pytest -m unit -v` | `0` | **49 passed** | [`evidence/tests/unit-tests.log`](tests/unit-tests.log) |
 | Property Tests | `python -m pytest -m property -v` (Hypothesis) | `0` | **7 passed** | [`evidence/tests/property-tests.log`](tests/property-tests.log) |
 | Integration Tests | `python -m pytest -m integration -v` | `0` | **6 passed** | [`evidence/tests/integration-tests.log`](tests/integration-tests.log) |
 | Regression Tests | `python -m pytest -m regression -v` | `0` | **1 passed** | [`evidence/tests/regression-tests.log`](tests/regression-tests.log) |
 | Security Tests | `python -m pytest -m security -v` | `0` | **8 passed** | [`evidence/tests/security-tests.log`](tests/security-tests.log) |
-| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **69 passed · `89%` (`8,149` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
+| Full Coverage | `python -m pytest --cov=core --cov=adapters --cov=benchmarks --cov=api` | `0` | **71 passed · `89%` (`8,168` stmts)** | [`evidence/tests/coverage.log`](tests/coverage.log) |
 | Frontend Typecheck | `npm --prefix frontend run typecheck` | `0` | **PASS** | [`evidence/tests/frontend-typecheck.log`](tests/frontend-typecheck.log) |
 | Frontend Unit | `npm --prefix frontend run test` (Vitest) | `0` | **4 passed (3 files)** | [`evidence/tests/frontend-vitest.log`](tests/frontend-vitest.log) |
 | Production Build | `npm --prefix frontend run build` (Vite 8) | `0` | **PASS** | [`evidence/tests/frontend-build.log`](tests/frontend-build.log) |
