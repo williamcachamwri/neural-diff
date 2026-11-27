@@ -1,13 +1,15 @@
 === NEURAL DIFF GIT VERIFICATION ===
-Captured (UTC): 2026-11-27T09:03:19.631214+00:00
+Captured (UTC): 2026-11-27T10:39:08.197289+00:00
 
 $ git rev-list --count HEAD (rc=0)
-129
+131
 
 $ git status --short (rc=0)
 (clean working tree)
 
 $ git log --oneline (rc=0)
+29f89e9 fix(evolution): enforce 4-condition causal provenance, complete-DAG lineage DP, and orthogonal 5-part SHA-256
+3a29ddf chore(evidence): refresh SHA-256 manifest and git ledger for evolution audit fixes
 6fa0915 fix(evolution): enforce 4-tier causal rigor, Holm-Bonferroni stats, 5-part SHA-256, and distinct v3/v4 pruning benchmark
 65bc344 chore(evidence): refresh SHA-256 manifest and git history for Studio UI redesign
 054f7cf feat(ui): precision rounded Studio redesign, optical cables, ⌘K palette, and transparent ND brand mark

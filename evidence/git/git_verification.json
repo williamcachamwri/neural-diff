@@ -1,9 +1,11 @@
 {
-  "captured_at_utc": "2026-11-27T09:03:19.631214+00:00",
-  "commit_count": 129,
+  "captured_at_utc": "2026-11-27T10:39:08.197289+00:00",
+  "commit_count": 131,
   "clean_working_tree": true,
   "status_short": [],
   "recent_commits": [
+    "29f89e9 fix(evolution): enforce 4-condition causal provenance, complete-DAG lineage DP, and orthogonal 5-part SHA-256",
+    "3a29ddf chore(evidence): refresh SHA-256 manifest and git ledger for evolution audit fixes",
     "6fa0915 fix(evolution): enforce 4-tier causal rigor, Holm-Bonferroni stats, 5-part SHA-256, and distinct v3/v4 pruning benchmark",
     "65bc344 chore(evidence): refresh SHA-256 manifest and git history for Studio UI redesign",
     "054f7cf feat(ui): precision rounded Studio redesign, optical cables, \u2318K palette, and transparent ND brand mark",
@@ -26,8 +28,6 @@
     "91d0fe5 chore(evidence): update SHA-256 manifest prior to GitHub release push",
     "0d0fcf6 docs(evidence): refresh git history log after 5-language architectural documentation",
     "add3f2f docs(readme): expand 7-layer architecture specification, sequence diagrams, and API reference across all 5 languages",
-    "d2938bf chore(evidence): update SHA-256 evidence manifest for final artifacts",
-    "b4e4546 docs(evidence): capture verified 105-commit git history log",
-    "a619282 docs(report): finalize engineering acceptance report across all 20 phases"
+    "d2938bf chore(evidence): update SHA-256 evidence manifest for final artifacts"
   ]
 }
