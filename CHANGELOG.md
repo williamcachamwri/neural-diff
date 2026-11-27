@@ -4,6 +4,17 @@ All notable changes to **NEURAL DIFF** are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-11-27
+
+### Added
+- **Module I — Neural Evolution Tracking (`core/evolution/`):**
+  - Validated Directed Acyclic Graph (`EvolutionDAG`) supporting linear chains, experimental branches, multi-parent Model Merging, Lowest Common Ancestor (LCA), and 3-color DFS circular dependency rejection (`CYCLIC_DEPENDENCY_ERROR`).
+  - Streaming 4 MiB chunked SHA-256 checkpoint registry (`registry.py`) with duplicate content detection, PEFT LoRA `adapter_config.json` & quantization metadata extraction, and versioned SQLite schema migrations (`EvolutionStore`).
+  - Multi-Generation & Direct Cumulative Tensor Evolution (`tensor_evolution.py`) strictly separating `consecutive`, direct `base_to_current` (`W_current - W_base`), and `branch_to_branch` scopes with path-cancellation ratios.
+  - Dedicated Layer Evolution Engine (`layer_evolution.py`), Multi-Generation Behavioral Evolution Engine (`behavioral_evolution.py`) with Wilson 95% CIs and surviving-regression tracking, Representation Evolution Engine (`representation_evolution.py`) with Centered Linear CKA matrices & cross-checkpoint causal patching, and Automatic Regression Origin Pinpointing (`regression_origin.py`) strictly distinguishing `CORRELATED` from `CAUSALLY VERIFIED`.
+  - Pure-Python `%PDF-1.4` multi-page vector report generator (`pdf_writer.py`) alongside `JSON`, `CSV`, and `HTML` (`exporter.py`), 20 REST endpoints under `/api/evolution/*`, `neural-diff evolution` CLI subcommands, and the interactive ReactFlow `EvolutionStudioView` UI.
+- **CI/CD Hardening (`.github/workflows/`):** 8 specialized GitHub Actions pipelines (`backend-ci.yml`, `frontend-ci.yml`, `e2e-playwright.yml`, `security-audit.yml`, `codeql.yml`, `numerical-benchmarks.yml`, `docs-and-evidence.yml`, and `package-and-release.yml`).
+
 ## [0.1.0] - 2026-11-27
 
 ### Added

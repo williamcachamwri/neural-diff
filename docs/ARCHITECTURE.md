@@ -87,7 +87,8 @@ neural-diff/                        # Mounted at workspace root (d:\LLM)
 │   ├── behavioral_analysis/        # Module F: Paired inference & deterministic behavioral diff runner
 │   ├── regression_engine/          # Module G: Versioned baselines, thresholds, SQLite persistence
 │   ├── statistics/                 # Histograms, quantiles, paired bootstrap & McNemar utilities
-│   └── report_engine/              # Module H: Self-contained HTML (SVG heatmaps), Markdown, JSON
+│   ├── report_engine/              # Module H: Self-contained HTML (SVG heatmaps), Markdown, JSON
+│   └── evolution/                  # Module I: Multi-generation DAG lineage, cumulative weights, CKA, regression origin & PDF/CSV/HTML/JSON exporter
 ├── adapters/
 │   ├── safetensors/                # Binary header verifier + single/sharded lazy slice reader
 │   ├── pytorch/                    # Safe weights_only=True checkpoint adapter

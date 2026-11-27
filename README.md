@@ -349,6 +349,33 @@ npm --prefix frontend run dev
 | `GET` | `/api/diagnostics/history-trends` | Multi-run `diff-of-diffs` category trend analysis |
 | `GET/POST/DELETE` | `/api/baselines*` | List, snapshot, or delete versioned regression baselines |
 | `GET/PUT` | `/api/settings` | Read or update persisted engine runtime & security settings |
+| `GET/POST/PUT/DELETE` | `/api/evolution/projects*` | Create, list, inspect, update, or delete multi-generation Evolution DAG projects |
+| `POST/GET/PATCH/DELETE` | `/api/evolution/projects/{id}/checkpoints*` | Register SHA-256 fingerprinted checkpoints, detect duplicates/LoRA, rename, or remove |
+| `POST/DELETE` | `/api/evolution/projects/{id}/relationships*` | Add or delete parent-child / merge DAG edges with 3-color DFS cycle prevention |
+| `GET/POST` | `/api/evolution/projects/{id}/{graph,compare,analyze,runs,regressions}` | Query topological DAG, compare arbitrary pairs, run reproducible evolution analysis, or pinpoint regressions |
+| `GET/POST` | `/api/evolution/runs/{run_id}/export/{json,csv,html,pdf}` | Export multi-generation reports in RFC-8259 JSON, CSV, SVG-HTML, or multi-page `%PDF-1.4` |
+
+---
+
+## 10.5 Neural Evolution Tracking (`Module I` — Branched & Merged Lifecycle DAG)
+
+Full documentation: [`docs/NEURAL_EVOLUTION_TRACKING.md`](docs/NEURAL_EVOLUTION_TRACKING.md) · Runnable script: [`examples/track_model_evolution.py`](examples/track_model_evolution.py).
+
+**Real 6-Checkpoint `SmolLM2-135M` Branched & Merged DAG Experiment (`evorun-real-smollm2`):**
+- **Lineage:** `v0 · SmolLM2-Base` (`134.5M` params, `30` layers) $\to$ (`v1a · Instruct-SFT` $\parallel$ `v1b · SFT-Conservative`) $\to$ `v2 · Merged-AB` (`0.75/0.25` multi-parent merge) $\to$ `v3 · Quantized-LowBit` $\to$ `v4 · Pruned-MLP`.
+- **Direct Cumulative Weight Geometry (`OBSERVED`):** Direct `Base -> Quantized-LowBit` Euclidean distance is **`293.2059`** vs **`461.5365`** summed across individual steps (`path_cancellation_ratio = 0.6353`), proving non-collinear multi-stage updates without naive step summation.
+- **Representation Evolution (`OBSERVED`):** Largest step drift occurred on `SFT-Conservative -> Merged-AB` (`mean Linear CKA = 0.8353`, `drift = 0.1647`, `Logit JS = 0.4082`).
+- **Automatic Regression Origin Pinpointing:** Pinpointed `v2 · Merged-AB -> v3 · Quantized-LowBit` (`Quantization`) as the origin of the overall pass-rate drop (`37.5% -> 12.5%`) and `code_preservation` drop (`66.7% -> 0.0%`), strictly separating `CORRELATED` layer weight/CKA shifts from `CAUSALLY VERIFIED` cross-checkpoint residual-stream patching.
+
+| Evolution Dashboard & Insights | Branched & Merged DAG | Lineage Timeline & Pair Compare |
+| :---: | :---: | :---: |
+| ![16 Dashboard](evidence/frontend/16-evolution-dashboard.png) | ![18 Branched Graph](evidence/frontend/18-evolution-branched-graph.png) | ![17 Timeline](evidence/frontend/17-evolution-timeline.png) |
+| **Checkpoint Registry** | **Checkpoint Provenance Details** | **Cumulative Weight Evolution** |
+| ![19 Registry](evidence/frontend/19-evolution-checkpoint-registry.png) | ![20 Details](evidence/frontend/20-evolution-checkpoint-details.png) | ![21 Weights](evidence/frontend/21-evolution-tensor-comparison.png) |
+| **Layer Evolution Heatmap** | **Behavioral Evolution Chart** | **Representation CKA Matrix** |
+| ![22 Layers](evidence/frontend/22-evolution-layer-heatmap.png) | ![23 Behavioral](evidence/frontend/23-evolution-behavioral-chart.png) | ![24 CKA Matrix](evidence/frontend/24-evolution-representation-matrix.png) |
+| **Regression Origin Analysis** | **Experiment Reproducibility** | **Exported Standalone Report** |
+| ![25 Regression Origin](evidence/frontend/25-evolution-regression-origin.png) | ![26 Provenance](evidence/frontend/26-evolution-experiment-details.png) | ![27 Exported Report](evidence/frontend/27-evolution-exported-report.png) |
 
 ---
 
@@ -356,16 +383,16 @@ npm --prefix frontend run dev
 
 Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\python.exe scripts/run_security_audit.py`:
 
-* **Static Analysis:** `ruff check` (`exit 0`) and `mypy` across `70` Python files (`exit 0`).
-* **Python Test Suites (`55 passed`):** `36` unit tests, `7` Hypothesis property-based invariant tests, `4` multi-checkpoint & API integration tests, `1` golden regression test, and `5` adversarial security tests—achieving **`90%` statement coverage** across `4,682` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
-* **Frontend & Live E2E:** `tsc --noEmit` (`exit 0`), Vitest (`3 passed`), Vite 8 production build (`exit 0`), and live Playwright Chromium full-stack E2E (`1 passed`, `exit 0`).
+* **Static Analysis:** `ruff check` (`exit 0`) and `mypy` across `85` Python source files (`exit 0`).
+* **Python Test Suites (`64 passed`):** Unit, DAG cycle, cumulative math, Hypothesis property-based invariant, multi-checkpoint & Evolution REST API integration, golden regression, and adversarial security suites—achieving **`89%` statement coverage** across `7,189` statements ([`evidence/tests/coverage.log`](evidence/tests/coverage.log)).
+* **Frontend & Live E2E:** `tsc --noEmit` (`exit 0`), Vitest (`4 passed`), Vite 8 production build (`exit 0`), and live Playwright Chromium full-stack E2E (`2 passed`, `exit 0`).
 * **Vulnerability & Secret Audits:** `pip-audit` (`0` vulnerabilities), `npm audit` (`0` vulnerabilities), and secret scanner (`0` findings).
 
 ---
 
 ## 12. Evidence Integrity & Known Limitations
 
-* **SHA-256 Manifest Verification:** Run `.\.venv\Scripts\python.exe scripts/verify_evidence.py` to verify all `73` artifacts in [`evidence/EVIDENCE_MANIFEST.json`](evidence/EVIDENCE_MANIFEST.json) against recorded byte sizes and SHA-256 digests.
+* **SHA-256 Manifest Verification:** Run `.\.venv\Scripts\python.exe scripts/verify_evidence.py` to verify all recorded artifacts in [`evidence/EVIDENCE_MANIFEST.json`](evidence/EVIDENCE_MANIFEST.json) against recorded byte sizes and SHA-256 digests.
 * **Known Limitations ([`docs/LIMITATIONS.md`](docs/LIMITATIONS.md)):** Coordinate-level MLP/head shifts remain polysemantic without sparse decomposition; `default_suite_v1` uses 24 deterministic prompts (`McNemar p = 0.1094` on Qwen2.5-0.5B); and `run_residual_patching` establishes causal recovery strictly on the tested prompt pair and block site.
 
 ---
@@ -373,7 +400,7 @@ Run `.\.venv\Scripts\python.exe scripts/run_all_tests.py` and `.\.venv\Scripts\p
 ## 13. Repository Layout & Documentation Index
 
 * **5-Language READMEs:** [English](README.md) · [Tiếng Việt](docs/i18n/README.vi.md) · [简体中文](docs/i18n/README.zh-CN.md) · [日本語](docs/i18n/README.ja.md) · [Français](docs/i18n/README.fr.md)
-* **Technical Guides:** [`INSTALLATION.md`](docs/INSTALLATION.md) · [`ENVIRONMENT_AUDIT.md`](docs/ENVIRONMENT_AUDIT.md) · [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`RESEARCH.md`](docs/RESEARCH.md) · [`COMPETITIVE_ANALYSIS.md`](docs/COMPETITIVE_ANALYSIS.md) · [`TENSOR_COMPARISON.md`](docs/TENSOR_COMPARISON.md) · [`ACTIVATION_ANALYSIS.md`](docs/ACTIVATION_ANALYSIS.md) · [`BEHAVIORAL_EVALUATION.md`](docs/BEHAVIORAL_EVALUATION.md) · [`BENCHMARKS.md`](docs/BENCHMARKS.md) · [`SECURITY.md`](docs/SECURITY.md) · [`LIMITATIONS.md`](docs/LIMITATIONS.md) · [`ROADMAP.md`](docs/ROADMAP.md)
+* **Technical Guides:** [`NEURAL_EVOLUTION_TRACKING.md`](docs/NEURAL_EVOLUTION_TRACKING.md) · [`INSTALLATION.md`](docs/INSTALLATION.md) · [`ENVIRONMENT_AUDIT.md`](docs/ENVIRONMENT_AUDIT.md) · [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`RESEARCH.md`](docs/RESEARCH.md) · [`COMPETITIVE_ANALYSIS.md`](docs/COMPETITIVE_ANALYSIS.md) · [`TENSOR_COMPARISON.md`](docs/TENSOR_COMPARISON.md) · [`ACTIVATION_ANALYSIS.md`](docs/ACTIVATION_ANALYSIS.md) · [`BEHAVIORAL_EVALUATION.md`](docs/BEHAVIORAL_EVALUATION.md) · [`BENCHMARKS.md`](docs/BENCHMARKS.md) · [`SECURITY.md`](docs/SECURITY.md) · [`LIMITATIONS.md`](docs/LIMITATIONS.md) · [`ROADMAP.md`](docs/ROADMAP.md)
 * **Final Acceptance Report:** [`evidence/FINAL_ENGINEERING_REPORT.md`](evidence/FINAL_ENGINEERING_REPORT.md)
 
 ## License
