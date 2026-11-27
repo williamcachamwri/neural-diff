@@ -43,7 +43,7 @@ export const WeightEvolutionSection: React.FC<{
 
         {baseSeries.length > 0 ? (
           <svg
-            viewBox={`0 0 760 ${Math.max(70, baseSeries.length * 32 + 24)}`}
+            viewBox={`0 0 920 ${Math.max(70, baseSeries.length * 32 + 24)}`}
             width="100%"
             style={{ display: "block", marginBottom: 14 }}
           >
@@ -51,8 +51,8 @@ export const WeightEvolutionSection: React.FC<{
               const l2 = row.l2_distance ?? 0;
               const sumStep = row.sum_of_step_l2_along_path ?? l2;
               const scaleMax = Math.max(maxBaseL2, sumStep, 1e-6);
-              const wDirect = Math.max(3, Math.round((l2 / scaleMax) * 380));
-              const wSum = Math.max(3, Math.round((sumStep / scaleMax) * 380));
+              const wDirect = Math.max(3, Math.round((l2 / scaleMax) * 320));
+              const wSum = Math.max(3, Math.round((sumStep / scaleMax) * 320));
               const y = 14 + idx * 32;
               return (
                 <g key={row.target_checkpoint_id}>

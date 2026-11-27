@@ -132,52 +132,74 @@ def generate_evolution_insights(
                     }
                 )
 
-    # 4. Behavioral trajectory reversal ("Capability improved after X but declined after Y")
+    # 4. Behavioral trajectory reversal ("Capability improved after X but declined after Y" along a sequential chain)
     if behavioral_evolution:
         beh_edges = behavioral_evolution.get("consecutive_transitions", [])
         if len(beh_edges) >= 2:
-            # Check categories that improved on an earlier step then declined on a later step
-            gained_step_by_cat: dict[str, dict[str, Any]] = {}
-            reversal_found = False
+            by_src: dict[str, list[dict[str, Any]]] = {}
             for edge in beh_edges:
-                for cd in edge.get("category_deltas", []):
-                    cat = str(cd["category"])
-                    delta = float(cd["mean_score_delta"])
-                    if delta >= 0.05 and cat not in gained_step_by_cat:
-                        gained_step_by_cat[cat] = {
-                            "edge": edge,
-                            "delta": delta,
-                            "after_score": cd["mean_score_after"],
-                        }
-                    elif delta <= -0.05 and cat in gained_step_by_cat and not reversal_found:
-                        gain_info = gained_step_by_cat[cat]
-                        g_edge = gain_info["edge"]
-                        insights.append(
-                            {
-                                "insight_id": f"insight-trajectory-reversal-{cat}",
-                                "domain": "behavioral_evolution",
-                                "statement": (
-                                    f"Category '{cat}' improved after {g_edge['transformation_type']} "
-                                    f"({g_edge['source_label']} → {g_edge['target_label']}, Δ={gain_info['delta']:+.3f}) "
-                                    f"but declined after {edge['transformation_type']} "
-                                    f"({edge['source_label']} → {edge['target_label']}, Δ={delta:+.3f}, n={cd['sample_size']})."
-                                ),
-                                "epistemic_status": EpistemicStatus.OBSERVED.value,
-                                "checkpoints": [
-                                    g_edge["source_checkpoint_id"],
-                                    g_edge["target_checkpoint_id"],
-                                    edge["target_checkpoint_id"],
-                                ],
-                                "evaluation_cases": list(edge.get("newly_introduced_failures", [])),
-                                "supporting_measurements": {
-                                    "category": cat,
-                                    "sample_size": cd["sample_size"],
-                                    "initial_gain_delta": gain_info["delta"],
-                                    "subsequent_drop_delta": delta,
-                                },
-                            }
-                        )
-                        reversal_found = True
+                by_src.setdefault(str(edge["source_checkpoint_id"]), []).append(edge)
+
+            reversal_found = False
+            for first_edge in beh_edges:
+                if reversal_found:
+                    break
+                mid_id = str(first_edge["target_checkpoint_id"])
+                # Walk downstream reachable edges from `mid_id`
+                downstream: list[dict[str, Any]] = []
+                stack = list(by_src.get(mid_id, []))
+                visited_e: set[tuple[str, str]] = set()
+                while stack:
+                    cur_e = stack.pop(0)
+                    ekey = (str(cur_e["source_checkpoint_id"]), str(cur_e["target_checkpoint_id"]))
+                    if ekey in visited_e:
+                        continue
+                    visited_e.add(ekey)
+                    downstream.append(cur_e)
+                    stack.extend(by_src.get(str(cur_e["target_checkpoint_id"]), []))
+
+                first_gains = {
+                    str(cd["category"]): float(cd["mean_score_delta"])
+                    for cd in first_edge.get("category_deltas", [])
+                    if float(cd["mean_score_delta"]) >= 0.05
+                }
+                for later_edge in downstream:
+                    if reversal_found:
+                        break
+                    for cd in later_edge.get("category_deltas", []):
+                        cat = str(cd["category"])
+                        drop_delta = float(cd["mean_score_delta"])
+                        if cat in first_gains and drop_delta <= -0.05:
+                            gain_val = first_gains[cat]
+                            insights.append(
+                                {
+                                    "insight_id": f"insight-trajectory-reversal-{cat}",
+                                    "domain": "behavioral_evolution",
+                                    "statement": (
+                                        f"Category '{cat}' improved after {first_edge['transformation_type']} "
+                                        f"({first_edge['source_label']} → {first_edge['target_label']}, Δ={gain_val:+.3f}) "
+                                        f"but declined downstream after {later_edge['transformation_type']} "
+                                        f"({later_edge['source_label']} → {later_edge['target_label']}, Δ={drop_delta:+.3f}, n={cd['sample_size']})."
+                                    ),
+                                    "epistemic_status": EpistemicStatus.OBSERVED.value,
+                                    "checkpoints": [
+                                        first_edge["source_checkpoint_id"],
+                                        first_edge["target_checkpoint_id"],
+                                        later_edge["target_checkpoint_id"],
+                                    ],
+                                    "evaluation_cases": list(
+                                        later_edge.get("newly_introduced_failures", [])
+                                    ),
+                                    "supporting_measurements": {
+                                        "category": cat,
+                                        "sample_size": cd["sample_size"],
+                                        "initial_gain_delta": gain_val,
+                                        "subsequent_drop_delta": drop_delta,
+                                    },
+                                }
+                            )
+                            reversal_found = True
+                            break
 
     # 5. Primary regression origin finding
     if regression_events:

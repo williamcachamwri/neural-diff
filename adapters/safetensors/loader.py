@@ -85,7 +85,7 @@ class SingleSafetensorsReader(CheckpointReader):
             raise ModelNotFoundError(f"Tensor '{name}' not found in {self.file_path.name}.")
         try:
             with safe_open(str(self.file_path), framework="pt", device="cpu") as handle:
-                return handle.get_tensor(name)
+                return handle.get_tensor(name).clone()
         except Exception as exc:
             raise MalformedCheckpointError(
                 f"Failed reading tensor '{name}' from {self.file_path.name}: {exc}"

@@ -393,6 +393,13 @@ def capture_12_evolution_screenshots_and_e2e() -> list[dict[str, Any]]:
                 f"Playwright E2E failed (exit {e2e_proc.returncode}):\n{e2e_proc.stdout}\n{e2e_proc.stderr}"
             )
 
+        # Clean up temporary E2E projects immediately so screenshots show clean canonical project state
+        evo_cleanup = EvolutionStore()
+        _, all_projs = evo_cleanup.list_projects(limit=100)
+        for ep in all_projs:
+            if str(ep["name"]).startswith("E2E Evolution "):
+                evo_cleanup.delete_project(ep["project_id"])
+
         # 2. Re-select canonical real-model project `evo-smollm2-dag` and capture all 12 required screenshots!
         from playwright.sync_api import sync_playwright
 
@@ -439,9 +446,9 @@ def capture_12_evolution_screenshots_and_e2e() -> list[dict[str, Any]]:
                 "Branched & Merged Evolution Graph",
             )
 
-            # 3. Evolution timeline (scrolled to arbitrary comparator + branch lineage timeline)
+            # 3. Evolution timeline (wait for live pair comparison to finish completely before snapping!)
             page.get_by_test_id("btn-evo-compare-pair").click()
-            page.wait_for_timeout(500)
+            page.get_by_text("Scope · Common Ancestor").wait_for(timeout=20_000)
             page.get_by_test_id("evo-timeline-table").scroll_into_view_if_needed()
             _snap(
                 "17-evolution-timeline.png",
@@ -514,11 +521,12 @@ def capture_12_evolution_screenshots_and_e2e() -> list[dict[str, Any]]:
                 "Experiment Reproducibility Details",
             )
 
-            # 12. Exported report (live rendered HTML evolution report served directly from `/api/evolution/runs/.../export/html`)
-            page.goto("http://127.0.0.1:8000/api/evolution/runs/evorun-real-smollm2/export/html")
+            # 12. Exported report (live rendered standalone HTML report exported by EvolutionReportExporter)
+            exported_html_path = (EVOLUTION_EVIDENCE / "exports" / "evorun-real-smollm2.html").resolve()
+            page.goto(exported_html_path.as_uri())
             _snap(
                 "27-evolution-exported-report.png",
-                "Rendered standalone HTML Evolution Report exported from `/api/evolution/runs/evorun-real-smollm2/export/html` containing SVG charts, registry hashes, and regression origin tables.",
+                "Rendered standalone HTML Evolution Report (`evidence/evolution/exports/evorun-real-smollm2.html`) containing SVG cumulative weight & behavioral charts, registry hashes, and regression origin tables.",
                 "Exported Standalone Evolution Report",
             )
 
@@ -580,14 +588,31 @@ def capture_12_evolution_screenshots_and_e2e() -> list[dict[str, Any]]:
 
 
 def main() -> int:
-    print("1/2 Running real SmolLM2-135M 6-checkpoint branched & merged evolution experiment...")
-    bundle = seed_and_run_real_evolution_project()
-    print(
-        f"Completed run {bundle['run_id']}: {len(bundle['checkpoints'])} ckpts, "
-        f"{len(bundle['regression_events'])} regressions, {len(bundle['insights'])} insights."
-    )
+    evo_store = EvolutionStore()
+    bundle: dict[str, Any] | None = None
+    if "--recompute" not in sys.argv:
+        try:
+            existing = evo_store.get_run("evorun-real-smollm2")
+            if existing.get("status") == "completed":
+                bundle = existing
+                print("1/2 Reusing verified real SmolLM2-135M run evorun-real-smollm2 from SQLite.")
+        except Exception:
+            bundle = None
+
+    if bundle is None:
+        print("1/2 Running real SmolLM2-135M 6-checkpoint branched & merged evolution experiment...")
+        bundle = seed_and_run_real_evolution_project()
+        print(
+            f"Completed run {bundle['run_id']}: {len(bundle['checkpoints'])} ckpts, "
+            f"{len(bundle['regression_events'])} regressions, {len(bundle['insights'])} insights."
+        )
     print("2/2 Running live Playwright E2E + capturing 12 required Evolution screenshots...")
     snaps = capture_12_evolution_screenshots_and_e2e()
+    # Clean up temporary E2E test projects created during Playwright E2E so DB stays tidy
+    _, all_projs = evo_store.list_projects(limit=100)
+    for p in all_projs:
+        if str(p["name"]).startswith("E2E Evolution "):
+            evo_store.delete_project(p["project_id"])
     print(f"Captured {len(snaps)} live Evolution PNG screenshots.")
     return 0
 

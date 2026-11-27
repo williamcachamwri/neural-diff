@@ -10,6 +10,7 @@ import {
   Position,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
 import { ChevronDown, ChevronRight, GitBranch, GitMerge } from "lucide-react";
 import type {
@@ -64,7 +65,7 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
       data-testid={`evo-node-${n.checkpoint_id}`}
       onClick={() => d.onInspect(n.checkpoint_id)}
       style={{
-        width: 244,
+        width: 210,
         background: "var(--bg-node)",
         border: `1px solid ${borderColor}`,
         borderRadius: 10,
@@ -252,6 +253,17 @@ const EvolutionCheckpointNode: React.FC<NodeProps> = ({ data }) => {
 
 const EVO_NODE_TYPES = { evoCheckpoint: EvolutionCheckpointNode };
 
+const DagAutoFit: React.FC<{ triggerKey: string }> = ({ triggerKey }) => {
+  const { fitView } = useReactFlow();
+  useEffect(() => {
+    const t = setTimeout(() => {
+      void fitView({ padding: 0.12, duration: 0 });
+    }, 80);
+    return () => clearTimeout(t);
+  }, [fitView, triggerKey]);
+  return null;
+};
+
 export interface EvolutionDagCanvasProps {
   graph: EvolutionGraphPayload;
   tensorTransitions: TransitionTensorRecord[];
@@ -373,13 +385,13 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
   const rfNodes: Node[] = useMemo(() => {
     return visibleNodes.map((n) => {
       const beh = behById.get(n.checkpoint_id);
-      const yOffset = (n.lane_index - (n.lane_count - 1) / 2) * 188;
+      const yOffset = (n.lane_index - (n.lane_count - 1) / 2) * 176;
       return {
         id: n.checkpoint_id,
         type: "evoCheckpoint",
         position: {
-          x: 40 + n.generation_depth * 308,
-          y: 170 + yOffset,
+          x: 24 + n.generation_depth * 252,
+          y: 165 + yOffset,
         },
         data: {
           node: n,
@@ -478,7 +490,7 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
       data-testid="evolution-dag-canvas"
       style={{
         width: "100%",
-        height: 410,
+        height: 440,
         background: "#09090b",
         border: "1px solid var(--border-subtle)",
         borderRadius: 10,
@@ -492,12 +504,13 @@ export const EvolutionDagCanvas: React.FC<EvolutionDagCanvasProps> = ({
           edges={rfEdges}
           nodeTypes={EVO_NODE_TYPES}
           fitView
-          fitViewOptions={{ padding: 0.16 }}
-          minZoom={0.3}
+          fitViewOptions={{ padding: 0.12 }}
+          minZoom={0.2}
           maxZoom={1.8}
           className="dark"
           proOptions={{ hideAttribution: true }}
         >
+          <DagAutoFit triggerKey={`${rfNodes.length}-${rfEdges.length}`} />
           <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#1e1e24" />
           <MiniMap
             pannable

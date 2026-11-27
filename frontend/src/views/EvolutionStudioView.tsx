@@ -108,16 +108,22 @@ export const EvolutionStudioView: React.FC<EvolutionStudioViewProps> = ({
           const det = await evolutionApi.getProjectDetail(targetId);
           setDetail(det);
           if (det.checkpoints.length > 0) {
+            const validIds = new Set(det.checkpoints.map((c) => c.checkpoint_id));
             setSelectedCheckpointId((prev) =>
-              prev && det.checkpoints.some((c) => c.checkpoint_id === prev)
+              prev && validIds.has(prev) ? prev : det.checkpoints[0].checkpoint_id
+            );
+            setCompareAId((prev) =>
+              prev && validIds.has(prev) ? prev : det.checkpoints[0].checkpoint_id
+            );
+            setCompareBId((prev) =>
+              prev && validIds.has(prev) && prev !== det.checkpoints[0].checkpoint_id
                 ? prev
-                : det.checkpoints[0].checkpoint_id
+                : det.checkpoints[det.checkpoints.length - 1].checkpoint_id
             );
-            setCompareAId((prev) => prev || det.checkpoints[0].checkpoint_id);
-            setCompareBId(
-              (prev) =>
-                prev || det.checkpoints[det.checkpoints.length - 1].checkpoint_id
-            );
+          } else {
+            setSelectedCheckpointId(null);
+            setCompareAId("");
+            setCompareBId("");
           }
         }
       } catch (err) {
