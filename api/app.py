@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse, Response
 
 import safetensors
 from api.routes.diagnostics import build_diagnostics_router
+from api.routes.evolution import build_evolution_router
 from api.schemas import (
     CreateBaselineRequest,
     InspectModelRequest,
@@ -28,6 +29,7 @@ from api.security_middleware import DEFAULT_MAX_API_BODY_BYTES, SecurityHardenin
 from api.store import ExperimentStore
 from benchmarks.datasets.loader import load_benchmark_suite
 from core import __version__
+from core.evolution.store import EvolutionStore
 from core.exceptions import ModelNotFoundError, NeuralDiffError, OperationCancelledError
 from core.loaders.model_loader import ModelLoader
 from core.orchestrator import ComparisonOrchestrator, ComparisonRequestConfig
@@ -91,6 +93,7 @@ def create_app(
     max_body_bytes: int = DEFAULT_MAX_API_BODY_BYTES,
 ) -> FastAPI:
     store = ExperimentStore(db_path=db_path)
+    evo_store = EvolutionStore(db_path=store.db_path)
     base_policy = policy or SecurityPolicy()
     active_tokens: dict[str, CancellationToken] = {}
     tokens_lock = threading.Lock()
@@ -101,6 +104,7 @@ def create_app(
         version=__version__,
     )
     app.state.store = store
+    app.state.evo_store = evo_store
     app.state.policy = base_policy
 
     app.add_middleware(
@@ -112,7 +116,7 @@ def create_app(
             "http://127.0.0.1:4173",
         ],
         allow_credentials=False,
-        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Accept"],
     )
     app.add_middleware(SecurityHardeningMiddleware, max_body_bytes=max_body_bytes)
@@ -570,6 +574,9 @@ def create_app(
 
     app.include_router(
         build_diagnostics_router(store=store, policy_provider=_effective_policy)
+    )
+    app.include_router(
+        build_evolution_router(evo_store=evo_store, policy_provider=_effective_policy)
     )
 
     return app

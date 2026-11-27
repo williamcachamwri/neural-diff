@@ -8,6 +8,10 @@ import sys
 from pathlib import Path
 
 from benchmarks.datasets.loader import load_benchmark_suite
+from core.evolution.exporter import EvolutionReportExporter
+from core.evolution.orchestrator import EvolutionAnalysisConfig, EvolutionOrchestrator
+from core.evolution.registry import inspect_and_build_checkpoint_record
+from core.evolution.store import EvolutionStore
 from core.exceptions import ModelNotFoundError, NeuralDiffError
 from core.loaders.model_loader import load_model
 from core.orchestrator import VALID_MODULES, ComparisonOrchestrator, ComparisonRequestConfig
@@ -76,6 +80,34 @@ def build_parser() -> argparse.ArgumentParser:
     p_svd.add_argument("--model-b", required=True)
     p_svd.add_argument("--tensor", required=True, help="Exact 2D matrix parameter name.")
     p_svd.add_argument("--local-only", action="store_true")
+
+    # evolution
+    p_evo = sub.add_parser("evolution", help="Manage Neural Evolution Tracking projects, checkpoints, and runs.")
+    evo_sub = p_evo.add_subparsers(dest="evo_action", required=True)
+
+    p_ep = evo_sub.add_parser("create-project", help="Create a new evolution tracking project.")
+    p_ep.add_argument("--name", required=True)
+    p_ep.add_argument("--description", default="")
+    p_ep.add_argument("--db-path", default=None)
+
+    p_er = evo_sub.add_parser("register", help="Register a checkpoint into an evolution project.")
+    p_er.add_argument("--project-id", required=True)
+    p_er.add_argument("--source", required=True)
+    p_er.add_argument("--label", default=None)
+    p_er.add_argument("--parents", default="", help="Comma-separated parent checkpoint IDs.")
+    p_er.add_argument("--transformation", default=None)
+    p_er.add_argument("--notes", default="")
+    p_er.add_argument("--local-only", action="store_true")
+    p_er.add_argument("--db-path", default=None)
+
+    p_ea = evo_sub.add_parser("analyze", help="Run multi-generation evolution analysis on a project.")
+    p_ea.add_argument("--project-id", required=True)
+    p_ea.add_argument("--skip-behavioral", action="store_true")
+    p_ea.add_argument("--skip-representation", action="store_true")
+    p_ea.add_argument("--force-rerun", action="store_true")
+    p_ea.add_argument("--local-only", action="store_true")
+    p_ea.add_argument("--output-dir", default=None, help="Export JSON/CSV/HTML/PDF reports to directory.")
+    p_ea.add_argument("--db-path", default=None)
 
     return parser
 
@@ -187,6 +219,57 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 print(json.dumps({"tensor": args.tensor, **spec.to_dict()}, indent=2))
             return 0
+
+        if args.command == "evolution":
+            evo_store = EvolutionStore(db_path=args.db_path)
+            if args.evo_action == "create-project":
+                proj = evo_store.create_project(name=args.name, description=args.description)
+                print(json.dumps(proj.to_dict(), indent=2))
+                return 0
+            if args.evo_action == "register":
+                parents = [p.strip() for p in str(args.parents).split(",") if p.strip()]
+                ckpt = inspect_and_build_checkpoint_record(
+                    project_id=args.project_id,
+                    source=args.source,
+                    version_label=args.label,
+                    parent_checkpoint_ids=parents,
+                    transformation_type=args.transformation,
+                    experiment_notes=args.notes,
+                    existing_project_checkpoints=evo_store.list_checkpoints(args.project_id),
+                    local_files_only=args.local_only,
+                )
+                saved = evo_store.add_checkpoint(ckpt)
+                print(json.dumps(saved.to_dict(), indent=2))
+                return 0
+            if args.evo_action == "analyze":
+                cfg_evo = EvolutionAnalysisConfig(
+                    include_behavioral_evolution=not args.skip_behavioral,
+                    include_representation_evolution=not args.skip_representation,
+                    force_rerun=args.force_rerun,
+                    local_files_only=args.local_only,
+                )
+                run_res = EvolutionOrchestrator(store=evo_store).run_analysis(
+                    args.project_id, cfg_evo
+                )
+                if args.output_dir:
+                    exp = EvolutionReportExporter()
+                    exported = {
+                        fmt: str(exp.export_file(run_res, fmt, args.output_dir))
+                        for fmt in ("json", "csv", "html", "pdf")
+                    }
+                    print(
+                        json.dumps(
+                            {
+                                "run_id": run_res["run_id"],
+                                "cache_hit": run_res.get("cache_hit", False),
+                                "exported_reports": exported,
+                            },
+                            indent=2,
+                        )
+                    )
+                else:
+                    print(json.dumps({"run_id": run_res["run_id"], "overview": run_res["overview"]}, indent=2))
+                return 0
 
     except NeuralDiffError as exc:
         sys.stderr.write(json.dumps(exc.to_dict(), indent=2) + "\n")
