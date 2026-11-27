@@ -1,13 +1,15 @@
 === NEURAL DIFF GIT VERIFICATION ===
-Captured (UTC): 2026-11-27T11:58:58.430802+00:00
+Captured (UTC): 2026-11-27T12:50:30.730124+00:00
 
 $ git rev-list --count HEAD (rc=0)
-133
+135
 
 $ git status --short (rc=0)
 (clean working tree)
 
 $ git log --oneline (rc=0)
+3707073 feat(cli): add Charmbracelet charm.land v2 native Go CLI, TUI studio, and multi-OS CI
+c8ac584 chore(evidence): refresh SHA-256 manifest and git ledger for audit closure
 bb40cc1 fix(evolution): separate behavioral/score/causal flags, hash coexisting adapter metadata, and sync 5-language epistemic docs
 76cff8d chore(evidence): seal 99-artifact SHA-256 manifest for final evolution audit
 29f89e9 fix(evolution): enforce 4-condition causal provenance, complete-DAG lineage DP, and orthogonal 5-part SHA-256
